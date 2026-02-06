@@ -4,13 +4,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthRepository } from './port/auth.repository';
-import { InputLoginDto, InputRegisterDto } from './dtos/auth.dto';
+import { InputLoginDto, InputRegisterDto, UserPayload } from './dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { User } from 'src/user/domain/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -109,5 +109,33 @@ export class AuthService {
     res.clearCookie('refresh_token', cookieOptions);
 
     return { message: 'Logout successfully' };
+  }
+
+  verifyAccessToken(token: string): UserPayload {
+    try {
+      return this.jwtService.verify<UserPayload>(token, {
+        secret: this.configService.get<string>('jwt.access.secret'),
+      });
+    } catch (err) {
+      throw new UnauthorizedException('Invalid or expired access token');
+    }
+  }
+
+  verifyRefreshToken(token: string): UserPayload {
+    try {
+      return this.jwtService.verify<UserPayload>(token, {
+        secret: this.configService.get<string>('jwt.refresh.secret'),
+      });
+    } catch (err) {
+      throw new UnauthorizedException('Invalid or expired access token');
+    }
+  }
+
+  refreshToken(req: Request, res: Response) {
+    const refreshToken = req.cookies.refresh_token;
+    if (!refreshToken) throw new UnauthorizedException('Missing refresh token');
+    const decoded = this.verifyRefreshToken(refreshToken);
+    if (!decoded) throw new UnauthorizedException('Invalid refresh token');
+    return this.generateTokenAuth(decoded.id, res);
   }
 }
