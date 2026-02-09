@@ -5,10 +5,17 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import config from './config/config';
+import { VideoModule } from './video/video.module';
+import { CloudinaryModule } from './video/cloudinary.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, cache: true, load: [config] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+      envFilePath: '.env',
+      load: [config],
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config) => ({
@@ -16,7 +23,9 @@ import config from './config/config';
       }),
       inject: [ConfigService],
     }),
+    CloudinaryModule,
     AuthModule,
+    VideoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

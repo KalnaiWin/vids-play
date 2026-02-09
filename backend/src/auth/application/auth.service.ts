@@ -85,13 +85,13 @@ export class AuthService {
     const refreshToken = this.generateRefreshToken(String(userId));
     res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: true,
+      secure: false, // change true in production
       sameSite: 'none',
       path: '/',
     });
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'none',
       path: '/',
     });
