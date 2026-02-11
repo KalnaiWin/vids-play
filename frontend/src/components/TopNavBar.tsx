@@ -1,18 +1,21 @@
-import { ArrowBigLeft, Bell, Menu, Plus, Search } from "lucide-react";
+import { ArrowBigLeft, Bell, LogOut, Menu, Plus, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import type { AppDispatch, RootState } from "../store";
 import {
   closeSearch,
+  selectLogin,
   toggleNavBar,
   toggleSearch,
   toogleNavBarResponsive,
 } from "../store/globalSlice";
 import { useEffect, useRef, useState } from "react";
 import { createInfoButton } from "../types/constant";
+import { logout } from "../feature/authThunk";
 
 const TopNavBar = () => {
   const { statusSearch } = useSelector((state: RootState) => state.global);
+  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const [isExpandCreate, setIsExpandCreate] = useState(false);
   const expandCreateBar = useRef<HTMLDivElement>(null);
@@ -132,9 +135,27 @@ const TopNavBar = () => {
             </div>
 
             <Bell className="hover:bg-blue-950 size-10 p-2 rounded-full" />
-            <div className="size-9 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white cursor-pointer">
-              U
-            </div>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <div className="size-9 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white cursor-pointer">
+                  {user?.name?.slice(0, 1)}
+                </div>
+                <button
+                  title="Đăng xuất"
+                  className="text-red-800 bg-red-100 rounded-md p-1 cursor-pointer"
+                  onClick={() => dispatch(logout())}
+                >
+                  <LogOut />
+                </button>
+              </div>
+            ) : (
+              <div
+                className="rounded-md bg-blue-500 flex items-center justify-center font-bold text-white cursor-pointer px-4 py-1"
+                onClick={() => dispatch(selectLogin())}
+              >
+                Đăng nhập
+              </div>
+            )}
           </div>
         </>
       )}

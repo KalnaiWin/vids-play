@@ -1,12 +1,27 @@
 import { Route, Routes } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
-import HomePage from "./page/HomePage";
+import MainPage from "./page/MainPage";
+import UploadVideoPage from "./page/video/UploadVideoPage";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "./store";
+import { useEffect } from "react";
+import { fetchUser } from "./feature/authThunk";
 
 const App = () => {
+  const { status } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchUser());
+    }
+  }, [dispatch, status]);
+
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="/video/upload" element={<UploadVideoPage />} />
       </Route>
     </Routes>
   );

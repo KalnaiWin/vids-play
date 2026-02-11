@@ -5,6 +5,7 @@ const initialState: GlobalState = {
   statusNavBar: true,
   statusSearch: false,
   statusNavBarReponsive: false,
+  statusAuth: "idle",
 };
 
 export const globalSlice = createSlice({
@@ -23,6 +24,15 @@ export const globalSlice = createSlice({
     toogleNavBarResponsive: (state) => {
       state.statusNavBarReponsive = !state.statusNavBarReponsive;
     },
+    selectLogin: (state) => {
+      state.statusAuth = "login";
+    },
+    selectRegister: (state) => {
+      state.statusAuth = "register";
+    },
+    resetSelect: (state) => {
+      state.statusAuth = "idle";
+    },
   },
 });
 
@@ -31,5 +41,8 @@ export const {
   toggleSearch,
   closeSearch,
   toogleNavBarResponsive,
+  selectRegister,
+  selectLogin,
+  resetSelect,
 } = globalSlice.actions;
 export default globalSlice.reducer;

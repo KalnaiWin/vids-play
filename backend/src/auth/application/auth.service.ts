@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthRepository } from './port/auth.repository';
@@ -22,6 +23,14 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
+  async getUser(userId: string) {
+    const exsitingUser = await this.userModel
+      .findById(userId)
+      .select('name email avatarUrl');
+    if (!exsitingUser) throw new NotFoundException('User not found');
+    return exsitingUser;
+  }
+
   async register(data: InputRegisterDto, res: Response) {
     const { name, email, password } = data;
     if (!name || !email || !password)
@@ -42,14 +51,21 @@ export class AuthService {
 
     this.generateTokenAuth(String(newUser._id), res);
 
-    return { message: 'Register successfully' };
+    return {
+      success: true,
+      message: 'Register successfully',
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+      },
+    };
   }
 
   async login(data: InputLoginDto, res: Response) {
     const { email, password } = data;
     const existingUser = await this.userModel
       .findOne({ email: email })
-      .select('password');
+      .select('password name email');
     if (!existingUser) throw new UnauthorizedException('User not found');
 
     const isMatchedPassword = await bcrypt.compare(
@@ -62,7 +78,14 @@ export class AuthService {
 
     this.generateTokenAuth(String(existingUser._id), res);
 
-    return { message: 'Login successfully' };
+    return {
+      success: true,
+      message: 'Login successfully',
+      user: {
+        name: existingUser.name,
+        email: existingUser.email,
+      },
+    };
   }
 
   generateAccessToken(userId: string) {
@@ -86,13 +109,13 @@ export class AuthService {
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: false, // change true in production
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
     });
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
     });
   }
@@ -100,8 +123,8 @@ export class AuthService {
   async logout(res: Response) {
     const cookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none' as const,
+      secure: false,
+      sameSite: 'lax' as const,
       path: '/',
     };
 

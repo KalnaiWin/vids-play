@@ -4,15 +4,17 @@ import SideNavbar, { ExpandSideNavBar } from "../components/SideNavbar";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { Menu } from "lucide-react";
-import { toogleNavBarResponsive } from "../store/globalSlice";
 import { useEffect, useRef } from "react";
+import { resetSelect, toogleNavBarResponsive } from "../store/globalSlice";
+import AuthenticatePage from "../page/AuthenticatePage";
 
 const MainLayout = () => {
-  const { statusNavBar, statusNavBarReponsive } = useSelector(
+  const { statusNavBar, statusNavBarReponsive, statusAuth } = useSelector(
     (state: RootState) => state.global,
   );
 
   const responsiveNavbar = useRef<HTMLDivElement>(null);
+  const authenticateShow = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -21,7 +23,11 @@ const MainLayout = () => {
         !responsiveNavbar.current.contains(event.target as Node)
       ) {
         dispatch(toogleNavBarResponsive());
-      }
+      } else if (
+        authenticateShow.current &&
+        !authenticateShow.current.contains(event.target as Node)
+      )
+        dispatch(resetSelect());
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -30,7 +36,18 @@ const MainLayout = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen overflow-hidden bg-black">
+      {statusAuth !== "idle" && (
+        <div className="fixed inset-0 z-60 bg-black/60 flex items-center justify-center">
+          <div
+            ref={authenticateShow}
+            className="bg-slate-950 rounded-xl w-[30%] p-6 shadow-xl text-sm border border-slate-500 text-white"
+          >
+            <AuthenticatePage />
+          </div>
+        </div>
+      )}
+
       <div className="fixed top-0 left-0 w-full h-16 z-50">
         <TopNavBar />
       </div>
@@ -76,7 +93,14 @@ const MainLayout = () => {
         <SideNavbar />
       </div>
 
-      <div className="pt-16 h-screen">
+      <div
+        className={`
+          mt-16 h-screen transition-all duration-100
+          bg-black
+            ${statusNavBar ? "xl:ml-60" : "md:ml-22"}
+            overflow-y-scroll
+        `}
+      >
         <div className="overflow-y-auto">
           <Outlet />
           {/* h-[calc(100vh-4rem)] */}

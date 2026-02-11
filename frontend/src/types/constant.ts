@@ -22,6 +22,11 @@ export const navbarItems = [
     path: "/subscription",
   },
   {
+    icon: SquarePlay,
+    name: "Video ngắn",
+    path: "/short",
+  },
+  {
     icon: UserCircleIcon,
     name: "Hồ sơ",
     path: "/profile",
@@ -33,6 +38,11 @@ export const navBarItemsExpandHomePage = [
     icon: Home,
     name: "Trang chủ",
     path: "/",
+  },
+  {
+    icon: SquarePlay,
+    name: "Video ngắn",
+    path: "/short",
   },
   {
     icon: Flame,
@@ -63,7 +73,7 @@ export const createInfoButton = [
   {
     icon: SquarePlay,
     name: "Tải video lên",
-    path: "/video/create",
+    path: "/video/upload",
   },
   {
     icon: Radio,
@@ -74,5 +84,20 @@ export const createInfoButton = [
     icon: SquarePen,
     name: "Đăng bài viết",
     path: "/post/create",
+  },
+];
+
+export const defaultCategory = [
+  {
+    name: "Tất cả",
+    path: "",
+  },
+  {
+    name: "Trò chơi",
+    path: "game",
+  },
+  {
+    name: "Âm nhạc",
+    path: "music",
   },
 ];

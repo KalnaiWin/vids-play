@@ -12,6 +12,7 @@ const SideNavbar = () => {
     <div className="w-full bg-black md:min-h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs p-1">
       {navbarItems.map((item) => (
         <Link
+          key={item.name}
           to={item.path}
           className={`flex flex-col items-center justify-center gap-2  py-5 px-1 rounded-md ${pathname === item.path ? "bg-blue-500 text-white" : "hover:bg-blue-950"}`}
         >
@@ -34,6 +35,7 @@ export const ExpandSideNavBar = () => {
         <h1 className="font-black text-white text-xl pb-3">Trang chủ</h1>
         {navBarItemsExpandHomePage.map((item) => (
           <Link
+            key={item.name}
             to={item.path}
             className={`flex items-center gap-2 hover:bg-blue-950 py-3 px-2 rounded-md w-full ${pathname === item.path ? "bg-blue-500 text-white" : "hover:bg-blue-950"} `}
           >
@@ -51,6 +53,7 @@ export const ExpandSideNavBar = () => {
         <h1 className="font-black text-white text-xl pb-3">Hồ sơ</h1>
         {navBarItemsExpandProfile.map((item) => (
           <Link
+            key={item.name}
             to={item.path}
             className={`flex items-center gap-2 hover:bg-blue-950 py-3 px-2 rounded-md w-full ${pathname === item.path ? "bg-blue-500 text-white" : "hover:bg-blue-950"} `}
           >
