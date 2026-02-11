@@ -9,7 +9,9 @@ export class VideoInputUpload {
   @IsString()
   description: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  duration: number;
+  @IsString()
+  duration: string;
+
+  @IsString()
+  visibility: string;
 }

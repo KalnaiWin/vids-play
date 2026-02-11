@@ -26,7 +26,6 @@ export const register = createAsyncThunk<
   try {
     const res = await axiosInstance.post("/auth/register", data);
     toast.success("Đăng ký thành công, Chúc bạn vui vẻ 😊");
-    console.log(res.data);
     return res.data;
   } catch (error: any) {
     toast.error("Đăng ký thất bại");
@@ -42,7 +41,6 @@ export const login = createAsyncThunk<
   try {
     const res = await axiosInstance.post("/auth/login", data);
     toast.success("Đăng nhập thành công. Chào mừng bạn trở lại 😄");
-    console.log(res.data);
     return res.data;
   } catch (error: any) {
     toast.error("Đăng nhập thất bại");
@@ -56,7 +54,6 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
     try {
       const res = await axiosInstance.post("/auth/logout");
       toast.success("Đăng xuất thành công. Hẹn gặp lại 👋");
-      console.log(res.data);
       return res.data;
     } catch (error: any) {
       toast.error("Đăng xuất thất bại");

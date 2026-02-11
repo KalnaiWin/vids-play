@@ -39,7 +39,7 @@ export class VideoController {
       },
     ]),
   )
-  async uploadVideo(
+  async uploadVideo( 
     @Req() req: Request,
     @Body() data: VideoInputUpload,
     @UploadedFiles()

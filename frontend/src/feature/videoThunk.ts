@@ -1,0 +1,38 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  type UploadFiles,
+  type VideoInfo,
+  type VideoInput,
+} from "../types/videoInterface";
+import axiosInstance from "../lib/axios";
+import { toast } from "react-toastify";
+
+export const uploadVideo = createAsyncThunk<
+  VideoInfo,
+  { data: VideoInput; file: UploadFiles },
+  { rejectValue: string }
+>("video/uploadVideo", async ({ data, file }, { rejectWithValue }) => {
+  try {
+    if (!file.thumbnailUrl || !file.videoUrl) {
+      return rejectWithValue("Thiếu file video hoặc thumbnail");
+    }
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    formData.append("duration", String(data.duration));
+    formData.append("visibility", data.visibility);
+    formData.append("thumbnailUrl", file.thumbnailUrl);
+    formData.append("videoUrl", file.videoUrl);
+
+    const result = await axiosInstance.post("/video/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success("Đăng video thành công");
+    return result.data;
+  } catch (error: any) {
+    toast.error("Đăng video thất bại");
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});

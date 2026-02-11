@@ -41,7 +41,7 @@ const MainLayout = () => {
         <div className="fixed inset-0 z-60 bg-black/60 flex items-center justify-center">
           <div
             ref={authenticateShow}
-            className="bg-slate-950 rounded-xl w-[30%] p-6 shadow-xl text-sm border border-slate-500 text-white"
+            className="bg-slate-950 rounded-xl xl:w-[30%] md:w-[65%] w-[80%] p-6 shadow-xl text-sm border border-slate-500 text-white"
           >
             <AuthenticatePage />
           </div>
@@ -97,8 +97,8 @@ const MainLayout = () => {
         className={`
           mt-16 h-screen transition-all duration-100
           bg-black
-            ${statusNavBar ? "xl:ml-60" : "md:ml-22"}
-            overflow-y-scroll
+            ${statusNavBar ? "xl:ml-55 md:ml-18 ml-0" : "md:ml-18"}
+            overflow-y-auto
         `}
       >
         <div className="overflow-y-auto">

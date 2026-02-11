@@ -28,12 +28,15 @@ export class VideoService {
     const existingUser = await this.userModel.findById(userId);
     if (!existingUser) throw new NotFoundException('User not found');
 
+    const allowedVisibility = ['PUBLIC', 'UNLISTED', 'PRIVATE'];
+
+    if (!allowedVisibility.includes(data.visibility)) {
+      throw new BadRequestException('Invalid visibility');
+    }
+
     if (!thumbnail || !video) {
       throw new BadRequestException('Thumbnail and video are required');
     }
-
-    // console.log('Buffer thumbnail', thumbnail.buffer);
-    // console.log('Buffer video', video.buffer);
 
     const uploadedImage = await this.cloudinaryService.uploadImage(thumbnail);
     const uploadedVideo = await this.cloudinaryService.uploadVideo(video);
@@ -41,19 +44,15 @@ export class VideoService {
     if (!uploadedVideo || !uploadedImage)
       throw new InternalServerErrorException('Upload failed');
 
-    // console.log(uploadedImage);
-    // console.log(uploadedVideo);
-
-    const newUploadedVideo = await this.videoModel.create({
+    await this.videoModel.create({
       owner: existingUser._id,
       title: data.title,
       description: data.description,
       duration: data.duration,
+      visibility: data.visibility,
       videoUrl: uploadedVideo.secure_url,
       thumbnailUrl: uploadedImage.secure_url,
     });
-
-    console.log(newUploadedVideo);
 
     return { message: 'Upload video successfully' };
   }

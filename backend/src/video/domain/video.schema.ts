@@ -24,7 +24,7 @@ export class Video {
   videoUrl: string;
 
   @Prop({ required: true })
-  duration: number;
+  duration: string;
 
   @Prop({
     enum: ['PUBLIC', 'UNLISTED', 'PRIVATE'],
