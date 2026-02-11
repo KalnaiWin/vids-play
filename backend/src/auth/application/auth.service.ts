@@ -89,10 +89,12 @@ export class AuthService {
   }
 
   generateAccessToken(userId: string) {
+    if (!userId) throw new BadRequestException('Invalid user ID');
     return this.jwtService.sign({ userId, type: 'access' });
   }
 
   generateRefreshToken(userId: string) {
+    if (!userId) throw new BadRequestException('Invalid user ID');
     const refreshToken = this.jwtService.sign(
       { userId, type: 'refresh' },
       {
@@ -104,19 +106,24 @@ export class AuthService {
   }
 
   generateTokenAuth(userId: string, res: Response) {
+    if (!userId) throw new BadRequestException('Invalid user ID');
     const accessToken = this.generateAccessToken(String(userId));
     const refreshToken = this.generateRefreshToken(String(userId));
     res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: false, // change true in production
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production', // change true in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
     });
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
+    });
+    return res.json({
+      message: 'Token refreshed successfully',
+      success: true,
     });
   }
 
@@ -159,6 +166,6 @@ export class AuthService {
     if (!refreshToken) throw new UnauthorizedException('Missing refresh token');
     const decoded = this.verifyRefreshToken(refreshToken);
     if (!decoded) throw new UnauthorizedException('Invalid refresh token');
-    return this.generateTokenAuth(decoded.id, res);
+    return this.generateTokenAuth(decoded.userId, res);
   }
 }

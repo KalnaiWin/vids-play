@@ -27,6 +27,6 @@ export class OutputAuthenticateDto {
 }
 
 export class UserPayload {
-  id: string;
+  userId: string;
   name: string;
 }
