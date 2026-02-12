@@ -42,7 +42,7 @@ const WatchVideo = () => {
         <ArrowBigLeft />
       </button>
 
-      <div className="flex-1 p-4 md:p-10 md:pt-16">
+      <div className="flex-1 p-4 md:p-10 md:pt-16 xl:w-2/3 w-full">
         <div className="mx-auto flex flex-col gap-6">
           <div className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
             <video
@@ -116,7 +116,7 @@ const WatchVideo = () => {
         </div>
       </div>
 
-      <div className="w-full xl:mx-0 p-4 xl:pt-16 md:bg-zinc-900/20 md:border-l border-zinc-800 px-10">
+      <div className="w-full xl:w-1/3 xl:mx-0 p-4 xl:pt-16 md:bg-zinc-900/20 md:border-l border-zinc-800 px-10">
         <h2 className="text-lg font-bold px-2 text-white mb-6">
           Video tiếp theo
         </h2>
