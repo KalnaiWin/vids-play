@@ -5,7 +5,7 @@ const HomePage = () => {
   const [selectPath, setSelectPath] = useState("");
 
   return (
-    <div className="w-full min-h-screen bg-black text-white text-sm md:p-5 p-0">
+    <div className="w-full bg-black text-white text-sm md:p-5 p-0">
       <div className="flex gap-2 items-center my-5 mx-5">
         {defaultCategory.map((item) => (
           <div

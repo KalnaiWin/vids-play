@@ -101,10 +101,10 @@ const MainLayout = () => {
             overflow-y-auto
         `}
       >
-        <div className="overflow-y-auto">
-          <Outlet />
-          {/* h-[calc(100vh-4rem)] */}
-        </div>
+        {/* <div className="overflow-y-auto"> */}
+        <Outlet />
+        {/* h-[calc(100vh-4rem)] */}
+        {/* </div> */}
       </div>
     </div>
   );
