@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   Req,
   // UploadedFile,
@@ -39,7 +41,7 @@ export class VideoController {
       },
     ]),
   )
-  async uploadVideo( 
+  async uploadVideo(
     @Req() req: Request,
     @Body() data: VideoInputUpload,
     @UploadedFiles()
@@ -50,11 +52,28 @@ export class VideoController {
   ) {
     const userId = req.user?.userId;
     if (!userId) return { message: 'UserId not found' };
-    return this.videoService.postNewVideo(
+    return await this.videoService.postNewVideo(
       userId,
       data,
       files.thumbnailUrl[0],
       files.videoUrl[0],
     );
+  }
+
+  @Get('/')
+  async getAllVideos() {
+    return await this.videoService.getAllVideos();
+  }
+
+  @Get(':id')
+  async watchVideo(@Param('id') videoId: string) {
+    if (!videoId) return { message: 'Video not found' };
+    return await this.videoService.watchVideo(String(videoId));
+  }
+
+  @Get('/recommend/:id')
+  async getRecommendedVideos(@Param('id') videoId: string) {
+    if (!videoId) return { message: 'Video not found' };
+    return await this.videoService.getRandomVideosForRecommend(videoId);
   }
 }

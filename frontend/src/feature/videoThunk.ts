@@ -1,8 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  type RecommendVideos,
   type UploadFiles,
   type VideoInfo,
   type VideoInput,
+  type VideoWatchingInfo,
 } from "../types/videoInterface";
 import axiosInstance from "../lib/axios";
 import { toast } from "react-toastify";
@@ -33,6 +35,45 @@ export const uploadVideo = createAsyncThunk<
     return result.data;
   } catch (error: any) {
     toast.error("Đăng video thất bại");
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const getAllVieos = createAsyncThunk<
+  VideoInfo[],
+  void,
+  { rejectValue: string }
+>("video/getAllVideos", async (_, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get("/video");
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const watchVieo = createAsyncThunk<
+  VideoWatchingInfo,
+  { id: string },
+  { rejectValue: string }
+>("video/watchVieo", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(`/video/${id}`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const recommendVideos = createAsyncThunk<
+  RecommendVideos[],
+  { id: string },
+  { rejectValue: string }
+>("video/recommendVideos", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(`/video/recommend/${id}`);
+    return result.data;
+  } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");
   }
 });
