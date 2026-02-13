@@ -76,4 +76,10 @@ export class VideoController {
     if (!videoId) return { message: 'Video not found' };
     return await this.videoService.getRandomVideosForRecommend(videoId);
   }
+
+  @Post('/count-view/:id')
+  async countViewVideo(@Param('id') videoId: string) {
+    if (!videoId) return { message: 'Video not found' };
+    return await this.videoService.countViewVideo(videoId);
+  }
 }

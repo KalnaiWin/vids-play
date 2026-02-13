@@ -78,3 +78,16 @@ export const recommendVideos = createAsyncThunk<
     return rejectWithValue(error.response?.data || "Error");
   }
 });
+
+export const countViewVideo = createAsyncThunk<
+  any,
+  { id: string },
+  { rejectValue: string }
+>("video/countViewVideo", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.post(`/video/count-view/${id}`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});

@@ -74,4 +74,12 @@ export class VideoService {
   async getRandomVideosForRecommend(videoId: string) {
     return this.videoRepository.getRandomVideos(10, videoId);
   }
+
+  async countViewVideo(videoId: string) {
+    return await this.videoModel.findByIdAndUpdate(
+      videoId,
+      { $inc: { viewCount: 1 } },
+      { new: true },
+    );
+  }
 }

@@ -1,8 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
-import { useEffect } from "react";
-import { recommendVideos, watchVieo } from "../../feature/videoThunk";
+import { useEffect, useRef, useState } from "react";
+import {
+  countViewVideo,
+  recommendVideos,
+  watchVieo,
+} from "../../feature/videoThunk";
 import { timeAgo } from "../../types/helperFunction";
 import {
   ArrowBigLeft,
@@ -20,11 +24,11 @@ const WatchVideo = () => {
   const { watchingVideo, status, recommendedVideos } = useSelector(
     (state: RootState) => state.video,
   );
+  const [viewCount, setViewCount] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   useEffect(() => {
     if (!id) return;
-
     dispatch(watchVieo({ id: String(id) }));
     dispatch(recommendVideos({ id: String(id) }));
   }, [dispatch, id]);
@@ -46,7 +50,20 @@ const WatchVideo = () => {
         <div className="mx-auto flex flex-col gap-6">
           <div className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
             <video
+              ref={videoRef}
               src={watchingVideo.videoUrl}
+              onTimeUpdate={() => {
+                const video = videoRef.current;
+                if (!video) return;
+
+                const watchedTime = video.currentTime;
+                const duration = video.duration;
+
+                if (!viewCount && watchedTime >= (duration * 30) / 100) {
+                  setViewCount(true);
+                  dispatch(countViewVideo({ id: watchingVideo._id }));
+                }
+              }}
               className="w-full h-full object-contain"
               controls
               autoPlay
