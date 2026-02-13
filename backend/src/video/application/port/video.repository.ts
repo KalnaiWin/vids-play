@@ -2,10 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Video } from 'src/video/domain/video.schema';
+import { TypeInput } from '../dtos/video.dto';
+import { Type } from 'src/video/domain/type.schema';
+import { IsEmpty } from 'class-validator';
+import { isEmpty } from 'rxjs';
 
 @Injectable()
 export class VideoRepository {
-  constructor(@InjectModel(Video.name) private videoModel: Model<Video>) {}
+  constructor(
+    @InjectModel(Video.name) private videoModel: Model<Video>,
+    @InjectModel(Type.name) private typeModel: Model<Type>,
+  ) {}
 
   async findAllVideos() {
     return await this.videoModel.aggregate([
@@ -71,6 +78,7 @@ export class VideoRepository {
               'owner.avatarUrl': 1,
               'owner.subscriptions': 1,
               thumbnailUrl: 1,
+              types: 1,
               videoUrl: 1,
               visibility: 1,
               viewCount: 1,
@@ -120,5 +128,40 @@ export class VideoRepository {
         },
       },
     ]);
+  }
+
+  async findOrCreateNewType(types: TypeInput[]) {
+    if (!types.length) return [];
+    const ids: mongoose.Types.ObjectId[] = [];
+
+    const uniqueTypes = Array.from(
+      // remove duplicate slugs
+      new Map(types.map((t) => [t.slug, t])).values(),
+    );
+
+    const slugs = uniqueTypes.map((t) => t.slug);
+
+    const existingTypes = await this.typeModel.find({
+      // find all existing slugs
+      slug: { $in: slugs },
+    });
+
+    const existingSlugMap = new Map(existingTypes.map((t) => [t.slug, t]));
+    for (const type of uniqueTypes) {
+      if (existingSlugMap.has(type.slug)) {
+        ids.push(existingSlugMap.get(type.slug)!._id);
+      } else {
+        try {
+          const newType = await this.typeModel.create(type);
+          ids.push(newType._id);
+        } catch (error) {
+          const duplicated = await this.typeModel.findOne({
+            slug: type.slug,
+          });
+          if (duplicated) ids.push(duplicated._id);
+        }
+      }
+    }
+    return ids;
   }
 }

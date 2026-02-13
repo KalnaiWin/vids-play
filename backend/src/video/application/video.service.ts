@@ -47,12 +47,15 @@ export class VideoService {
     if (!uploadedVideo || !uploadedImage)
       throw new InternalServerErrorException('Upload failed');
 
+    const typeIds = await this.videoRepository.findOrCreateNewType(data.types);
+
     await this.videoModel.create({
       owner: existingUser._id,
       title: data.title,
       description: data.description?.trim() || undefined,
       duration: data.duration,
       visibility: data.visibility,
+      types: typeIds,
       videoUrl: uploadedVideo.secure_url,
       thumbnailUrl: uploadedImage.secure_url,
     });

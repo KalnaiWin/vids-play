@@ -20,6 +20,7 @@ export const uploadVideo = createAsyncThunk<
     }
     const formData = new FormData();
     formData.append("title", data.title);
+    formData.append("types", JSON.stringify(data.types));
     formData.append("description", data.description);
     formData.append("duration", String(data.duration));
     formData.append("visibility", data.visibility);

@@ -3,11 +3,17 @@ export interface UploadFiles {
   videoUrl: File | null;
 }
 
+export interface TypesInput {
+  name: string;
+  slug: string;
+}
+
 export interface VideoInput {
   title: string;
   description: string;
   duration: number;
   visibility: string;
+  types: TypesInput[];
 }
 
 export interface VideoInfo {
@@ -40,6 +46,7 @@ export interface VideoWatchingInfo {
     subscriptions: string;
   };
   thumbnailUrl: string;
+  types: TypesInput[];
   videoUrl: string;
   visibility: string;
   viewCount: number;

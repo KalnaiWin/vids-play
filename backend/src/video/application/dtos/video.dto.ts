@@ -1,5 +1,5 @@
-import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class VideoInputUpload {
   @IsString()
@@ -14,4 +14,17 @@ export class VideoInputUpload {
 
   @IsString()
   visibility: string;
+
+  @Transform(({ value }) => JSON.parse(value))
+  @IsArray()
+  types: TypeInput[];
+}
+
+export class TypeInput {
+  @IsString()
+  name: string;
+
+  @IsArray()
+  @IsString()
+  slug: string;
 }

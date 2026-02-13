@@ -35,5 +35,7 @@ export const timeAgo = (date: string | Date) => {
 
   const years = Math.floor(months / 12);
   return `${years} years ago`;
-}
+};
 
+export const generateSlug = (value: string) =>
+  value.toLowerCase().trim().replace(/\s+/g, "-");

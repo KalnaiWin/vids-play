@@ -1,6 +1,6 @@
 import { CloudUpload, Image, Info, XIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { formatDuration } from "../../types/helperFunction";
+import { formatDuration, generateSlug } from "../../types/helperFunction";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
 import { uploadVideo } from "../../feature/videoThunk";
@@ -15,7 +15,10 @@ const UploadVideoPage = () => {
     description: "",
     duration: 0,
     visibility: "PUBLIC",
+    types: [] as { name: string; slug: string }[],
   });
+
+  console.log(formData);
 
   const [files, setFiles] = useState<UploadFiles>({
     thumbnailUrl: null,
@@ -144,6 +147,65 @@ const UploadVideoPage = () => {
                     alt="Thumbnail preview"
                     className="w-full h-full object-cover"
                   />
+                </div>
+                <div className="w-1/3 border rounded-xl relative overflow-hidden bg-slate-950">
+                  <h1 className="font-black p-2">Tags</h1>
+                  <div className="text-white px-2">
+                    {formData.types.length > 0 && formData.types ? (
+                      <div className="flex flex-wrap gap-2 ">
+                        {formData.types.map((type) => (
+                          <div
+                            key={type.slug}
+                            className="bg-blue-600 px-2 py-1 rounded-md text-xs flex items-center gap-1"
+                          >
+                            {type.name}
+                            <button
+                              onClick={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  types: prev.types.filter(
+                                    (t) => t.slug !== type.slug,
+                                  ),
+                                }))
+                              }
+                              className="text-xs"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="">__</div>
+                    )}
+                  </div>
+                  <div className="absolute bottom-1 w-full px-2">
+                    <input
+                      type="text"
+                      className="w-full bg-white/30 rounded-md text-white indent-1 p-0.5 border"
+                      placeholder="tag..."
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                          e.preventDefault();
+                          const value = e.currentTarget.value.trim();
+                          const newType = {
+                            name: value,
+                            slug: generateSlug(value),
+                          };
+                          setFormData((prev) => ({
+                            ...prev,
+                            types: [
+                              ...prev.types.filter(
+                                (t) => t.slug !== newType.slug,
+                              ),
+                              newType,
+                            ],
+                          }));
+                          e.currentTarget.value = "";
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

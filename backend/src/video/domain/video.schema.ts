@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { ref } from 'process';
 
 @Schema({ timestamps: true })
 export class Video {
@@ -44,6 +45,18 @@ export class Video {
 
   @Prop({ default: 0 })
   dislikeCount: number;
+
+  @Prop({
+    type: [
+      {
+        type: Types.ObjectId,
+        ref: 'Type',
+        index: true,
+      },
+    ],
+    default: [],
+  })
+  types: Types.ObjectId[];
 
   @Prop({
     type: [
