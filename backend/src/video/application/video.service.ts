@@ -82,4 +82,69 @@ export class VideoService {
       { new: true },
     );
   }
+
+  async toggleReactionVideo(
+    videoId: string,
+    userId: string,
+    type: 'like' | 'dislike',
+  ) {
+    const video = await this.videoModel.findById(videoId);
+    if (!video) throw new NotFoundException('Video not found');
+
+    const liked = video.likes.some((id) => id.toString() === userId);
+    const disliked = video.dislikes.some((id) => id.toString() === userId);
+
+    let updated;
+
+    switch (type) {
+      case 'like':
+        if (liked) {
+          updated = await this.videoModel.findByIdAndUpdate(
+            videoId,
+            { $pull: { likes: userId } },
+            { new: true },
+          );
+        } else {
+          updated = await this.videoModel.findByIdAndUpdate(
+            videoId,
+            {
+              $addToSet: { likes: userId },
+              $pull: { dislikes: userId },
+            },
+            { new: true },
+          );
+        }
+        break;
+
+      case 'dislike':
+        if (disliked) {
+          updated = await this.videoModel.findByIdAndUpdate(
+            videoId,
+            { $pull: { dislikes: userId } },
+            { new: true },
+          );
+        } else {
+          updated = await this.videoModel.findByIdAndUpdate(
+            videoId,
+            {
+              $addToSet: { dislikes: userId },
+              $pull: { likes: userId },
+            },
+            { new: true },
+          );
+        }
+        break;
+
+      default:
+        throw new BadRequestException('Invalid reaction type');
+    }
+
+    return {
+      likeCount: updated!.likes,
+      dislikeCount: updated!.dislikes,
+      isLiked: updated!.likes.some((id) => id.toString() === userId),
+      isDisliked: updated!.dislikes.some((id) => id.toString() === userId),
+      userId: userId,
+    };
+  }
 }

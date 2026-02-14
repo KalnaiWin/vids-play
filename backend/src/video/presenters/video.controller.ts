@@ -82,4 +82,17 @@ export class VideoController {
     if (!videoId) return { message: 'Video not found' };
     return await this.videoService.countViewVideo(videoId);
   }
+
+  @UseGuards(AuthGuard)
+  @Post('/reaction/:id')
+  async toggleReactionVideo(
+    @Param('id') videoId: string,
+    @Req() req: Request,
+    @Body('type') reaction: 'like' | 'dislike',
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+
+    return this.videoService.toggleReactionVideo(videoId, userId, reaction);
+  }
 }

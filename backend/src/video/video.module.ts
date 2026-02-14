@@ -9,6 +9,7 @@ import { VideoSchema } from './domain/video.schema';
 import { UserSchema } from 'src/user/domain/user.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
+import { TypeSchema } from './domain/type.schema';
 
 @Module({
   imports: [
@@ -27,6 +28,10 @@ import multer from 'multer';
       {
         name: 'User',
         schema: UserSchema,
+      },
+      {
+        name: 'Type',
+        schema: TypeSchema,
       },
     ]),
   ],

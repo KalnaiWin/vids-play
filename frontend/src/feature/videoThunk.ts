@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  type ReactionResponse,
   type RecommendVideos,
   type UploadFiles,
   type VideoInfo,
@@ -87,6 +88,19 @@ export const countViewVideo = createAsyncThunk<
   try {
     const result = await axiosInstance.post(`/video/count-view/${id}`);
     return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const toggleReactionVideo = createAsyncThunk<
+  ReactionResponse,
+  { id: string; type: "like" | "dislike" },
+  { rejectValue: string }
+>("video/toggleReactionVideo", async ({ type, id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.post(`/video/reaction/${id}`, { type });
+    return result.data as ReactionResponse;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");
   }

@@ -30,8 +30,8 @@ export interface VideoInfo {
   videoUrl: string;
   visibility: string;
   viewCount: number;
-  likeCount: string;
-  dislikeCount: string;
+  likeCount: [];
+  dislikeCount: [];
   createdAt: Date;
 }
 
@@ -50,9 +50,11 @@ export interface VideoWatchingInfo {
   videoUrl: string;
   visibility: string;
   viewCount: number;
-  likeCount: string;
-  dislikeCount: string;
+  likeCount: string[];
+  dislikeCount: string[];
   createdAt: Date;
+  isLiked?: boolean;
+  isDisliked?: boolean;
 }
 
 export interface RecommendVideos {
@@ -69,10 +71,19 @@ export interface RecommendVideos {
   };
 }
 
+export interface ReactionResponse {
+  likeCount: [];
+  dislikeCount: [];
+  isLiked: boolean;
+  isDisliked: boolean;
+  userId: string;
+}
+
 export interface VideoInitailState {
   videos: VideoInfo[];
   watchingVideo: VideoWatchingInfo | null;
   recommendedVideos: RecommendVideos[];
   status: "idle" | "loading" | "succeeded" | "failed";
   statusCreating: "idle" | "loading" | "succeeded" | "failed";
+  statusReaction: "idle" | "loading" | "succeeded" | "failed";
 }

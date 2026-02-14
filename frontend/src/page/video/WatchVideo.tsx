@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   countViewVideo,
   recommendVideos,
+  toggleReactionVideo,
   watchVieo,
 } from "../../feature/videoThunk";
 import { timeAgo } from "../../types/helperFunction";
@@ -24,6 +25,7 @@ const WatchVideo = () => {
   const { watchingVideo, status, recommendedVideos } = useSelector(
     (state: RootState) => state.video,
   );
+  const { user } = useSelector((state: RootState) => state.auth);
   const [viewCount, setViewCount] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -101,14 +103,46 @@ const WatchVideo = () => {
 
               <div className="flex items-center gap-2">
                 <div className="flex bg-zinc-800 rounded-full p-1 overflow-hidden">
-                  <button className="flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700 transition-colors rounded-l-full border-r border-zinc-700">
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        toggleReactionVideo({
+                          id: watchingVideo._id,
+                          type: "like",
+                        }),
+                      )
+                    }
+                    className={`flex items-center gap-2 px-4 py-1.5  transition-colors rounded-l-full border-r border-zinc-700 ${
+                      watchingVideo?.isLiked
+                        ? "bg-blue-200/50 text-blue-800"
+                        : "hover:bg-zinc-700"
+                    } `}
+                    disabled={!user}
+                  >
                     <ThumbsUp />
                     <span className="text-sm font-medium">
-                      {watchingVideo.likeCount}
+                      {watchingVideo.likeCount.length}
                     </span>
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700 rounded-r-full transition-colors">
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        toggleReactionVideo({
+                          id: watchingVideo._id,
+                          type: "dislike",
+                        }),
+                      )
+                    }
+                    className={`flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700 rounded-r-full transition-colors ${
+                      watchingVideo.isDisliked
+                        ? "bg-red-200/50 text-red-800"
+                        : "hover:bg-zinc-700"
+                    }`}
+                  >
                     <ThumbsDown />
+                    <span className="text-sm font-medium">
+                      {watchingVideo.dislikeCount.length}
+                    </span>
                   </button>
                 </div>
                 <button className="p-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-full transition-colors">

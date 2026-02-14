@@ -3,16 +3,18 @@ import type { VideoInitailState } from "../types/videoInterface";
 import {
   getAllVieos,
   recommendVideos,
+  toggleReactionVideo,
   uploadVideo,
   watchVieo,
 } from "../feature/videoThunk";
 
 const initialState: VideoInitailState = {
   videos: [],
+  watchingVideo: null,
   recommendedVideos: [],
   statusCreating: "idle",
   status: "idle",
-  watchingVideo: null,
+  statusReaction: "idle",
 };
 
 export const videoSlice = createSlice({
@@ -20,6 +22,24 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    // Get recommended videos
+    builder
+      .addCase(toggleReactionVideo.pending, (state) => {
+        state.statusReaction = "loading";
+      })
+      .addCase(toggleReactionVideo.fulfilled, (state, action) => {
+        state.statusReaction = "succeeded";
+        if (state.watchingVideo) {
+          state.watchingVideo.likeCount = action.payload.likeCount;
+          state.watchingVideo.dislikeCount = action.payload.dislikeCount;
+          state.watchingVideo.isLiked = action.payload.isLiked;
+          state.watchingVideo.isDisliked = action.payload.isDisliked;
+        }
+      })
+      .addCase(toggleReactionVideo.rejected, (state) => {
+        state.statusReaction = "failed";
+      });
+
     // Get recommended videos
     builder
       .addCase(recommendVideos.pending, (state) => {

@@ -40,11 +40,11 @@ export class Video {
   @Prop({ default: true })
   isActive: boolean;
 
-  @Prop({ default: 0 })
-  likeCount: number;
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  likes: Types.ObjectId[];
 
-  @Prop({ default: 0 })
-  dislikeCount: number;
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  dislikes: Types.ObjectId[];
 
   @Prop({
     type: [
