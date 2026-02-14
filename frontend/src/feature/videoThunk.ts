@@ -5,6 +5,7 @@ import {
   type UploadFiles,
   type VideoInfo,
   type VideoInput,
+  type VideosForSpecificUser,
   type VideoWatchingInfo,
 } from "../types/videoInterface";
 import axiosInstance from "../lib/axios";
@@ -101,6 +102,19 @@ export const toggleReactionVideo = createAsyncThunk<
   try {
     const result = await axiosInstance.post(`/video/reaction/${id}`, { type });
     return result.data as ReactionResponse;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const getAllVideosForSpecificUser = createAsyncThunk<
+  VideosForSpecificUser[],
+  { id: string },
+  { rejectValue: string }
+>("video/getAllVideosForSpecificUser", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(`/video/manage/${id}`);
+    return result.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");
   }

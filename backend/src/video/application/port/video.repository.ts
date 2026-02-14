@@ -164,4 +164,28 @@ export class VideoRepository {
     }
     return ids;
   }
+
+  async findAllVideosForSpecificUser(userId: string) {
+    return await this.videoModel.aggregate([
+      {
+        $match: {
+          owner: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          thumbnailUrl: 1,
+          videoUrl: 1,
+          duration: 1,
+          likes: 1,
+          description: 1,
+          visibility: 1,
+          viewCount: 1,
+          createdAt: 1,
+        },
+      },
+    ]);
+  }
 }

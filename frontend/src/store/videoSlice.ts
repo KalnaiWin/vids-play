@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { VideoInitailState } from "../types/videoInterface";
 import {
+  getAllVideosForSpecificUser,
   getAllVieos,
   recommendVideos,
   toggleReactionVideo,
@@ -12,9 +13,11 @@ const initialState: VideoInitailState = {
   videos: [],
   watchingVideo: null,
   recommendedVideos: [],
+  videosOfUser: [],
   statusCreating: "idle",
   status: "idle",
   statusReaction: "idle",
+  statusFetchingVideos: "idle",
 };
 
 export const videoSlice = createSlice({
@@ -22,6 +25,19 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    // Get all videos of user
+    builder
+      .addCase(getAllVideosForSpecificUser.pending, (state) => {
+        state.statusFetchingVideos = "loading";
+      })
+      .addCase(getAllVideosForSpecificUser.fulfilled, (state, action) => {
+        state.statusFetchingVideos = "succeeded";
+        state.videosOfUser = action.payload;
+      })
+      .addCase(getAllVideosForSpecificUser.rejected, (state) => {
+        state.statusFetchingVideos = "failed";
+      });
+
     // Get recommended videos
     builder
       .addCase(toggleReactionVideo.pending, (state) => {

@@ -76,11 +76,26 @@ export interface ReactionResponse {
   dislikes: [];
 }
 
+export interface VideosForSpecificUser {
+  _id: string;
+  title: string;
+  thumbnailUrl: string;
+  videoUrl: string;
+  duration: string;
+  likes: [];
+  description: string;
+  visibility: string;
+  viewCount: number;
+  createdAt: Date;
+}
+
 export interface VideoInitailState {
   videos: VideoInfo[];
   watchingVideo: VideoWatchingInfo | null;
   recommendedVideos: RecommendVideos[];
+  videosOfUser: VideosForSpecificUser[];
   status: "idle" | "loading" | "succeeded" | "failed";
   statusCreating: "idle" | "loading" | "succeeded" | "failed";
   statusReaction: "idle" | "loading" | "succeeded" | "failed";
+  statusFetchingVideos: "idle" | "loading" | "succeeded" | "failed";
 }

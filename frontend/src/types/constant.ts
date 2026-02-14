@@ -1,5 +1,8 @@
 import {
   Bookmark,
+  Clock,
+  DollarSign,
+  Eye,
   Flame,
   GalleryVerticalEnd,
   Home,
@@ -8,6 +11,7 @@ import {
   SquarePen,
   SquarePlay,
   UserCircleIcon,
+  Users,
 } from "lucide-react";
 
 export const navbarItems = [
@@ -99,5 +103,40 @@ export const defaultCategory = [
   {
     name: "Âm nhạc",
     path: "music",
+  },
+];
+
+export const analyticVideo = [
+  {
+    type: "views",
+    name: "Số lượt xem",
+    icon: Eye,
+    bg: "bg-blue-950",
+    text: "text-blue-500",
+    color: "#3B82F6", 
+  },
+  {
+    type: "subscriptions",
+    name: "Người đăng ký",
+    icon: Users,
+    bg: "bg-purple-950",
+    text: "text-purple-500",
+    color: "#A855F7", 
+  },
+  {
+    type: "durations",
+    name: "Thời gian xem (giờ)",
+    icon: Clock,
+    bg: "bg-red-950",
+    text: "text-red-500",
+    color: "#EF4444", 
+  },
+  {
+    type: "revenues",
+    name: "Doanh thu ước tính",
+    icon: DollarSign,
+    bg: "bg-green-950",
+    text: "text-green-500",
+    color: "#22C55E", 
   },
 ];

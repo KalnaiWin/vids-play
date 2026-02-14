@@ -65,26 +65,20 @@ export class VideoController {
     return await this.videoService.getAllVideos();
   }
 
-  @Get(':id')
-  async watchVideo(@Param('id') videoId: string) {
-    if (!videoId) return { message: 'Video not found' };
-    return await this.videoService.watchVideo(String(videoId));
-  }
-
-  @Get('/recommend/:id')
+  @Get('recommend/:id')
   async getRecommendedVideos(@Param('id') videoId: string) {
     if (!videoId) return { message: 'Video not found' };
     return await this.videoService.getRandomVideosForRecommend(videoId);
   }
 
-  @Post('/count-view/:id')
+  @Post('count-view/:id')
   async countViewVideo(@Param('id') videoId: string) {
     if (!videoId) return { message: 'Video not found' };
     return await this.videoService.countViewVideo(videoId);
   }
 
   @UseGuards(AuthGuard)
-  @Post('/reaction/:id')
+  @Post('reaction/:id')
   async toggleReactionVideo(
     @Param('id') videoId: string,
     @Req() req: Request,
@@ -93,6 +87,23 @@ export class VideoController {
     const userId = req.user?.userId;
     if (!userId) return { message: 'UserId not found' };
 
-    return this.videoService.toggleReactionVideo(videoId, userId, reaction);
+    return await this.videoService.toggleReactionVideo(
+      videoId,
+      userId,
+      reaction,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('manage/:id')
+  async getAllVideosForSpecificUser(@Param('id') userId: string) {
+    if (!userId) return { message: 'UserId not found' };
+    return await this.videoService.getAllVideosForSpecificUser(userId);
+  }
+
+  @Get(':id')
+  async watchVideo(@Param('id') videoId: string) {
+    if (!videoId) return { message: 'Video not found' };
+    return await this.videoService.watchVideo(String(videoId));
   }
 }

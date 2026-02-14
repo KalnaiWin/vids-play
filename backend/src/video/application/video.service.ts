@@ -144,4 +144,8 @@ export class VideoService {
       dislikes: updated!.dislikes,
     };
   }
+
+  async getAllVideosForSpecificUser(userId: string) {
+    return await this.videoRepository.findAllVideosForSpecificUser(userId);
+  }
 }
