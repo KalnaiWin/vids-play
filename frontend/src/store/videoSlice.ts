@@ -30,10 +30,8 @@ export const videoSlice = createSlice({
       .addCase(toggleReactionVideo.fulfilled, (state, action) => {
         state.statusReaction = "succeeded";
         if (state.watchingVideo) {
-          state.watchingVideo.likeCount = action.payload.likeCount;
-          state.watchingVideo.dislikeCount = action.payload.dislikeCount;
-          state.watchingVideo.isLiked = action.payload.isLiked;
-          state.watchingVideo.isDisliked = action.payload.isDisliked;
+          state.watchingVideo.likes = action.payload.likes;
+          state.watchingVideo.dislikes = action.payload.dislikes;
         }
       })
       .addCase(toggleReactionVideo.rejected, (state) => {

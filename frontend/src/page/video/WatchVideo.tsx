@@ -35,7 +35,9 @@ const WatchVideo = () => {
     dispatch(recommendVideos({ id: String(id) }));
   }, [dispatch, id]);
 
-  if (!watchingVideo) return "/";
+  if (!watchingVideo) return <p>Loading...</p>;
+
+  console.log(watchingVideo);
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col xl:flex-row overflow-y-auto">
@@ -113,7 +115,7 @@ const WatchVideo = () => {
                       )
                     }
                     className={`flex items-center gap-2 px-4 py-1.5  transition-colors rounded-l-full border-r border-zinc-700 ${
-                      watchingVideo?.isLiked
+                      watchingVideo?.likes?.includes(user?._id ?? "")
                         ? "bg-blue-200/50 text-blue-800"
                         : "hover:bg-zinc-700"
                     } `}
@@ -121,7 +123,7 @@ const WatchVideo = () => {
                   >
                     <ThumbsUp />
                     <span className="text-sm font-medium">
-                      {watchingVideo.likeCount.length}
+                      {watchingVideo.likes?.length}
                     </span>
                   </button>
                   <button
@@ -134,14 +136,14 @@ const WatchVideo = () => {
                       )
                     }
                     className={`flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700 rounded-r-full transition-colors ${
-                      watchingVideo.isDisliked
+                      watchingVideo?.dislikes?.includes(user?._id ?? "")
                         ? "bg-red-200/50 text-red-800"
                         : "hover:bg-zinc-700"
                     }`}
                   >
                     <ThumbsDown />
                     <span className="text-sm font-medium">
-                      {watchingVideo.dislikeCount.length}
+                      {watchingVideo.dislikes?.length}
                     </span>
                   </button>
                 </div>

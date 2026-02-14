@@ -68,11 +68,11 @@ export class VideoService {
   }
 
   async watchVideo(videoId: string) {
-    return this.videoRepository.getDetailWatchingVideo(videoId);
+    return await this.videoRepository.getDetailWatchingVideo(videoId);
   }
 
   async getRandomVideosForRecommend(videoId: string) {
-    return this.videoRepository.getRandomVideos(10, videoId);
+    return await this.videoRepository.getRandomVideos(10, videoId);
   }
 
   async countViewVideo(videoId: string) {
@@ -140,11 +140,8 @@ export class VideoService {
     }
 
     return {
-      likeCount: updated!.likes,
-      dislikeCount: updated!.dislikes,
-      isLiked: updated!.likes.some((id) => id.toString() === userId),
-      isDisliked: updated!.dislikes.some((id) => id.toString() === userId),
-      userId: userId,
+      likes: updated!.likes,
+      dislikes: updated!.dislikes,
     };
   }
 }
