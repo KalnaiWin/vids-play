@@ -1,4 +1,12 @@
-import { ChevronRight, ThumbsDown, ThumbsUp, User } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  ChevronRight,
+  ThumbsDown,
+  ThumbsUp,
+  User,
+  UserRoundX,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { useEffect, useState } from "react";
@@ -10,17 +18,18 @@ interface Props {
 }
 
 const SubscribeAndReactionVideo = ({ id }: Props) => {
-  const { watchingVideo, status, recommendedVideos } = useSelector(
-    (state: RootState) => state.video,
-  );
+  const { watchingVideo } = useSelector((state: RootState) => state.video);
   const { user } = useSelector((state: RootState) => state.auth);
   const { statusSubscribe } = useSelector((state: RootState) => state.user);
-  const [viewCount, setViewCount] = useState(false);
+
+  const [openSubscribe, setOpenSubscribe] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     if (!id) return;
     dispatch(watchVieo({ id: String(id) }));
   }, [dispatch, id, statusSubscribe]);
+
+  const isSubscribed = watchingVideo?.subscriptions.includes(String(user?._id));
 
   if (!watchingVideo) return <p>Loading...</p>;
   return (
@@ -43,22 +52,95 @@ const SubscribeAndReactionVideo = ({ id }: Props) => {
             {watchingVideo.subscriptions.length} subscribers
           </div>
         </div>
-        <button
-          className="ml-4 md:text-md text-sm px-6 py-2 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-colors"
-          onClick={() => {
-            if (watchingVideo) {
-              dispatch(
-                subscribeChannel({
-                  id: String(watchingVideo.owner._id),
-                }),
-              );
-            }
-          }}
-        >
-          {watchingVideo.subscriptions.includes(String(user?._id))
-            ? "Unsubscribre"
-            : "Subscribe"}
-        </button>
+        <div className="flex items-center gap-2 ml-4 relative">
+          {!isSubscribed ? (
+            <button
+              className="md:text-md text-sm px-6 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition"
+              onClick={() =>
+                dispatch(
+                  subscribeChannel({
+                    id: String(watchingVideo?.owner._id),
+                    notification: "",
+                  }),
+                )
+              }
+            >
+              Subscribe
+            </button>
+          ) : (
+            <>
+              <button
+                className="md:text-md text-sm px-6 py-2 bg-zinc-200 text-black font-semibold rounded-full hover:bg-zinc-300 transition"
+                onClick={() =>
+                  dispatch(
+                    subscribeChannel({
+                      id: String(watchingVideo?.owner._id),
+                      notification: "",
+                    }),
+                  )
+                }
+              >
+                Subscribed
+              </button>
+
+              <button
+                className="p-2 rounded-full hover:bg-zinc-200 transition"
+                onClick={() => setOpenSubscribe(!openSubscribe)}
+              >
+                <Bell size={20} />
+              </button>
+
+              {openSubscribe && (
+                <div className="absolute top-12 right-0 bg-white shadow-xl rounded-xl w-56 border">
+                  <div
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    onClick={() =>
+                      dispatch(
+                        subscribeChannel({
+                          id: String(watchingVideo?.owner._id),
+                          notification: "all",
+                        }),
+                      )
+                    }
+                  >
+                    <Bell size={18} />
+                    <span>All notifications</span>
+                  </div>
+
+                  <div
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    onClick={() =>
+                      dispatch(
+                        subscribeChannel({
+                          id: String(watchingVideo?.owner._id),
+                          notification: "none",
+                        }),
+                      )
+                    }
+                  >
+                    <BellOff size={18} />
+                    <span>No notifications</span>
+                  </div>
+
+                  <div
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-600"
+                    onClick={() =>
+                      dispatch(
+                        subscribeChannel({
+                          id: String(watchingVideo?.owner._id),
+                          notification: "",
+                        }),
+                      )
+                    }
+                  >
+                    <UserRoundX size={18} />
+                    <span>Unsubscribe</span>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

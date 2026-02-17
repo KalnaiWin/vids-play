@@ -25,12 +25,27 @@ export class UserService {
     return await this.userRepository.findUserSubscription(subscriberId);
   }
 
-  async toggleSubscribe(channelId: string, subscriberId: string) {
+  async toggleSubscribe(
+    channelId: string,
+    subscriberId: string,
+    notification: 'none' | '' | 'all',
+  ) {
     const existing = await this.userRepository.checkSubscriberExsiting(
       channelId,
       subscriberId,
     );
     if (existing) {
+      if (notification !== '') {
+        await this.subscriptionModel.updateOne(
+          {
+            subscriber: new Types.ObjectId(subscriberId),
+            channel: new Types.ObjectId(channelId),
+          },
+          {
+            $set: { notification },
+          },
+        );
+      }
       await this.subscriptionModel.deleteOne({
         _id: existing._id,
       });

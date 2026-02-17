@@ -4,8 +4,6 @@ import mongoose, { Model } from 'mongoose';
 import { Video } from 'src/video/domain/video.schema';
 import { TypeInput } from '../dtos/video.dto';
 import { Type } from 'src/video/domain/type.schema';
-import { IsEmpty } from 'class-validator';
-import { isEmpty } from 'rxjs';
 import { Subscription } from 'src/user/application/subscription.schema';
 import { UserRepository } from 'src/user/application/port/user.repository';
 

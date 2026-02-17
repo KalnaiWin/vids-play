@@ -1,5 +1,13 @@
 import { UserRepository } from './../application/port/user.repository';
-import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../domain/user.schema';
 import { Model } from 'mongoose';
@@ -25,12 +33,21 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Post('subscribe/:id')
-  async toggleSubscribe(@Param('id') channelId: string, @Req() req: Request) {
+  async toggleSubscribe(
+    @Param('id') channelId: string,
+    @Req() req: Request,
+    @Body('notification') notification: 'none' | '' | 'all',
+  ) {
     const subscriberId = req.user?.userId;
+    
     if (!subscriberId || !channelId)
       return { message: 'ChannelId or SubscriberId is not found' };
     else if (subscriberId === channelId)
       return { message: 'Can not subscribe your self' };
-    return await this.userService.toggleSubscribe(channelId, subscriberId);
+    return await this.userService.toggleSubscribe(
+      channelId,
+      subscriberId,
+      notification,
+    );
   }
 }
