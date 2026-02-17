@@ -12,7 +12,6 @@ export default axiosInstance;
 
 export const generateRefreshToken = async () => {
   try {
-    alert("Calling backend to get access_token");
     await axiosInstance.get("/auth/refresh");
   } catch (error: any) {
     console.error(error);

@@ -6,12 +6,17 @@ import { TypeInput } from '../dtos/video.dto';
 import { Type } from 'src/video/domain/type.schema';
 import { IsEmpty } from 'class-validator';
 import { isEmpty } from 'rxjs';
+import { Subscription } from 'src/user/application/subscription.schema';
+import { UserRepository } from 'src/user/application/port/user.repository';
 
 @Injectable()
 export class VideoRepository {
   constructor(
     @InjectModel(Video.name) private videoModel: Model<Video>,
     @InjectModel(Type.name) private typeModel: Model<Type>,
+    @InjectModel(Subscription.name)
+    private subscriptionModel: Model<Subscription>,
+    private userRepository: UserRepository,
   ) {}
 
   async findAllVideos() {
@@ -69,6 +74,37 @@ export class VideoRepository {
             $unwind: '$owner',
           },
           {
+            $lookup: {
+              from: 'subscriptions',
+              let: { ownerId: '$owner._id' },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ['$channel', '$$ownerId'] },
+                  },
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    subscriber: 1,
+                  },
+                },
+              ],
+              as: 'subscriptions',
+            },
+          },
+          {
+            $addFields: {
+              subscriptions: {
+                $map: {
+                  input: '$subscriptions',
+                  as: 'sub',
+                  in: { $toString: '$$sub.subscriber' },
+                },
+              },
+            },
+          },
+          {
             $project: {
               _id: 1,
               title: 1,
@@ -84,6 +120,7 @@ export class VideoRepository {
               viewCount: 1,
               likes: 1,
               dislikes: 1,
+              subscriptions: 1,
               createdAt: 1,
             },
           },

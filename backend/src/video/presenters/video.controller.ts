@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Req,
-  // UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -14,17 +13,16 @@ import { VideoService } from '../application/video.service';
 import type { Request } from 'express';
 import { VideoInputUpload } from '../application/dtos/video.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import {
-  FileFieldsInterceptor,
-  // FileInterceptor,
-} from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../application/cloudinary.service';
+import { UserService } from 'src/user/application/user.service';
 
 @Controller('video')
 export class VideoController {
   constructor(
     private videoService: VideoService,
     private cloudinarySerice: CloudinaryService,
+    private userService: UserService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -87,7 +85,7 @@ export class VideoController {
     const userId = req.user?.userId;
     if (!userId) return { message: 'UserId not found' };
 
-    return await this.videoService.toggleReactionVideo(
+    return await this.userService.toggleReactionVideo(
       videoId,
       userId,
       reaction,

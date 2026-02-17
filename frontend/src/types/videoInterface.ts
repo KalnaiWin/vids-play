@@ -52,9 +52,8 @@ export interface VideoWatchingInfo {
   viewCount: number;
   likes: string[];
   dislikes: string[];
+  subscriptions: string[];
   createdAt: Date;
-  isLiked?: boolean;
-  isDisliked?: boolean;
 }
 
 export interface RecommendVideos {

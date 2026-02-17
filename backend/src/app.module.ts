@@ -3,10 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
 import config from './config/config';
 import { VideoModule } from './video/video.module';
 import { CloudinaryModule } from './video/cloudinary.module';
+import { AuthModule } from './auth/presenters/auth.module';
 
 @Module({
   imports: [

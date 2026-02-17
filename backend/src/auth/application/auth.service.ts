@@ -13,6 +13,7 @@ import { User } from 'src/user/domain/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -76,12 +77,14 @@ export class AuthService {
     if (!isMatchedPassword)
       throw new UnauthorizedException('Invalid credentials');
 
-    this.generateTokenAuth(String(existingUser._id), res);
+    const token = this.generateTokenAuth(String(existingUser._id), res);
 
     return {
       success: true,
       message: 'Login successfully',
+      token,
       user: {
+        _id: existingUser._id,
         name: existingUser.name,
         email: existingUser.email,
       },
@@ -121,10 +124,7 @@ export class AuthService {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
     });
-    return res.json({
-      message: 'Token refreshed successfully',
-      success: true,
-    });
+    return { accessToken, refreshToken };
   }
 
   async logout(res: Response) {
