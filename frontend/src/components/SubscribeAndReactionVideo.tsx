@@ -9,25 +9,16 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { useEffect, useState } from "react";
-import { toggleReactionVideo, watchVieo } from "../feature/videoThunk";
+import { useState } from "react";
+import { toggleReactionVideo } from "../feature/videoThunk";
 import { subscribeChannel } from "../feature/userThunk";
 
-interface Props {
-  id: string;
-}
-
-const SubscribeAndReactionVideo = ({ id }: Props) => {
+const SubscribeAndReactionVideo = () => {
   const { watchingVideo } = useSelector((state: RootState) => state.video);
   const { user } = useSelector((state: RootState) => state.auth);
-  const { statusSubscribe } = useSelector((state: RootState) => state.user);
 
   const [openSubscribe, setOpenSubscribe] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  useEffect(() => {
-    if (!id) return;
-    dispatch(watchVieo({ id: String(id) }));
-  }, [dispatch, id, statusSubscribe]);
 
   const isSubscribed = watchingVideo?.subscriptions.includes(String(user?._id));
 

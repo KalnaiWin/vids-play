@@ -13,9 +13,18 @@ export const subscribeChannel = createAsyncThunk<
       const result = await axiosInstance.post(`/user/subscribe/${id}`, {
         notification,
       });
-      toast.success(
-        `Đã ${result.data.subscribed ? "" : "hủy "}đăng kí thành công`,
-      );
+      const { subscribed } = result.data;
+
+      if (subscribed) {
+        if (notification === "all") {
+          toast.success("Đã đăng ký và bật tất cả thông báo 🔔");
+        } else if (notification === "none") {
+          toast.success("Đã đăng ký kênh");
+        }
+      } else {
+        toast.success("Đã hủy đăng ký kênh");
+      }
+
       return result.data;
     } catch (error: any) {
       toast.error("Đã đăng kí thất bại");

@@ -8,6 +8,7 @@ import {
   uploadVideo,
   watchVieo,
 } from "../feature/videoThunk";
+import { subscribeChannel } from "../feature/userThunk";
 
 const initialState: VideoInitailState = {
   videos: [],
@@ -18,6 +19,7 @@ const initialState: VideoInitailState = {
   status: "idle",
   statusReaction: "idle",
   statusFetchingVideos: "idle",
+  statusSubscribe: "idle",
 };
 
 export const videoSlice = createSlice({
@@ -25,6 +27,25 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(subscribeChannel.pending, (state) => {
+        state.statusSubscribe = "loading";
+      })
+      .addCase(subscribeChannel.fulfilled, (state, action) => {
+        if (!state.watchingVideo) return;
+        state.statusSubscribe = "succeeded";
+        const userId = action.payload.userId;
+        const index = state.watchingVideo.subscriptions.indexOf(userId);
+        if (index > -1) {
+          state.watchingVideo.subscriptions.splice(index, 1);
+        } else {
+          state.watchingVideo.subscriptions.push(userId);
+        }
+      })
+      .addCase(subscribeChannel.rejected, (state) => {
+        state.statusSubscribe = "failed";
+      });
+
     // Get all videos of user
     builder
       .addCase(getAllVideosForSpecificUser.pending, (state) => {
@@ -38,7 +59,7 @@ export const videoSlice = createSlice({
         state.statusFetchingVideos = "failed";
       });
 
-    // Get recommended videos
+    // Toggle reaction videos
     builder
       .addCase(toggleReactionVideo.pending, (state) => {
         state.statusReaction = "loading";
@@ -73,7 +94,7 @@ export const videoSlice = createSlice({
         state.status = "loading";
       })
       .addCase(watchVieo.fulfilled, (state, action) => {
-        ((state.status = "succeeded"), state);
+        state.status = "succeeded";
         state.watchingVideo = action.payload;
       })
       .addCase(watchVieo.rejected, (state) => {

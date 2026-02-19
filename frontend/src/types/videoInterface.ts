@@ -97,4 +97,5 @@ export interface VideoInitailState {
   statusCreating: "idle" | "loading" | "succeeded" | "failed";
   statusReaction: "idle" | "loading" | "succeeded" | "failed";
   statusFetchingVideos: "idle" | "loading" | "succeeded" | "failed";
+  statusSubscribe: "idle" | "loading" | "succeeded" | "failed";
 }

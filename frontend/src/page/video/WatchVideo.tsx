@@ -16,9 +16,8 @@ const WatchVideo = () => {
   const navigate = useNavigate();
   if (!id) return "/";
 
-  const { watchingVideo, status, recommendedVideos } = useSelector(
-    (state: RootState) => state.video,
-  );
+  const { watchingVideo, status, statusSubscribe, recommendedVideos } =
+    useSelector((state: RootState) => state.video);
   const [viewCount, setViewCount] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -26,7 +25,7 @@ const WatchVideo = () => {
     if (!id) return;
     dispatch(watchVieo({ id: String(id) }));
     dispatch(recommendVideos({ id: String(id) }));
-  }, [dispatch, id]);
+  }, [dispatch, id, statusSubscribe]);
 
   if (!watchingVideo) return <p>Loading...</p>;
 
@@ -71,7 +70,7 @@ const WatchVideo = () => {
             </h1>
 
             <div>
-              <SubscribeAndReactionVideo id={watchingVideo._id} />
+              <SubscribeAndReactionVideo />
             </div>
 
             <div className="bg-zinc-900/50 p-4 rounded-xl border text-white border-zinc-800/50 text-sm">
