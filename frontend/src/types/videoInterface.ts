@@ -48,6 +48,7 @@ export interface VideoWatchingInfo {
   thumbnailUrl: string;
   types: TypesInput[];
   videoUrl: string;
+  duration: number;
   visibility: string;
   viewCount: number;
   likes: string[];
@@ -98,4 +99,6 @@ export interface VideoInitailState {
   statusReaction: "idle" | "loading" | "succeeded" | "failed";
   statusFetchingVideos: "idle" | "loading" | "succeeded" | "failed";
   statusSubscribe: "idle" | "loading" | "succeeded" | "failed";
+  statusDelete: "idle" | "loading" | "succeeded" | "failed";
+  statusUpdate: "idle" | "loading" | "succeeded" | "failed";
 }

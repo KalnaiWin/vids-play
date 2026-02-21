@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { VideoInitailState } from "../types/videoInterface";
 import {
+  deleteVideo,
+  editVideo,
   getAllVideosForSpecificUser,
   getAllVieos,
   recommendVideos,
@@ -20,6 +22,8 @@ const initialState: VideoInitailState = {
   statusReaction: "idle",
   statusFetchingVideos: "idle",
   statusSubscribe: "idle",
+  statusDelete: "idle",
+  statusUpdate: "idle",
 };
 
 export const videoSlice = createSlice({
@@ -27,6 +31,29 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(editVideo.pending, (state) => {
+        state.statusUpdate = "loading";
+      })
+      .addCase(editVideo.fulfilled, (state) => {
+        state.statusUpdate = "succeeded";
+      })
+      .addCase(editVideo.rejected, (state) => {
+        state.statusUpdate = "failed";
+      });
+
+    builder
+      .addCase(deleteVideo.pending, (state) => {
+        state.statusDelete = "loading";
+      })
+      .addCase(deleteVideo.fulfilled, (state, action) => {
+        state.statusDelete = "succeeded";
+        state.videosOfUser.filter((video) => video._id === action.payload);
+      })
+      .addCase(deleteVideo.rejected, (state) => {
+        state.statusDelete = "failed";
+      });
+
     builder
       .addCase(subscribeChannel.pending, (state) => {
         state.statusSubscribe = "loading";

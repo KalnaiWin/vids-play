@@ -112,6 +112,7 @@ export class VideoRepository {
               'owner.avatarUrl': 1,
               'owner.subscriptions': 1,
               thumbnailUrl: 1,
+              duration: 1,
               types: 1,
               videoUrl: 1,
               visibility: 1,
@@ -200,12 +201,20 @@ export class VideoRepository {
     return ids;
   }
 
-  async findAllVideosForSpecificUser(userId: string) {
+  async findAllVideosForSpecificUser(userId: string, nameVideo: string) {
+    const matchStage: any = {
+      owner: new mongoose.Types.ObjectId(userId),
+    };
+
+    if (nameVideo && nameVideo.trim() !== '') {
+      matchStage.title = {
+        $regex: nameVideo,
+        $options: 'i',
+      };
+    }
     return await this.videoModel.aggregate([
       {
-        $match: {
-          owner: new mongoose.Types.ObjectId(userId),
-        },
+        $match: matchStage,
       },
       {
         $project: {

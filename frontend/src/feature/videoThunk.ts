@@ -109,13 +109,70 @@ export const toggleReactionVideo = createAsyncThunk<
 
 export const getAllVideosForSpecificUser = createAsyncThunk<
   VideosForSpecificUser[],
+  { id: string; name: string },
+  { rejectValue: string }
+>(
+  "video/getAllVideosForSpecificUser",
+  async ({ id, name }, { rejectWithValue }) => {
+    try {
+      const result = await axiosInstance.get(`/video/manage/${id}`, {
+        params: {
+          name: name,
+        },
+      });
+      return result.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Error");
+    }
+  },
+);
+
+export const deleteVideo = createAsyncThunk<
+  string,
   { id: string },
   { rejectValue: string }
->("video/getAllVideosForSpecificUser", async ({ id }, { rejectWithValue }) => {
+>("video/deleteVideo", async ({ id }, { rejectWithValue }) => {
   try {
-    const result = await axiosInstance.get(`/video/manage/${id}`);
+    const result = await axiosInstance.delete(`/video/delete/${id}`);
+    toast.success("Xóa video thành công");
     return result.data;
   } catch (error: any) {
+    toast.error("Xóa video thất bại");
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const editVideo = createAsyncThunk<
+  VideoInfo,
+  { data: VideoInput; file: UploadFiles; id: string },
+  { rejectValue: string }
+>("video/editVideo", async ({ data, file, id }, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+
+    formData.append("title", data.title);
+    formData.append("types", JSON.stringify(data.types));
+    formData.append("description", data.description);
+    formData.append("duration", String(data.duration));
+    formData.append("visibility", data.visibility);
+
+    if (file.thumbnailUrl) {
+      formData.append("thumbnail", file.thumbnailUrl);
+    }
+
+    if (file.videoUrl) {
+      formData.append("video", file.videoUrl);
+    }
+
+    const result = await axiosInstance.post(`/video/update/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success("Chỉnh sửa video thành công");
+    return result.data;
+  } catch (error: any) {
+    toast.error("Chỉnh sửa video thất bại");
     return rejectWithValue(error.response?.data || "Error");
   }
 });

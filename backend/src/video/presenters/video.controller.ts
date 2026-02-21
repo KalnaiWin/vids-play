@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Query,
   Req,
   UploadedFiles,
   UseGuards,
@@ -94,14 +96,58 @@ export class VideoController {
 
   @UseGuards(AuthGuard)
   @Get('manage/:id')
-  async getAllVideosForSpecificUser(@Param('id') userId: string) {
+  async getAllVideosForSpecificUser(
+    @Param('id') userId: string,
+    @Query('name') nameVideo: string,
+  ) {
     if (!userId) return { message: 'UserId not found' };
-    return await this.videoService.getAllVideosForSpecificUser(userId);
+    return await this.videoService.getAllVideosForSpecificUser(
+      userId,
+      nameVideo,
+    );
   }
 
   @Get(':id')
   async watchVideo(@Param('id') videoId: string) {
     if (!videoId) return { message: 'Video not found' };
     return await this.videoService.watchVideo(String(videoId));
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  async deleteVideo(@Param('id') videoId: string, @Req() req: Request) {
+    const userId = req.user?.userId;
+    if (!videoId || !userId) return { message: 'UserId or VideoId not found' };
+    await this.videoService.deleteVideo(userId, videoId);
+    return videoId;
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('update/:id')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'thumbnailUrl',
+        maxCount: 1,
+      },
+      {
+        name: 'videoUrl',
+        maxCount: 1,
+      },
+    ]),
+  )
+  async updateVideo(
+    @Param('id') videoId: string,
+    @Req() req: Request,
+    @Body() data: VideoInputUpload,
+    @UploadedFiles()
+    files: {
+      thumbnail?: Express.Multer.File[];
+      video?: Express.Multer.File[];
+    },
+  ) {
+    const userId = req.user?.userId;
+    if (!videoId || !userId) return { message: 'UserId or VideoId not found' };
+    await this.videoService.updateVideo(userId, videoId, data, files);
   }
 }

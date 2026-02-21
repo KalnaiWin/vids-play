@@ -5,8 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
 import { uploadVideo } from "../../feature/videoThunk";
 import type { UploadFiles } from "../../types/videoInterface";
+import { useNavigate } from "react-router-dom";
 
 const UploadVideoPage = () => {
+  const navigate = useNavigate();
   const { statusCreating } = useSelector((state: RootState) => state.video);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -17,8 +19,6 @@ const UploadVideoPage = () => {
     visibility: "PUBLIC",
     types: [] as { name: string; slug: string }[],
   });
-
-  console.log(formData);
 
   const [files, setFiles] = useState<UploadFiles>({
     thumbnailUrl: null,
@@ -61,14 +61,20 @@ const UploadVideoPage = () => {
       if (thumbnailPreviewUrl) URL.revokeObjectURL(thumbnailPreviewUrl);
     };
   }, [videoPreviewUrl, thumbnailPreviewUrl]);
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!files.thumbnailUrl) {
       alert("Vui lòng chọn hình thu nhỏ trước khi đăng lên");
       return;
     }
-    const result = dispatch(uploadVideo({ data: formData, file: files }));
-    if (result !== null) return "/";
+
+    try {
+      await dispatch(uploadVideo({ data: formData, file: files })).unwrap();
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -212,7 +218,11 @@ const UploadVideoPage = () => {
           </div>
           <div className="md:w-1/3 w-full bg-slate-950">
             <div className="w-full relative">
-              <video src={videoPreviewUrl || ""} className="rounded-t-xl" />
+              <video
+                src={videoPreviewUrl || ""}
+                controls
+                className="rounded-t-xl"
+              />
               <div className="absolute top-5 left-5 z-60 bg-blue-200 px-2 py-0.5 rounded-md">
                 <div className="text-xs text-black font-medium">
                   {formatDuration(formData.duration)}

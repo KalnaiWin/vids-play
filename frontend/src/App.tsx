@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { fetchUser } from "./feature/authThunk";
 import WatchVideo from "./page/video/WatchVideo";
 import ManagementVideo from "./page/video/ManagementVideo";
+import EditVideo from "./page/video/EditVideo";
 
 const App = () => {
   const { status } = useSelector((state: RootState) => state.auth);
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/video" element={<ManagementVideo />} />
         <Route path="/video/upload" element={<UploadVideoPage />} />
         <Route path="/watch/:id" element={<WatchVideo />} />
+        <Route path="/edit/:id" element={<EditVideo />} />
       </Route>
     </Routes>
   );
