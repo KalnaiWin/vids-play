@@ -19,21 +19,22 @@ export const generateRefreshToken = async () => {
 };
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   async (error) => {
     const originalRequest = error.config;
 
-    if (originalRequest._retry) {
-      return Promise.reject(error);
-    }
-
     if (
       error.response?.status === 401 &&
-      !originalRequest.url?.includes("/refresh")
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh")
     ) {
       originalRequest._retry = true;
+
       try {
-        await generateRefreshToken();
+        await axiosInstance.get("/auth/refresh", {
+          withCredentials: true,
+        });
+
         return axiosInstance(originalRequest);
       } catch (err) {
         return Promise.reject(err);
