@@ -46,4 +46,90 @@ export class UserRepository {
       subscriber: new Types.ObjectId(subscriberId),
     });
   }
+
+  async findUserChannel(userId: string) {
+    return await this.userModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'videos',
+          let: { userId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$owner', '$$userId'],
+                },
+                visibility: 'PUBLIC',
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                totalVideoCount: { $sum: 1 },
+                totalViews: { $sum: '$viewCount' },
+              },
+            },
+          ],
+          as: 'video',
+        },
+      },
+      {
+        $lookup: {
+          from: 'subscriptions',
+          let: { ownerId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$channel', '$$ownerId'],
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                subscriber: 1,
+              },
+            },
+          ],
+          as: 'subscribers',
+        },
+      },
+      {
+        $addFields: {
+          subscribers: {
+            $map: {
+              input: '$subscribers',
+              as: 'sub',
+              in: { $toString: '$$sub.subscriber' },
+            },
+          },
+          totalVideoCount: {
+            $ifNull: [{ $arrayElemAt: ['$video.totalVideoCount', 0] }, 0],
+          },
+          totalViews: {
+            $ifNull: [{ $arrayElemAt: ['$video.totalViews', 0] }, 0],
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          handleName: 1,
+          avatarUrl: 1,
+          description: 1,
+          subscribers: 1,
+          totalVideoCount: 1,
+          totalViews: 1,
+          createdAt: 1,
+        },
+      },
+    ]);
+  }
 }

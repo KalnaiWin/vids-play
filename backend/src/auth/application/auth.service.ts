@@ -44,10 +44,22 @@ export class AuthService {
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
 
+    let baseHandle = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (await this.userModel.exists({ name: name })) {
+      let handle = baseHandle;
+      let counter = 1;
+
+      while (await this.userModel.exists({ handleName: handle })) {
+        handle = `${baseHandle}${counter}`;
+        counter++;
+      }
+    }
+
     const newUser = await this.userModel.create({
       name,
       email,
       password: hashedPassword,
+      handleName: baseHandle,
     });
 
     this.generateTokenAuth(String(newUser._id), res);

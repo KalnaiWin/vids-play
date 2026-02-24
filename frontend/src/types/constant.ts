@@ -113,7 +113,7 @@ export const analyticVideo = [
     icon: Eye,
     bg: "bg-blue-950",
     text: "text-blue-500",
-    color: "#3B82F6", 
+    color: "#3B82F6",
   },
   {
     type: "subscriptions",
@@ -121,7 +121,7 @@ export const analyticVideo = [
     icon: Users,
     bg: "bg-purple-950",
     text: "text-purple-500",
-    color: "#A855F7", 
+    color: "#A855F7",
   },
   {
     type: "durations",
@@ -129,7 +129,7 @@ export const analyticVideo = [
     icon: Clock,
     bg: "bg-red-950",
     text: "text-red-500",
-    color: "#EF4444", 
+    color: "#EF4444",
   },
   {
     type: "revenues",
@@ -137,6 +137,33 @@ export const analyticVideo = [
     icon: DollarSign,
     bg: "bg-green-950",
     text: "text-green-500",
-    color: "#22C55E", 
+    color: "#22C55E",
+  },
+];
+
+export const typeVideo = [
+  {
+    name: "Trang chủ",
+    path: "homepage",
+  },
+  {
+    name: "Video",
+    path: "video",
+  },
+  {
+    name: "Shorts",
+    path: "short",
+  },
+  {
+    name: "Video phát trực tiếp",
+    path: "livestream",
+  },
+  {
+    name: "Danh sách phát",
+    path: "playlist",
+  },
+  {
+    name: "Bài đăng",
+    path: "post",
   },
 ];

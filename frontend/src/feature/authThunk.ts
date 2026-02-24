@@ -22,9 +22,10 @@ export const register = createAsyncThunk<
   loginInputAndGlobalOutput,
   registerInput,
   { rejectValue: string }
->("auth/register", async (data, { rejectWithValue }) => {
+>("auth/register", async (data, { dispatch, rejectWithValue }) => {
   try {
     const res = await axiosInstance.post("/auth/register", data);
+    dispatch(fetchUser());
     toast.success("Đăng ký thành công, Chúc bạn vui vẻ 😊");
     return res.data;
   } catch (error: any) {
@@ -37,9 +38,10 @@ export const login = createAsyncThunk<
   loginInputAndGlobalOutput,
   loginInputAndGlobalOutput,
   { rejectValue: string }
->("auth/login", async (data, { rejectWithValue }) => {
+>("auth/login", async (data, { dispatch, rejectWithValue }) => {
   try {
     const res = await axiosInstance.post("/auth/login", data);
+    dispatch(fetchUser());
     toast.success("Đăng nhập thành công. Chào mừng bạn trở lại 😄");
     return res.data;
   } catch (error: any) {

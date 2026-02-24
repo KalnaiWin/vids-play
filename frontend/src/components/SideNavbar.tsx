@@ -4,6 +4,11 @@ import {
   navBarItemsExpandHomePage,
   navBarItemsExpandProfile,
 } from "../types/constant";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store";
+import { fetchSubscriptions } from "../feature/userThunk";
+import { getColorFromFirstLetter } from "../types/helperFunction";
 
 const SideNavbar = () => {
   const { pathname } = useLocation();
@@ -28,6 +33,17 @@ export default SideNavbar;
 
 export const ExpandSideNavBar = () => {
   const { pathname } = useLocation();
+
+  const { subscription } = useSelector((state: RootState) => state.user);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchSubscriptions());
+    }
+  }, [dispatch, user]);
+
   return (
     <div className="w-full bg-black md:min-h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs py-3">
       {/* Home Page */}
@@ -47,6 +63,36 @@ export const ExpandSideNavBar = () => {
       {/* Subscription */}
       <div className="flex flex-col gap-2 items-start px-2 w-full">
         <h1 className="font-black text-white text-xl pb-3">Kênh đăng ký</h1>
+        <div className="w-full flex flex-col gap-2">
+          {subscription &&
+            subscription.map((sub) => (
+              <Link
+                to={`/channel/${sub.channelId}`}
+                key={sub._id}
+                className="flex items-center gap-5 hover:bg-slate-200/30 w-full rounded-md py-2 px-3 cursor-pointer"
+              >
+                <div>
+                  {sub.avatarUrl !== "" ? (
+                    <img
+                      src={sub.avatarUrl}
+                      alt="avatar"
+                      className="size-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: getColorFromFirstLetter(sub?.name),
+                      }}
+                      className="size-10 rounded-full object-cover flex justify-center items-center font-bold text-white text-sm"
+                    >
+                      {sub?.name?.slice(0, 1)}
+                    </div>
+                  )}
+                </div>
+                <h1 className="text-white md:text-lg text-sm">{sub.name}</h1>
+              </Link>
+            ))}
+        </div>
       </div>
       {/* Profile */}
       <div className="flex flex-col gap-2 items-start px-2 w-full">

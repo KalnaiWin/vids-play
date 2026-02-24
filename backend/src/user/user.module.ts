@@ -9,6 +9,7 @@ import {
   SubscriptionSchema,
 } from './application/subscription.schema';
 import { Video, VideoSchema } from 'src/video/domain/video.schema';
+import { CloudinaryModule } from 'src/video/cloudinary.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Video, VideoSchema } from 'src/video/domain/video.schema';
         schema: VideoSchema,
       },
     ]),
+    CloudinaryModule,
   ],
   controllers: [UserController],
   providers: [UserService, UserRepository],

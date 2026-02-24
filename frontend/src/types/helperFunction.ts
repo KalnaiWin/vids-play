@@ -39,3 +39,20 @@ export const timeAgo = (date: string | Date) => {
 
 export const generateSlug = (value: string) =>
   value.toLowerCase().trim().replace(/\s+/g, "-");
+
+export const getColorFromFirstLetter = (name: string) => {
+  if (!name) return "#999999";
+
+  const letter = name.trim().charAt(0).toLowerCase();
+
+  if (["a", "e", "d"].includes(letter)) return "#22c55e";
+  if (["b", "f", "g"].includes(letter)) return "#ef4444";
+  if (["c", "h", "i"].includes(letter)) return "#3b82f6";
+  if (["j", "k", "l"].includes(letter)) return "#f59e0b";
+  if (["m", "n", "o"].includes(letter)) return "#8b5cf6";
+  if (["p", "q", "r"].includes(letter)) return "#ec4899";
+  if (["s", "t", "u"].includes(letter)) return "#14b8a6";
+  if (["v", "w", "x", "y", "z"].includes(letter)) return "#64748b";
+
+  return "#999999";
+};

@@ -14,7 +14,7 @@ import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVide
 const WatchVideo = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  if (!id) return "/";
+  if (!id) navigate("/");
 
   const { watchingVideo, status, statusSubscribe, recommendedVideos } =
     useSelector((state: RootState) => state.video);

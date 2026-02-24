@@ -12,6 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { createInfoButton } from "../types/constant";
 import { logout } from "../feature/authThunk";
+import { getColorFromFirstLetter } from "../types/helperFunction";
 
 const TopNavBar = () => {
   const { statusSearch } = useSelector((state: RootState) => state.global);
@@ -33,10 +34,7 @@ const TopNavBar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        expandCreateBar.current &&
-        !expandCreateBar.current.contains(event.target as Node)
-      ) {
+      if ( expandCreateBar.current && !expandCreateBar.current.contains(event.target as Node) ) {
         setIsExpandCreate(false);
       }
     };
@@ -137,9 +135,16 @@ const TopNavBar = () => {
             <Bell className="hover:bg-blue-950 size-10 p-2 rounded-full" />
             {user ? (
               <div className="flex items-center gap-2">
-                <div className="size-9 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white cursor-pointer">
+                <Link
+                  to={`/channel/${user._id}`}
+                  title="Hồ sơ"
+                  style={{
+                    backgroundColor: getColorFromFirstLetter(user?.name),
+                  }}
+                  className="size-9 rounded-full uppercase flex items-center justify-center font-bold text-white cursor-pointer"
+                >
                   {user?.name?.slice(0, 1)}
-                </div>
+                </Link>
                 <button
                   title="Đăng xuất"
                   className="text-red-800 bg-red-100 rounded-md p-1 cursor-pointer"

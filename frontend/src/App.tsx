@@ -9,16 +9,17 @@ import { fetchUser } from "./feature/authThunk";
 import WatchVideo from "./page/video/WatchVideo";
 import ManagementVideo from "./page/video/ManagementVideo";
 import EditVideo from "./page/video/EditVideo";
+import ChannelUser from "./page/ChannelUser";
 
 const App = () => {
-  const { status } = useSelector((state: RootState) => state.auth);
+  const { status, user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchUser());
     }
-  }, [dispatch, status]);
+  }, [dispatch, status, user]);
 
   return (
     <Routes>
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/video/upload" element={<UploadVideoPage />} />
         <Route path="/watch/:id" element={<WatchVideo />} />
         <Route path="/edit/:id" element={<EditVideo />} />
+        <Route path="/channel/:id" element={<ChannelUser />} />
       </Route>
     </Routes>
   );

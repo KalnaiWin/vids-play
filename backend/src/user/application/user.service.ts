@@ -9,6 +9,7 @@ import { Model, Types } from 'mongoose';
 import { UserRepository } from './port/user.repository';
 import { Subscription } from './subscription.schema';
 import { Video } from 'src/video/domain/video.schema';
+import { CloudinaryService } from 'src/video/application/cloudinary.service';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,7 @@ export class UserService {
     @InjectModel(Subscription.name)
     private subscriptionModel: Model<Subscription>,
     private userRepository: UserRepository,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async getUserSubscription(subscriberId: string) {
@@ -120,5 +122,29 @@ export class UserService {
       likes: updated!.likes,
       dislikes: updated!.dislikes,
     };
+  }
+
+  async updateProfileChannel(
+    userId: string,
+    avatarUrl: Express.Multer.File,
+    description: string,
+  ) {
+    const exisitingUser = await this.userModel.findById(userId);
+
+    if (!exisitingUser) throw new NotFoundException('User not found');
+
+    let newAvatarUrl = exisitingUser.avatarUrl;
+
+    if (avatarUrl) {
+      const uploadedImage = await this.cloudinaryService.uploadImage(avatarUrl);
+      newAvatarUrl = uploadedImage.secure_url;
+    }
+
+    await this.userModel.findByIdAndUpdate(exisitingUser._id, {
+      avatarUrl: newAvatarUrl,
+      description: description !== '' && description,
+    });
+
+    return { message: 'Update channel successfully' };
   }
 }
