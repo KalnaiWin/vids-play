@@ -176,3 +176,16 @@ export const editVideo = createAsyncThunk<
     return rejectWithValue(error.response?.data || "Error");
   }
 });
+
+export const getLikedVideo = createAsyncThunk<
+  RecommendVideos[],
+  void,
+  { rejectValue: string }
+>("video/getLikedVideo", async (_, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get("/video/liked");
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});

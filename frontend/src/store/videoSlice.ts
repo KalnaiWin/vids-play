@@ -5,6 +5,7 @@ import {
   editVideo,
   getAllVideosForSpecificUser,
   getAllVieos,
+  getLikedVideo,
   recommendVideos,
   toggleReactionVideo,
   uploadVideo,
@@ -15,6 +16,7 @@ import { subscribeChannel } from "../feature/userThunk";
 const initialState: VideoInitailState = {
   videos: [],
   watchingVideo: null,
+  likedVideo: [],
   recommendedVideos: [],
   videosOfUser: [],
   statusCreating: "idle",
@@ -31,6 +33,18 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(getLikedVideo.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getLikedVideo.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.likedVideo = action.payload;
+      })
+      .addCase(getLikedVideo.rejected, (state) => {
+        state.status = "failed";
+      });
+
     builder
       .addCase(editVideo.pending, (state) => {
         state.statusUpdate = "loading";

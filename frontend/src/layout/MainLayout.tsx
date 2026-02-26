@@ -99,6 +99,8 @@ const MainLayout = () => {
           bg-black
             ${statusNavBar ? "xl:ml-55 md:ml-18 ml-0" : "md:ml-18"}
             overflow-y-auto
+
+            overflow-x-hidden
         `}
       >
         {/* <div className="overflow-y-auto"> */}

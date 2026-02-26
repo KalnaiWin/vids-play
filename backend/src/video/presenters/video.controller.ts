@@ -1,3 +1,4 @@
+import { VideoRepository } from './../application/port/video.repository';
 import {
   Body,
   Controller,
@@ -18,11 +19,13 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../application/cloudinary.service';
 import { UserService } from 'src/user/application/user.service';
+import { log } from 'console';
 
 @Controller('video')
 export class VideoController {
   constructor(
     private videoService: VideoService,
+    private videoRepository: VideoRepository,
     private cloudinarySerice: CloudinaryService,
     private userService: UserService,
   ) {}
@@ -105,6 +108,14 @@ export class VideoController {
       userId,
       nameVideo,
     );
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('liked')
+  async likedVideo(@Req() req: Request) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+    return await this.videoRepository.likedVideo(String(userId));
   }
 
   @Get(':id')

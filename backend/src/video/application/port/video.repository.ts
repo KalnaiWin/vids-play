@@ -212,22 +212,60 @@ export class VideoRepository {
         $options: 'i',
       };
     }
+    return await this.videoModel
+      .aggregate([
+        {
+          $match: matchStage,
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            thumbnailUrl: 1,
+            videoUrl: 1,
+            duration: 1,
+            likes: 1,
+            description: 1,
+            visibility: 1,
+            viewCount: 1,
+            createdAt: 1,
+          },
+        },
+      ])
+      .limit(10);
+  }
+
+  async likedVideo(userId: string) {
     return await this.videoModel.aggregate([
       {
-        $match: matchStage,
+        $match: {
+          likes: userId,
+          visibility: 'PUBLIC',
+          isActive: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'owner',
+          foreignField: '_id',
+          as: 'owner',
+        },
+      },
+      {
+        $unwind: '$owner',
       },
       {
         $project: {
           _id: 1,
+          'owner._id': 1,
+          'owner.name': 1,
+          'owner.avatarUrl': 1,
           title: 1,
           thumbnailUrl: 1,
-          videoUrl: 1,
           duration: 1,
-          likes: 1,
-          description: 1,
-          visibility: 1,
-          viewCount: 1,
           createdAt: 1,
+          viewCount: 1,
         },
       },
     ]);

@@ -91,6 +91,7 @@ export interface VideosForSpecificUser {
 
 export interface VideoInitailState {
   videos: VideoInfo[];
+  likedVideo: RecommendVideos[];
   watchingVideo: VideoWatchingInfo | null;
   recommendedVideos: RecommendVideos[];
   videosOfUser: VideosForSpecificUser[];
