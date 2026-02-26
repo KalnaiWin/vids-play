@@ -13,7 +13,6 @@ import { User } from 'src/user/domain/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -90,6 +89,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
 
     const token = this.generateTokenAuth(String(existingUser._id), res);
+    console.log(token);
 
     return {
       success: true,
@@ -105,13 +105,19 @@ export class AuthService {
 
   generateAccessToken(userId: string) {
     if (!userId) throw new BadRequestException('Invalid user ID');
-    return this.jwtService.sign({ userId, type: 'access' });
+    return this.jwtService.sign(
+      { userId },
+      {
+        secret: this.configService.get('jwt.access.secret'),
+        expiresIn: this.configService.get('jwt.access.expiresIn'),
+      },
+    );
   }
 
   generateRefreshToken(userId: string) {
     if (!userId) throw new BadRequestException('Invalid user ID');
     const refreshToken = this.jwtService.sign(
-      { userId, type: 'refresh' },
+      { userId },
       {
         secret: this.configService.get('jwt.refresh.secret'),
         expiresIn: this.configService.get('jwt.refresh.expiresIn'),
@@ -169,7 +175,7 @@ export class AuthService {
         secret: this.configService.get<string>('jwt.refresh.secret'),
       });
     } catch (err) {
-      throw new UnauthorizedException('Invalid or expired access token');
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
 
