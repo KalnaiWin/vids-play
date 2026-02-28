@@ -34,6 +34,9 @@ export class Video {
   })
   visibility: 'PUBLIC' | 'UNLISTED' | 'PRIVATE';
 
+  @Prop({ type: Date, default: null })
+  scheduledAt: Date | null;
+
   @Prop({ default: 0 })
   viewCount: number;
 

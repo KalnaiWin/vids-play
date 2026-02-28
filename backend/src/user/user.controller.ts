@@ -1,4 +1,3 @@
-import { UserRepository } from './../application/port/user.repository';
 import {
   BadRequestException,
   Body,
@@ -13,12 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.schema';
 import mongoose, { Model } from 'mongoose';
-import { UserService } from '../application/user.service';
 import type { Request } from 'express';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from './user.schema';
+import { UserService } from './user.service';
+import { UserRepository } from './user.repository';
 
 @Controller('user')
 export class UserController {

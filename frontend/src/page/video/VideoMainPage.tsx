@@ -51,10 +51,10 @@ const VideoMainPage = () => {
             </div>
             <div className="flex gap-3 px-1">
               <div>
-                {video.owner.avatarUrl !== "" ? (
+                {video?.owner?.avatarUrl !== "" ? (
                   <img
-                    src={video.owner.avatarUrl}
-                    alt={video.owner.name}
+                    src={video?.owner?.avatarUrl}
+                    alt={video?.owner?.name}
                     className="w-10 h-10 rounded-full object-cover border border-zinc-800"
                   />
                 ) : (
@@ -63,16 +63,16 @@ const VideoMainPage = () => {
               </div>
               <div className="flex flex-col min-w-0">
                 <h3 className="text-[15px] font-semibold text-zinc-100 leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
-                  {video.title}
+                  {video?.title}
                 </h3>
                 <div className="mt-1 flex flex-col text-[13px] text-zinc-400">
                   <span className="hover:text-zinc-200 transition-colors">
-                    {video.owner.name}
+                    {video?.owner?.name}
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <span>{formatViewCount(video.viewCount)} views</span>
+                    <span>{formatViewCount(video?.viewCount) || 0} views</span>
                     <span className="w-0.5 h-0.5 rounded-full bg-zinc-600"></span>
-                    <span>{timeAgo(video.createdAt)}</span>
+                    <span>{timeAgo(video?.createdAt)}</span>
                   </div>
                 </div>
               </div>

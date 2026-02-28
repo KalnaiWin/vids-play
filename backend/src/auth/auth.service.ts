@@ -4,12 +4,11 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthRepository } from './port/auth.repository';
-import { InputLoginDto, InputRegisterDto, UserPayload } from './dtos/auth.dto';
+import { InputLoginDto, InputRegisterDto, UserPayload } from './auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
-import { User } from 'src/user/domain/user.schema';
+import { User } from 'src/user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -17,7 +16,6 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly authRepository: AuthRepository,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectModel(User.name) private userModel: Model<User>,

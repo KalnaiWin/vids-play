@@ -5,8 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
 import { VideoModule } from './video/video.module';
-import { CloudinaryModule } from './video/cloudinary.module';
-import { AuthModule } from './auth/presenters/auth.module';
+import { AuthModule } from './auth/auth.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/presenters/auth.module';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     CloudinaryModule,
     AuthModule,
     VideoModule,

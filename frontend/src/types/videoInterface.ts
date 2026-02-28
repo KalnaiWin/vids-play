@@ -14,6 +14,8 @@ export interface VideoInput {
   duration: number;
   visibility: string;
   types: TypesInput[];
+  scheduleDate: string;
+  scheduleTime: string;
 }
 
 export interface VideoInfo {
@@ -55,6 +57,7 @@ export interface VideoWatchingInfo {
   dislikes: string[];
   subscriptions: string[];
   createdAt: Date;
+  scheduledAt: Date;
 }
 
 export interface RecommendVideos {

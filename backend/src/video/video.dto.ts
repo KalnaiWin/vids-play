@@ -18,6 +18,12 @@ export class VideoInputUpload {
   @Transform(({ value }) => JSON.parse(value))
   @IsArray()
   types: TypeInput[];
+
+  @IsString()
+  scheduleDate: string;
+
+  @IsString()
+  scheduleTime: string;
 }
 
 export class TypeInput {

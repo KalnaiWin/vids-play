@@ -1,4 +1,4 @@
-import { VideoRepository } from './../application/port/video.repository';
+import { VideoRepository } from './video.repository';
 import {
   Body,
   Controller,
@@ -6,20 +6,21 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { VideoService } from '../application/video.service';
 import type { Request } from 'express';
-import { VideoInputUpload } from '../application/dtos/video.dto';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { VideoInputUpload } from './video.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from '../application/cloudinary.service';
-import { UserService } from 'src/user/application/user.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { UserService } from 'src/user/user.service';
 import { log } from 'console';
+import { VideoService } from './video.service';
 
 @Controller('video')
 export class VideoController {
@@ -134,7 +135,7 @@ export class VideoController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('update/:id')
+  @Put('update/:id')
   @UseInterceptors(
     FileFieldsInterceptor([
       {

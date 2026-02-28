@@ -18,6 +18,8 @@ const UploadVideoPage = () => {
     duration: 0,
     visibility: "PUBLIC",
     types: [] as { name: string; slug: string }[],
+    scheduleDate: "",
+    scheduleTime: "",
   });
 
   const [files, setFiles] = useState<UploadFiles>({
@@ -127,11 +129,19 @@ const UploadVideoPage = () => {
               />
             </div>
             <div className="flex flex-col text-slate-400">
-              <label className="text-sm">Hình thu nhỏ</label>
-              <p className="text-xs text-slate-500 mb-3">
-                Chọn hoặc tải 1 một hình ảnh lên để thể hiện nội dung video của
-                bạn
-              </p>
+              <div className="flex justify-between">
+                <div className="flex flex-col">
+                  <label className="text-sm">Hình thu nhỏ</label>
+                  <p className="text-xs text-slate-500 mb-3">
+                    Chọn hoặc tải 1 một hình ảnh lên để thể hiện nội dung video
+                    của bạn
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-amber-400 text-xs">
+                  <Info className="size-3" /> Vui lòng chọn hình thu nhỏ trước
+                  khi đăng lên
+                </div>
+              </div>
               <div className="flex gap-2 w-full h-40">
                 <div className="relative border border-dashed text-slate-500 bg-slate-950 border-slate-500 flex flex-col justify-center items-center w-1/3 rounded-xl">
                   <input
@@ -236,18 +246,57 @@ const UploadVideoPage = () => {
             <div className="w-full h-0.5 bg-slate-900 my-4" />
             <div className="flex flex-col px-5">
               <div className="flex flex-col gap-2">
-                <label className="text-slate-500">Chế độ hiển thị</label>
+                <label className="text-slate-500 text-sm">
+                  Chế độ hiển thị
+                </label>
                 <select
                   defaultValue={"PUBLIC"}
                   onChange={(e) =>
                     setFormData({ ...formData, visibility: e.target.value })
                   }
-                  className="border p-2 rounded-md bg-slate-900"
+                  className="border p-1 rounded-md bg-slate-900"
                 >
                   <option value="PUBLIC">Công khai</option>
                   <option value="PRIVATE">Riêng tư</option>
                 </select>
               </div>
+              {formData.visibility === "PRIVATE" && (
+                <div className="flex justify-between gap-2 w-full mt-2">
+                  <div className="flex flex-col w-1/2">
+                    <label className="text-sm font-medium text-slate-500 mb-1">
+                      Chọn ngày
+                    </label>
+                    <input
+                      type="date"
+                      className="bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white"
+                      value={formData.scheduleDate}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          scheduleDate: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="flex flex-col w-1/2">
+                    <label className="text-sm font-medium text-slate-500 mb-1">
+                      Chọn giờ
+                    </label>
+                    <input
+                      type="time"
+                      className="bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white"
+                      value={formData.scheduleTime || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          scheduleTime: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
               <button
                 type="submit"
                 className={`w-full bg-blue-700 p-3 flex justify-center my-5 rounded-xl  ${statusCreating === "loading" ? "cursor-not-allowed opacity-80" : "cursor-pointer hover:bg-blue-600"}`}
@@ -255,10 +304,6 @@ const UploadVideoPage = () => {
               >
                 {statusCreating !== "loading" ? "Đăng lên" : "Đang đăng..."}
               </button>
-              <div className="flex items-center gap-2 text-amber-400 text-xs">
-                <Info className="size-3" /> Vui lòng chọn hình thu nhỏ trước khi
-                đăng lên
-              </div>
             </div>
           </div>
         </form>

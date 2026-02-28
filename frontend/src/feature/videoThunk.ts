@@ -28,6 +28,8 @@ export const uploadVideo = createAsyncThunk<
     formData.append("visibility", data.visibility);
     formData.append("thumbnailUrl", file.thumbnailUrl);
     formData.append("videoUrl", file.videoUrl);
+    formData.append("scheduleDate", data.scheduleDate);
+    formData.append("scheduleTime", data.scheduleTime);
 
     const result = await axiosInstance.post("/video/upload", formData, {
       headers: {
@@ -155,6 +157,8 @@ export const editVideo = createAsyncThunk<
     formData.append("description", data.description);
     formData.append("duration", String(data.duration));
     formData.append("visibility", data.visibility);
+    formData.append("scheduleDate", data.scheduleDate);
+    formData.append("scheduleTime", data.scheduleTime);
 
     if (file.thumbnailUrl) {
       formData.append("thumbnail", file.thumbnailUrl);
@@ -164,7 +168,7 @@ export const editVideo = createAsyncThunk<
       formData.append("video", file.videoUrl);
     }
 
-    const result = await axiosInstance.post(`/video/update/${id}`, formData, {
+    const result = await axiosInstance.put(`/video/update/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

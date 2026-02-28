@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { Video } from 'src/video/domain/video.schema';
-import { TypeInput } from '../dtos/video.dto';
-import { Type } from 'src/video/domain/type.schema';
-import { Subscription } from 'src/user/application/subscription.schema';
-import { UserRepository } from 'src/user/application/port/user.repository';
+import { Video } from 'src/video/video.schema';
+import { TypeInput } from './video.dto';
+import { Type } from 'src/video/type.schema';
+import { Subscription } from 'src/user/subscription.schema';
+import { UserRepository } from 'src/user/user.repository';
 
 @Injectable()
 export class VideoRepository {
@@ -121,6 +121,7 @@ export class VideoRepository {
               dislikes: 1,
               subscriptions: 1,
               createdAt: 1,
+              scheduledAt: 1,
             },
           },
         ])
@@ -229,6 +230,7 @@ export class VideoRepository {
             visibility: 1,
             viewCount: 1,
             createdAt: 1,
+            scheduledAt: 1,
           },
         },
       ])

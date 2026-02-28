@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
-import { VideoController } from './presenters/video.controller';
-import { VideoService } from './application/video.service';
-import { VideoRepository } from './application/port/video.repository';
-import { CloudinaryService } from './application/cloudinary.service';
+import { VideoController } from './video.controller';
+import { VideoRepository } from './video.repository';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { VideoSchema } from './domain/video.schema';
-import { UserSchema } from 'src/user/domain/user.schema';
+import { VideoSchema } from './video.schema';
+import { UserSchema } from 'src/user/user.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
-import { TypeSchema } from './domain/type.schema';
-import { AuthModule } from 'src/auth/presenters/auth.module';
-import { UserService } from 'src/user/application/user.service';
+import { TypeSchema } from './type.schema';
+import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
-import { SubscriptionSchema } from 'src/user/application/subscription.schema';
+import { SubscriptionSchema } from 'src/user/subscription.schema';
+import { VideoService } from './video.service';
+import { ScheduleService } from 'src/schedule/schedule.service';
 
 @Module({
   imports: [
@@ -44,7 +44,12 @@ import { SubscriptionSchema } from 'src/user/application/subscription.schema';
     ]),
   ],
   controllers: [VideoController],
-  providers: [VideoService, VideoRepository, CloudinaryService],
+  providers: [
+    VideoService,
+    VideoRepository,
+    CloudinaryService,
+    ScheduleService,
+  ],
   exports: [VideoRepository],
 })
 export class VideoModule {}

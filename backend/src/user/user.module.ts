@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './domain/user.schema';
-import { UserController } from './presenters/user.controller';
-import { UserService } from './application/user.service';
-import { UserRepository } from './application/port/user.repository';
-import {
-  Subscription,
-  SubscriptionSchema,
-} from './application/subscription.schema';
-import { Video, VideoSchema } from 'src/video/domain/video.schema';
-import { CloudinaryModule } from 'src/video/cloudinary.module';
+import { User, UserSchema } from './user.schema';
+import { UserService } from './user.service';
+import { Subscription, SubscriptionSchema } from './subscription.schema';
+import { Video, VideoSchema } from 'src/video/video.schema';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { UserController } from './user.controller';
+import { UserRepository } from './user.repository';
 
 @Module({
   imports: [

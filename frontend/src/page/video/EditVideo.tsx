@@ -31,10 +31,16 @@ const EditVideo = () => {
     duration: 0,
     visibility: "PUBLIC",
     types: [] as { name: string; slug: string }[],
+    scheduleDate: "",
+    scheduleTime: "",
   });
+
+  console.log(watchingVideo);
 
   useEffect(() => {
     if (!watchingVideo) return;
+
+    const scheduleAt = new Date(watchingVideo.scheduledAt);
 
     setFormData({
       title: watchingVideo.title,
@@ -42,6 +48,8 @@ const EditVideo = () => {
       duration: watchingVideo.duration,
       visibility: watchingVideo.visibility,
       types: watchingVideo.types ?? [],
+      scheduleDate: scheduleAt.toISOString().split("T")[0],
+      scheduleTime: scheduleAt.toTimeString().slice(0, 5),
     });
 
     setPreview({
@@ -326,7 +334,7 @@ const EditVideo = () => {
             <div className="flex flex-col gap-2">
               <label className="text-slate-500">Chế độ hiển thị</label>
               <select
-                defaultValue={"PUBLIC"}
+                value={formData.visibility}
                 onChange={(e) =>
                   setFormData({ ...formData, visibility: e.target.value })
                 }
@@ -336,6 +344,43 @@ const EditVideo = () => {
                 <option value="PRIVATE">Riêng tư</option>
               </select>
             </div>
+            {formData.visibility === "PRIVATE" && (
+              <div className="flex justify-between gap-2 w-full mt-2">
+                <div className="flex flex-col w-1/2">
+                  <label className="text-sm font-medium text-slate-500 mb-1">
+                    Chọn ngày
+                  </label>
+                  <input
+                    type="date"
+                    className="bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white"
+                    value={formData.scheduleDate}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        scheduleDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="flex flex-col w-1/2">
+                  <label className="text-sm font-medium text-slate-500 mb-1">
+                    Chọn giờ
+                  </label>
+                  <input
+                    type="time"
+                    className="bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white"
+                    value={formData.scheduleTime || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        scheduleTime: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            )}
             <button
               type="submit"
               className={`w-full bg-blue-700 p-3 flex justify-center my-5 rounded-xl  ${statusUpdate === "loading" ? "cursor-not-allowed opacity-80" : "cursor-pointer hover:bg-blue-600"}`}

@@ -6,12 +6,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Video } from '../domain/video.schema';
 import { Model } from 'mongoose';
-import { VideoInputUpload } from './dtos/video.dto';
-import { User } from 'src/user/domain/user.schema';
-import { CloudinaryService } from './cloudinary.service';
-import { VideoRepository } from './port/video.repository';
+import { User } from 'src/user/user.schema';
+import { Video } from './video.schema';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { VideoRepository } from './video.repository';
+import { VideoInputUpload } from './video.dto';
 
 @Injectable()
 export class VideoService {
@@ -49,7 +49,11 @@ export class VideoService {
 
     const typeIds = await this.videoRepository.findOrCreateNewType(data.types);
 
-    await this.videoModel.create({
+    const today = new Date();
+    const scheduled = new Date(`${data.scheduleDate}T${data.scheduleTime}:00`);
+    const scheduleData = scheduled >= today ? scheduled : null;
+
+    const newVideo = await this.videoModel.create({
       owner: existingUser._id,
       title: data.title,
       description: data.description?.trim() || undefined,
@@ -58,9 +62,12 @@ export class VideoService {
       types: typeIds,
       videoUrl: uploadedVideo.secure_url,
       thumbnailUrl: uploadedImage.secure_url,
+      scheduledAt: scheduleData,
     });
 
-    return { message: 'Upload video successfully' };
+    await newVideo.save();
+
+    return newVideo;
   }
 
   async getAllVideos() {
@@ -141,17 +148,36 @@ export class VideoService {
       newVideoUrl = uploadedVideo.secure_url;
     }
 
-    await this.videoModel.findByIdAndUpdate(existingVideo._id, {
-      title: data.title,
-      description: data.description?.trim() || undefined,
-      duration: data.duration,
-      visibility: data.visibility,
-      types: typeIds,
-      videoUrl: newVideoUrl,
-      thumbnailUrl: newThumbnailUrl,
-    });
+    let scheduleData: Date | null = null;
 
-    return { message: 'Update video successfully' };
+    if (data.scheduleDate && data.scheduleTime) {
+      const scheduled = new Date(
+        `${data.scheduleDate}T${data.scheduleTime}:00`,
+      );
+      if (isNaN(scheduled.getTime())) {
+        throw new BadRequestException('Invalid schedule date');
+      }
+      if (scheduled < new Date()) {
+        throw new BadRequestException('Schedule time must be in the future');
+      }
+      scheduleData = scheduled;
+    }
+
+    const updatedvideo = await this.videoModel.findByIdAndUpdate(
+      existingVideo._id,
+      {
+        title: data.title,
+        description: data.description?.trim() || undefined,
+        duration: data.duration,
+        visibility: data.visibility,
+        types: typeIds,
+        videoUrl: newVideoUrl,
+        thumbnailUrl: newThumbnailUrl,
+        scheduledAt: scheduleData,
+      },
+      { new: true },
+    );
+
+    return updatedvideo;
   }
-
 }

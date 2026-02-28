@@ -4,12 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.schema';
+import { User } from './user.schema';
 import { Model, Types } from 'mongoose';
-import { UserRepository } from './port/user.repository';
 import { Subscription } from './subscription.schema';
-import { Video } from 'src/video/domain/video.schema';
-import { CloudinaryService } from 'src/video/application/cloudinary.service';
+import { Video } from 'src/video/video.schema';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
