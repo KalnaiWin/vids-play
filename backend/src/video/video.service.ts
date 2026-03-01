@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from 'src/user/user.schema';
 import { Video } from './video.schema';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
@@ -47,7 +47,11 @@ export class VideoService {
     if (!uploadedVideo || !uploadedImage)
       throw new InternalServerErrorException('Upload failed');
 
-    const typeIds = await this.videoRepository.findOrCreateNewType(data.types);
+    let typeIds: Types.ObjectId[] | undefined;
+
+    if (data.types?.length) {
+      typeIds = await this.videoRepository.findOrCreateNewType(data.types);
+    }
 
     const today = new Date();
     const scheduled = new Date(`${data.scheduleDate}T${data.scheduleTime}:00`);
@@ -129,7 +133,11 @@ export class VideoService {
       throw new BadRequestException('Invalid visibility');
     }
 
-    const typeIds = await this.videoRepository.findOrCreateNewType(data.types);
+    let typeIds: Types.ObjectId[] | undefined;
+
+    if (data.types?.length) {
+      typeIds = await this.videoRepository.findOrCreateNewType(data.types);
+    }
 
     let newThumbnailUrl = existingVideo.thumbnailUrl;
     let newVideoUrl = existingVideo.videoUrl;

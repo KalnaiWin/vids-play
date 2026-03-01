@@ -8,6 +8,7 @@ import { VideoModule } from './video/video.module';
 import { AuthModule } from './auth/auth.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     CloudinaryModule,
     AuthModule,
     VideoModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

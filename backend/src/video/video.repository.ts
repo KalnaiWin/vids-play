@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Video } from 'src/video/video.schema';
 import { TypeInput } from './video.dto';
-import { Type } from 'src/video/type.schema';
+import { Type } from 'src/utils/type.schema';
 import { Subscription } from 'src/user/subscription.schema';
 import { UserRepository } from 'src/user/user.repository';
 

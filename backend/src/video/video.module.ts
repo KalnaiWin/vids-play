@@ -7,7 +7,7 @@ import { VideoSchema } from './video.schema';
 import { UserSchema } from 'src/user/user.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
-import { TypeSchema } from './type.schema';
+import { TypeSchema } from '../utils/type.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { SubscriptionSchema } from 'src/user/subscription.schema';
