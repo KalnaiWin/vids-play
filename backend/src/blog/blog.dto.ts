@@ -4,9 +4,6 @@ import { TypeInput } from 'src/video/video.dto';
 
 export class InputUploadBlog {
   @IsString()
-  title: string;
-
-  @IsString()
   description: string;
 
   @IsString()
@@ -21,7 +18,6 @@ export class InputUploadBlog {
 
 export class OutputUploadBlog {
   id: string;
-  title: string;
   description: string;
   image_blog: string;
   types?: string[];

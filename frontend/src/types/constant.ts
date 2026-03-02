@@ -1,18 +1,27 @@
 import {
   Bookmark,
+  ChartNoAxesColumn,
   Clock,
   DollarSign,
   Eye,
   Flame,
   GalleryVerticalEnd,
   Home,
+  Image,
   MonitorPlay,
   Radio,
+  Smile,
   SquarePen,
   SquarePlay,
   UserCircleIcon,
   Users,
 } from "lucide-react";
+import HomepageVideoChannel from "../page/channel/HomepageVideoChannel";
+import VideoChannel from "../page/channel/VideoChannel";
+import ShortVideo from "../page/channel/ShortVideo";
+import LivestreamPage from "../page/channel/LivestreamPage";
+import PlaylistPage from "../page/channel/PlaylistPage";
+import BlogPage from "../page/channel/BlogPage";
 
 export const navbarItems = [
   {
@@ -145,25 +154,46 @@ export const typeVideo = [
   {
     name: "Trang chủ",
     path: "homepage",
+    component: HomepageVideoChannel,
   },
   {
     name: "Video",
     path: "video",
+    component: VideoChannel,
   },
   {
     name: "Shorts",
     path: "short",
+    component: ShortVideo,
   },
   {
     name: "Video phát trực tiếp",
     path: "livestream",
+    component: LivestreamPage,
   },
   {
     name: "Danh sách phát",
     path: "playlist",
+    component: PlaylistPage,
   },
   {
     name: "Bài đăng",
-    path: "post",
+    path: "blog/channel",
+    component: BlogPage,
+  },
+];
+
+export const typeBlogs = [
+  {
+    name: "Hình ảnh",
+    icon: Image,
+  },
+  {
+    name: "Bình chọn",
+    icon: ChartNoAxesColumn,
+  },
+  {
+    name: "Cảm xúc",
+    icon: Smile,
   },
 ];

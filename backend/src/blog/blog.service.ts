@@ -31,6 +31,9 @@ export class PostService {
     const exsitingUser = await this.userModel.findById(authorId).select('_id');
     if (!exsitingUser) throw new NotFoundException('User not found');
 
+    if (!data.description || data.description === '')
+      throw new BadRequestException('Description must be a text');
+
     let uploadedImage: any = null;
 
     if (imageBlog) {
@@ -41,6 +44,8 @@ export class PostService {
       }
     }
 
+    console.log(imageBlog);
+
     let typeIds: Types.ObjectId[] | undefined;
 
     if (data.types?.length) {
@@ -49,7 +54,6 @@ export class PostService {
 
     const newPost = await this.blogModel.create({
       author: new Types.ObjectId(authorId),
-      title: data.title,
       description: data.description,
       status: data.status !== '' ? data.status : 'PUBLIC',
       image_blog: uploadedImage?.secure_url ?? '',
@@ -59,7 +63,6 @@ export class PostService {
     await newPost.save();
     return {
       id: newPost._id.toString(),
-      title: newPost.title,
       description: newPost.description,
       image_blog: newPost.image_blog,
       types: newPost.types?.map((id: Types.ObjectId) => id.toString()),
@@ -78,7 +81,7 @@ export class PostService {
     if (!deletedBlog)
       throw new NotFoundException('Blog not found or not yours');
 
-    return { message: 'Blog deleted successfully' };
+    return blogId;
   }
 
   async editBlog(
@@ -120,7 +123,6 @@ export class PostService {
 
     return {
       id: updatedPost._id.toString(),
-      title: updatedPost.title,
       description: updatedPost.description,
       image_blog: updatedPost.image_blog,
       types: updatedPost.types?.map((id: Types.ObjectId) => id.toString()),

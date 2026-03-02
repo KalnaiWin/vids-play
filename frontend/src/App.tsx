@@ -9,8 +9,9 @@ import { fetchUser } from "./feature/authThunk";
 import WatchVideo from "./page/video/WatchVideo";
 import ManagementVideo from "./page/video/ManagementVideo";
 import EditVideo from "./page/video/EditVideo";
-import ChannelUser from "./page/ChannelUser";
+import ChannelUser from "./page/channel/ChannelUser";
 import LikedPage from "./page/LikedPage";
+import BlogPage from "./page/channel/BlogPage";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -32,6 +33,8 @@ const App = () => {
         <Route path="/edit/:id" element={<EditVideo />} />
         <Route path="/channel/:id" element={<ChannelUser />} />
         <Route path="/liked" element={<LikedPage />} />
+        <Route path="/liked" element={<LikedPage />} />
+        <Route path="/blog/channel/:id" element={<BlogPage />} />
       </Route>
     </Routes>
   );

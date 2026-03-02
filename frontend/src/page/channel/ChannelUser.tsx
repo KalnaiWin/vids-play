@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import type { AppDispatch, RootState } from "../store";
+import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import {
   getChannelUser,
   subscribeChannel,
   updateProfileChannel,
-} from "../feature/userThunk";
-import { getColorFromFirstLetter } from "../types/helperFunction";
+} from "../../feature/userThunk";
+import { getColorFromFirstLetter } from "../../types/helperFunction";
 import {
   BadgeInfoIcon,
   Bell,
@@ -20,7 +20,7 @@ import {
   UserStar,
   Youtube,
 } from "lucide-react";
-import ChannelVideo, { type UserProps } from "./video/ChannelVideo";
+import ChannelVideo, { type UserProps } from "./ListTabVideo";
 
 const ChannelUser = () => {
   const { id } = useParams();
@@ -291,7 +291,7 @@ const ChannelUser = () => {
         </div>
       )}
       <div className="my-10">
-        <ChannelVideo userId={channel._id} />
+        <ChannelVideo />
       </div>
     </div>
   );

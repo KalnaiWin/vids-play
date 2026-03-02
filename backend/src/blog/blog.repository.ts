@@ -30,7 +30,6 @@ export class PostRepository {
             name: '$author.name',
             avatarUrl: '$author.avatarUrl',
           },
-          title: 1,
           description: 1,
           types: 1,
           image_blog: 1,
@@ -39,6 +38,9 @@ export class PostRepository {
           dislikes: 1,
           createdAt: 1,
         },
+      },
+      {
+        $sort: { createdAt: -1 },
       },
     ]);
   }

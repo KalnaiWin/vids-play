@@ -19,7 +19,9 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Blog } from './blog.schema';
 import type { Request } from 'express';
 import { InputUploadBlog } from './blog.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import {
+  FileInterceptor,
+} from '@nestjs/platform-express';
 
 @Controller('blog')
 export class PostController {
@@ -30,14 +32,7 @@ export class PostController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      {
-        name: 'image_blog',
-        maxCount: 1,
-      },
-    ]),
-  )
+  @UseInterceptors(FileInterceptor('image_blog'))
   @Post('upload')
   async uploadPost(
     @Req() req: Request,
@@ -46,7 +41,6 @@ export class PostController {
   ) {
     const userId = req.user?.userId;
     if (!userId) return { message: 'UserID not found' };
-
     return await this.postService.uploadBlog(userId, data, imageBlog);
   }
 
@@ -65,14 +59,7 @@ export class PostController {
   }
 
   @UseGuards(AuthGuard)
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      {
-        name: 'image_blog',
-        maxCount: 1,
-      },
-    ]),
-  )
+  @UseInterceptors(FileInterceptor('image_blog'))
   @Put('edit/:id')
   async editBlog(
     @Param('id') blogId: string,

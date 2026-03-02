@@ -12,9 +12,6 @@ export class Blog {
   author: Types.ObjectId;
 
   @Prop({ required: true, type: String })
-  title: string;
-
-  @Prop({ required: true, type: String })
   description: string;
 
   @Prop({

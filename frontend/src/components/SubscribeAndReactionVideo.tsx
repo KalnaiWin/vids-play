@@ -12,6 +12,7 @@ import type { AppDispatch, RootState } from "../store";
 import { useState } from "react";
 import { toggleReactionVideo } from "../feature/videoThunk";
 import { subscribeChannel } from "../feature/userThunk";
+import { Link } from "react-router-dom";
 
 const SubscribeAndReactionVideo = () => {
   const { watchingVideo } = useSelector((state: RootState) => state.video);
@@ -27,18 +28,23 @@ const SubscribeAndReactionVideo = () => {
     <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-b border-zinc-800 pb-6">
       <div className="flex items-center gap-4">
         {watchingVideo.owner.avatarUrl !== "" ? (
-          <img
-            src={watchingVideo.owner.avatarUrl}
-            className="size-12 rounded-full border border-zinc-700"
-            alt=""
-          />
+          <Link to={`/channel/${watchingVideo.owner._id}`}>
+            <img
+              src={watchingVideo.owner.avatarUrl}
+              className="size-12 rounded-full border border-zinc-700 object-cover"
+              alt=""
+            />
+          </Link>
         ) : (
           <User className="md:size-12 size-10 rounded-full border border-zinc-700 text-white" />
         )}
         <div>
-          <div className="font-bold text-white flex items-center gap-1">
+          <Link
+            to={`/channel/${watchingVideo.owner._id}`}
+            className="font-bold text-white flex items-center gap-1"
+          >
             {watchingVideo.owner.name}
-          </div>
+          </Link>
           <div className="text-xs text-zinc-400">
             {watchingVideo.subscriptions.length} subscribers
           </div>
