@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { BlogModule } from './blog/blog.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { BlogModule } from './blog/blog.module';
     AuthModule,
     VideoModule,
     BlogModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
