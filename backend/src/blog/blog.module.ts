@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { PostController } from './blog.controller';
-import { PostService } from './blog.service';
+import { BlogController } from './blog.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from 'src/user/user.schema';
-import { PostRepository } from './blog.repository';
+import { BlogRepository } from './blog.repository';
 import { BlogSchema } from './blog.schema';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { VideoModule } from 'src/video/video.module';
+import { BlogService } from './blog.service';
 
 @Module({
   imports: [
@@ -27,8 +27,8 @@ import { VideoModule } from 'src/video/video.module';
       },
     ]),
   ],
-  controllers: [PostController],
-  providers: [PostService, PostRepository],
+  controllers: [BlogController],
+  providers: [BlogService, BlogRepository],
   exports: [],
 })
 export class BlogModule {}

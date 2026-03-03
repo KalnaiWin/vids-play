@@ -6,19 +6,19 @@ import {
 } from '@nestjs/common';
 import { Blog } from './blog.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, Types } from 'mongoose';
-import { PostRepository } from './blog.repository';
+import { Model, Types } from 'mongoose';
 import { InputUploadBlog, OutputUploadBlog } from './blog.dto';
 import { User } from 'src/user/user.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { VideoRepository } from 'src/video/video.repository';
+import { BlogRepository } from './blog.repository';
 
 @Injectable()
-export class PostService {
+export class BlogService {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<Blog>,
     @InjectModel(User.name) private userModel: Model<User>,
-    private postRepository: PostRepository,
+    private postRepository: BlogRepository,
     private cloudinaryService: CloudinaryService,
     private videoRepository: VideoRepository,
   ) {}
@@ -126,6 +126,73 @@ export class PostService {
       description: updatedPost.description,
       image_blog: updatedPost.image_blog,
       types: updatedPost.types?.map((id: Types.ObjectId) => id.toString()),
+    };
+  }
+
+  async toggleReactionBlog(
+    blogId: string,
+    userId: string,
+    type: 'like' | 'dislike',
+  ) {
+    const existignUser = await this.userModel.findById(userId);
+    if (!userId) throw new NotFoundException('User not found');
+
+    const exsitingBlog = await this.blogModel.findById(blogId);
+    if (!exsitingBlog) throw new NotFoundException('Blog not found');
+
+    const liked = exsitingBlog.likes.some((id) => id.toString() === userId);
+    const disliked = exsitingBlog.dislikes.some(
+      (id) => id.toString() === userId,
+    );
+
+    let updated;
+
+    switch (type) {
+      case 'like':
+        if (liked) {
+          updated = await this.blogModel.findByIdAndUpdate(
+            blogId,
+            { $pull: { likes: userId } },
+            { new: true },
+          );
+        } else {
+          updated = await this.blogModel.findByIdAndUpdate(
+            blogId,
+            {
+              $addToSet: { likes: userId },
+              $pull: { dislikes: userId },
+            },
+            { new: true },
+          );
+        }
+        break;
+
+      case 'dislike':
+        if (disliked) {
+          updated = await this.blogModel.findByIdAndUpdate(
+            blogId,
+            { $pull: { dislikes: userId } },
+            { new: true },
+          );
+        } else {
+          updated = await this.blogModel.findByIdAndUpdate(
+            blogId,
+            {
+              $addToSet: { dislikes: userId },
+              $pull: { likes: userId },
+            },
+            { new: true },
+          );
+        }
+        break;
+
+      default:
+        throw new BadRequestException('Invalid reaction type');
+    }
+
+    return {
+      likes: updated!.likes,
+      dislikes: updated!.dislikes,
     };
   }
 }

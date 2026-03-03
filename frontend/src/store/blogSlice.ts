@@ -1,9 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { BlogInitialState } from "../types/blogInterface";
-import { deleteBlog, getBlogs, uploadBlog } from "../feature/blogThunk";
+import {
+  deleteBlog,
+  getBlogDetail,
+  getBlogs,
+  toggleReactBlog,
+  uploadBlog,
+} from "../feature/blogThunk";
 
 const initialState: BlogInitialState = {
   blogs: [],
+  blogsDetail: null,
   status: "idle",
   uploadStatus: "idle",
   deleteStatus: "idle",
@@ -14,6 +21,35 @@ export const blogSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    // reaction blog detail
+    builder
+      .addCase(toggleReactBlog.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleReactBlog.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        if (state.blogsDetail) {
+          state.blogsDetail.likes = action.payload.likes;
+          state.blogsDetail.dislikes = action.payload.dislikes;
+        }
+      })
+      .addCase(toggleReactBlog.rejected, (state) => {
+        state.status = "failed";
+      });
+
+    // Get blog detail
+    builder
+      .addCase(getBlogDetail.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getBlogDetail.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.blogsDetail = action.payload;
+      })
+      .addCase(getBlogDetail.rejected, (state) => {
+        state.status = "failed";
+      });
+
     // Delete blog
     builder
       .addCase(deleteBlog.pending, (state) => {

@@ -1,4 +1,3 @@
-import { PostRepository } from './blog.repository';
 import {
   Body,
   Controller,
@@ -14,21 +13,20 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PostService } from './blog.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Blog } from './blog.schema';
 import type { Request } from 'express';
 import { InputUploadBlog } from './blog.dto';
-import {
-  FileInterceptor,
-} from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BlogService } from './blog.service';
+import { BlogRepository } from './blog.repository';
 
 @Controller('blog')
-export class PostController {
+export class BlogController {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<Blog>,
-    private postService: PostService,
-    private postRepository: PostRepository,
+    private blogService: BlogService,
+    private blogRepository: BlogRepository,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -41,13 +39,19 @@ export class PostController {
   ) {
     const userId = req.user?.userId;
     if (!userId) return { message: 'UserID not found' };
-    return await this.postService.uploadBlog(userId, data, imageBlog);
+    return await this.blogService.uploadBlog(userId, data, imageBlog);
+  }
+
+  @Get('channel/:id')
+  async getBlogs(@Param('id') authorId: string) {
+    if (!authorId) return { message: 'AuthorId not found' };
+    return await this.blogRepository.getBlogsForOthers(authorId);
   }
 
   @Get(':id')
-  async getBlogs(@Param('id') authorId: string) {
-    if (!authorId) return { message: 'AuthorId not found' };
-    return await this.postRepository.getBlogsForOthers(authorId);
+  async getBlogsDetail(@Param('id') blogId: string) {
+    if (!blogId) return { message: 'AuthorId not found' };
+    return (await this.blogRepository.getBlogDetail(blogId))[0];
   }
 
   @UseGuards(AuthGuard)
@@ -55,7 +59,7 @@ export class PostController {
   async deleteBlog(@Param('id') blogId: string, @Req() req: Request) {
     const authorId = req.user?.userId;
     if (!authorId) return { messgae: 'AuthorId not found' };
-    return await this.postService.deleteBlog(blogId, authorId);
+    return await this.blogService.deleteBlog(blogId, authorId);
   }
 
   @UseGuards(AuthGuard)
@@ -69,6 +73,18 @@ export class PostController {
   ) {
     const authorId = req.user?.userId;
     if (!authorId) return { messgae: 'AuthorId not found' };
-    return await this.postService.editBlog(blogId, authorId, data, imageBlog);
+    return await this.blogService.editBlog(blogId, authorId, data, imageBlog);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('react/:id')
+  async toggleReactionBlog(
+    @Param('id') blogId: string,
+    @Req() req: Request,
+    @Body('type') type: 'like' | 'dislike',
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) return { messgae: 'UserId not found' };
+    return await this.blogService.toggleReactionBlog(blogId, userId, type);
   }
 }

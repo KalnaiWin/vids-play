@@ -1,15 +1,25 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
 import {
   generateSlug,
   getColorFromFirstLetter,
   timeAgo,
 } from "../../types/helperFunction";
-import { Check, Loader2, Lock, Send, Trash, XIcon } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  Lock,
+  MessageCircleIcon,
+  Send,
+  ThumbsDown,
+  ThumbsUp,
+  XIcon,
+} from "lucide-react";
 import { typeBlogs } from "../../types/constant";
 import { useEffect, useState } from "react";
-import { deleteBlog, getBlogs, uploadBlog } from "../../feature/blogThunk";
+import { getBlogs, uploadBlog } from "../../feature/blogThunk";
+import LikeAndComment from "../../components/LikeAndComment";
 
 const BlogPage = () => {
   const { id } = useParams();
@@ -213,20 +223,11 @@ const BlogPage = () => {
       <div className="flex flex-col gap-8">
         {blogs &&
           blogs.map((blog) => (
-            <div
+            <Link
+              to={`/blog/${blog._id}`}
               key={blog._id}
               className="rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6 text-white border relative"
             >
-              {user?._id === id && (
-                <button
-                  className="absolute top-1 right-1 bg-red-600 p-1 rounded-full cursor-pointer"
-                  onClick={() => dispatch(deleteBlog({ id: blog._id }))}
-                  title="Xóa bài viết"
-                >
-                  <Trash className="text-red-300 size-5" />
-                </button>
-              )}
-
               <div className="flex items-center gap-3 mb-4">
                 <img
                   src={blog.author.avatarUrl}
@@ -257,12 +258,20 @@ const BlogPage = () => {
                   />
                 </div>
               )}
-              {/* reaction section */}
-              {/* <div className="flex gap-2">
-                <div></div>
-                <div></div>
-              </div> */}
-            </div>
+              <div className="mt-5 flex gap-5 text-slate-500">
+                <div className="flex gap-2 items-center">
+                  <ThumbsUp />
+                  {blog.likes.length}
+                </div>
+                <div className="flex gap-2 items-center">
+                  <ThumbsDown />
+                  {blog.dislikes.length}
+                </div>
+                <div className="flex gap-2 items-center">
+                  <MessageCircleIcon />0
+                </div>
+              </div>
+            </Link>
           ))}
       </div>
     </div>

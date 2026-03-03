@@ -4,6 +4,7 @@ export interface BlogsInfo {
   _id: string;
   title: string;
   author: {
+    _id: string;
     name: string;
     avatarUrl: string;
   };
@@ -11,8 +12,8 @@ export interface BlogsInfo {
   types: TypesInput[];
   image_blog: string;
   status: string;
-  likes: [];
-  dislikes: [];
+  likes: string[];
+  dislikes: string[];
   createdAt: Date;
 }
 
@@ -24,6 +25,7 @@ export interface BlogUpload {
 
 export interface BlogInitialState {
   blogs: BlogsInfo[];
+  blogsDetail: BlogsInfo | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   uploadStatus: "idle" | "loading" | "succeeded" | "failed";
   deleteStatus: "idle" | "loading" | "succeeded" | "failed";

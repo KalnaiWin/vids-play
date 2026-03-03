@@ -12,6 +12,7 @@ import EditVideo from "./page/video/EditVideo";
 import ChannelUser from "./page/channel/ChannelUser";
 import LikedPage from "./page/LikedPage";
 import BlogPage from "./page/channel/BlogPage";
+import BlogDetail from "./page/channel/BlogDetail";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/liked" element={<LikedPage />} />
         <Route path="/liked" element={<LikedPage />} />
         <Route path="/blog/channel/:id" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
       </Route>
     </Routes>
   );
