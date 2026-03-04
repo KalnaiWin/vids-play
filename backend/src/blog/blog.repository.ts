@@ -24,6 +24,35 @@ export class BlogRepository {
       },
       { $unwind: '$author' },
       {
+        $lookup: {
+          from: 'comments',
+          let: { blogId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$target', '$$blogId'] },
+                    { $eq: ['$onModel', 'Blog'] },
+                  ],
+                },
+              },
+            },
+            {
+              $count: 'totalComments',
+            },
+          ],
+          as: 'commentData',
+        },
+      },
+      {
+        $addFields: {
+          commentCount: {
+            $ifNull: [{ $arrayElemAt: ['$commentData.totalComments', 0] }, 0],
+          },
+        },
+      },
+      {
         $project: {
           _id: 1,
           author: {
@@ -38,6 +67,7 @@ export class BlogRepository {
           likes: 1,
           dislikes: 1,
           createdAt: 1,
+          commentCount: 1,
         },
       },
       {

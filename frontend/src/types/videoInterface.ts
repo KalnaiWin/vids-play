@@ -1,3 +1,4 @@
+import type { BlogsInfo } from "./blogInterface";
 export interface UploadFiles {
   thumbnailUrl: File | null;
   videoUrl: File | null;
@@ -92,8 +93,15 @@ export interface VideosForSpecificUser {
   createdAt: Date;
 }
 
+export interface HomePageVideo {
+  popularVideos: VideoInfo[];
+  latestVideos: VideoInfo[];
+  blogs: BlogsInfo[];
+}
+
 export interface VideoInitailState {
   videos: VideoInfo[];
+  homeVideos: HomePageVideo | null;
   likedVideo: RecommendVideos[];
   watchingVideo: VideoWatchingInfo | null;
   recommendedVideos: RecommendVideos[];

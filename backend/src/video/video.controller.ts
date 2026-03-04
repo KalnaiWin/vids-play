@@ -17,17 +17,17 @@ import type { Request } from 'express';
 import { VideoInputUpload } from './video.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { UserService } from 'src/user/user.service';
-import { log } from 'console';
 import { VideoService } from './video.service';
+import { BlogRepository } from 'src/blog/blog.repository';
+import { last } from 'rxjs';
 
 @Controller('video')
 export class VideoController {
   constructor(
     private videoService: VideoService,
     private videoRepository: VideoRepository,
-    private cloudinarySerice: CloudinaryService,
+    private blogRepository: BlogRepository,
     private userService: UserService,
   ) {}
 
@@ -161,5 +161,16 @@ export class VideoController {
     const userId = req.user?.userId;
     if (!videoId || !userId) return { message: 'UserId or VideoId not found' };
     await this.videoService.updateVideo(userId, videoId, data, files);
+  }
+
+  @Get('/home/:id')
+  async getVideosHomePage(@Param('id') channelId: string) {
+    if (!channelId) return { message: 'ChannelId not found' };
+    const popularVideos =
+      await this.videoRepository.getPopularVideos(channelId);
+    const latestVideos =
+      await this.videoRepository.findAllVideosForSpecificUser(channelId, '');
+    const blogs = await this.blogRepository.getBlogsForOthers(channelId);
+    return { popularVideos, latestVideos, blogs };
   }
 }

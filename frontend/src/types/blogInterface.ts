@@ -15,6 +15,7 @@ export interface BlogsInfo {
   likes: string[];
   dislikes: string[];
   createdAt: Date;
+  commentCount: number;
 }
 
 export interface BlogUpload {

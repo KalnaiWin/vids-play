@@ -5,6 +5,7 @@ import {
   editVideo,
   getAllVideosForSpecificUser,
   getAllVieos,
+  getHomepageVideos,
   getLikedVideo,
   recommendVideos,
   toggleReactionVideo,
@@ -19,6 +20,7 @@ const initialState: VideoInitailState = {
   likedVideo: [],
   recommendedVideos: [],
   videosOfUser: [],
+  homeVideos: null,
   statusCreating: "idle",
   status: "idle",
   statusReaction: "idle",
@@ -33,6 +35,18 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(getHomepageVideos.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getHomepageVideos.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.homeVideos = action.payload;
+      })
+      .addCase(getHomepageVideos.rejected, (state) => {
+        state.status = "failed";
+      });
+
     builder
       .addCase(getLikedVideo.pending, (state) => {
         state.status = "loading";

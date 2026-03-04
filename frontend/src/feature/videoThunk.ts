@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  type HomePageVideo,
   type ReactionResponse,
   type RecommendVideos,
   type UploadFiles,
@@ -188,6 +189,19 @@ export const getLikedVideo = createAsyncThunk<
 >("video/getLikedVideo", async (_, { rejectWithValue }) => {
   try {
     const result = await axiosInstance.get("/video/liked");
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const getHomepageVideos = createAsyncThunk<
+  HomePageVideo,
+  { id: string },
+  { rejectValue: string }
+>("video/getHomepageVideos", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(`/video/home/${id}`);
     return result.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");

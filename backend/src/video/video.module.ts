@@ -13,6 +13,9 @@ import { UserModule } from 'src/user/user.module';
 import { SubscriptionSchema } from 'src/user/subscription.schema';
 import { VideoService } from './video.service';
 import { ScheduleService } from 'src/schedule/schedule.service';
+import { BlogModule } from 'src/blog/blog.module';
+import { BlogRepository } from 'src/blog/blog.repository';
+import { BlogSchema } from 'src/blog/blog.schema';
 
 @Module({
   imports: [
@@ -41,6 +44,10 @@ import { ScheduleService } from 'src/schedule/schedule.service';
         name: 'Subscription',
         schema: SubscriptionSchema,
       },
+      {
+        name: 'Blog',
+        schema: BlogSchema,
+      },
     ]),
   ],
   controllers: [VideoController],
@@ -49,6 +56,7 @@ import { ScheduleService } from 'src/schedule/schedule.service';
     VideoRepository,
     CloudinaryService,
     ScheduleService,
+    BlogRepository,
   ],
   exports: [VideoRepository],
 })

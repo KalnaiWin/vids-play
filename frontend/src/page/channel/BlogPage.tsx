@@ -1,11 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
-import {
-  generateSlug,
-  getColorFromFirstLetter,
-  timeAgo,
-} from "../../types/helperFunction";
+import { generateSlug, timeAgo } from "../../types/helperFunction";
 import {
   Check,
   Loader2,
@@ -19,7 +15,7 @@ import {
 import { typeBlogs } from "../../types/constant";
 import { useEffect, useState } from "react";
 import { getBlogs, uploadBlog } from "../../feature/blogThunk";
-import LikeAndComment from "../../components/LikeAndComment";
+import AvatarPage from "../../components/AvatarPage";
 
 const BlogPage = () => {
   const { id } = useParams();
@@ -72,23 +68,7 @@ const BlogPage = () => {
           onSubmit={handleSubmit}
         >
           <div className="flex gap-2 w-full">
-            {user.avatarUrl !== "" ? (
-              <img
-                src={user.avatarUrl}
-                alt=""
-                className="size-10 rounded-full object-cover"
-              />
-            ) : (
-              <div
-                title="Hồ sơ"
-                style={{
-                  backgroundColor: getColorFromFirstLetter(user?.name),
-                }}
-                className="size-10 rounded-full"
-              >
-                {user?.name?.slice(0, 1)}
-              </div>
-            )}
+            <AvatarPage name={user?.name} image={user.avatarUrl} size="10" />
             <div
               onClick={() =>
                 setFormData({

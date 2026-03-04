@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Video } from 'src/video/video.schema';
 import { TypeInput } from './video.dto';
 import { Type } from 'src/utils/type.schema';
@@ -47,6 +47,48 @@ export class VideoRepository {
           dislikeCount: 1,
           createdAt: 1,
         },
+      },
+    ]);
+  }
+
+  async getPopularVideos(ownerId: string) {
+    return await this.videoModel.aggregate([
+      {
+        $match: {
+          owner: new Types.ObjectId(ownerId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'owner',
+          foreignField: '_id',
+          as: 'owner',
+        },
+      },
+      {
+        $unwind: '$owner',
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          'owner._id': 1,
+          'owner.name': 1,
+          'owner.avatarUrl': 1,
+          duration: 1,
+          thumbnailUrl: 1,
+          videoUrl: 1,
+          visibility: 1,
+          viewCount: 1,
+          likeCount: 1,
+          dislikeCount: 1,
+          createdAt: 1,
+        },
+      },
+      {
+        $sort: { viewCount: -1 },
       },
     ]);
   }
@@ -232,6 +274,9 @@ export class VideoRepository {
             createdAt: 1,
             scheduledAt: 1,
           },
+        },
+        {
+          $sort: { createdAt: 1 },
         },
       ])
       .limit(10);
