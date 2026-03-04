@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Req,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -16,7 +17,7 @@ import { CommentService } from './comment.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import type { Request } from 'express';
 import { InputPostComment } from './comment.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CommentRepository } from './comment.repository';
 
 @Controller('comment')
@@ -28,27 +29,12 @@ export class CommentController {
 
   @UseGuards(AuthGuard)
   @Post('post/:id')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      {
-        name: 'imageCmt',
-        maxCount: 1,
-      },
-      {
-        name: 'videoCmt',
-        maxCount: 1,
-      },
-    ]),
-  )
+  @UseInterceptors(FileInterceptor('imageCmt'))
   async postComment(
     @Req() req: Request,
     @Body() data: InputPostComment,
     @Param('id') id: string,
-    @UploadedFiles()
-    files?: {
-      videoCmt?: Express.Multer.File;
-      imageCmt?: Express.Multer.File;
-    },
+    @UploadedFile() imageCmt?: Express.Multer.File,
   ) {
     const userId = req.user?.userId;
     if (!userId) return { messge: 'UserId not found' };
@@ -58,15 +44,14 @@ export class CommentController {
         userId,
         data.content,
         id,
-        files?.imageCmt?.[0],
+        imageCmt,
       );
     } else if (data.onModel === 'Blog') {
       return await this.commentService.postCommentBlog(
         userId,
         data.content,
         id,
-        files?.videoCmt?.[0],
-        files?.imageCmt?.[0],
+        imageCmt,
       );
     }
     throw new BadRequestException('Invalid onModel');

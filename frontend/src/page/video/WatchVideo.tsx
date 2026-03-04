@@ -10,6 +10,7 @@ import {
 import { timeAgo } from "../../types/helperFunction";
 import { ArrowBigLeft } from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
+import CommentPage from "../../components/CommentPage";
 
 const WatchVideo = () => {
   const { id } = useParams();
@@ -86,6 +87,7 @@ const WatchVideo = () => {
               </button>
             </div>
           </div>
+          <CommentPage id={watchingVideo._id} type="Video" />
         </div>
       </div>
 

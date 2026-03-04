@@ -4,6 +4,7 @@ import authSlice from "./authSlice";
 import videoSlice from "./videoSlice";
 import userSlice from "./userSlice";
 import blogSlice from "./blogSlice";
+import commentSlice from "./commentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     video: videoSlice,
     user: userSlice,
     blog: blogSlice,
+    comment: commentSlice,
   },
 });
 

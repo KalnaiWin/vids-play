@@ -12,7 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { createInfoButton } from "../types/constant";
 import { logout } from "../feature/authThunk";
-import { getColorFromFirstLetter } from "../types/helperFunction";
+import AvatarPage from "./AvatarPage";
 
 const TopNavBar = () => {
   const { statusSearch } = useSelector((state: RootState) => state.global);
@@ -138,27 +138,13 @@ const TopNavBar = () => {
             <Bell className="hover:bg-blue-950 size-10 p-2 rounded-full" />
             {user ? (
               <div className="flex items-center gap-2">
-                {user.avatarUrl === "" ? (
-                  <Link
-                    to={`/channel/${user._id}`}
-                    title="Hồ sơ"
-                    style={{
-                      backgroundColor: getColorFromFirstLetter(user?.name),
-                    }}
-                    className="size-9 rounded-full uppercase flex items-center justify-center font-bold text-white cursor-pointer"
-                  >
-                    {user?.name?.slice(0, 1)}
-                  </Link>
-                ) : (
-                  <Link to={`/channel/${user._id}`} title="Hồ sơ">
-                    <img
-                      src={user.avatarUrl}
-                      alt="avatar"
-                      className="size-9 rounded-full cursor-pointer object-cover"
-                    />
-                  </Link>
-                )}
-
+                <Link to={`/channel/${user._id}`} title="Hồ sơ">
+                  <AvatarPage
+                    size="9"
+                    name={user.name}
+                    image={user.avatarUrl}
+                  />
+                </Link>
                 <button
                   title="Đăng xuất"
                   className="text-red-800 bg-red-100 rounded-md p-1 cursor-pointer"

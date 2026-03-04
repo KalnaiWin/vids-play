@@ -2,6 +2,7 @@ import { MessageCircleDashed, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { toggleReactBlog } from "../feature/blogThunk";
+import CommentPage from "./CommentPage";
 
 interface Props {
   blogId: string;
@@ -9,14 +10,15 @@ interface Props {
 
 const LikeAndComment = ({ blogId }: Props) => {
   const { blogsDetail } = useSelector((state: RootState) => state.blog);
+  const { comments } = useSelector((state: RootState) => state.comment);
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
   if (!blogsDetail) return <p>Blog not found</p>;
 
   return (
-    <div className="flex gap-2 text-slate-400">
-      <div className="flex bg-zinc-800 rounded-full p-1 overflow-hidden">
+    <div className="flex flex-col gap-5">
+      <div className="flex bg-zinc-800 rounded-full p-1 w-fit">
         <button
           onClick={() =>
             dispatch(
@@ -47,7 +49,7 @@ const LikeAndComment = ({ blogId }: Props) => {
               }),
             ).unwrap()
           }
-          className={`flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700 rounded-r-full transition-colors ${
+          className={`flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700  transition-colors ${
             blogsDetail?.dislikes?.includes(user?._id ?? "")
               ? "bg-red-200/50 text-red-800"
               : "hover:bg-zinc-700"
@@ -58,10 +60,12 @@ const LikeAndComment = ({ blogId }: Props) => {
             {blogsDetail.dislikes?.length}
           </span>
         </button>
+        <div className="flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700  transition-colors rounded-r-full">
+          <MessageCircleDashed className="size-5" />
+          {comments.length}
+        </div>
       </div>
-      <div className="flex gap-2 items-center">
-        <MessageCircleDashed className="size-5" />0
-      </div>
+      <CommentPage id={blogsDetail._id} type="Blog" />
     </div>
   );
 };

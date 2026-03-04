@@ -26,9 +26,6 @@ export class Comment {
   @Prop({ type: String })
   imageCmt: string;
 
-  @Prop({ type: String })
-  videoCmt: string;
-
   @Prop({ type: Types.ObjectId, ref: 'Comment', default: null })
   parent: Types.ObjectId | null;
 

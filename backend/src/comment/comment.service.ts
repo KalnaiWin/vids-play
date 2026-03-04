@@ -49,7 +49,6 @@ export class CommentService {
         target: new Types.ObjectId(exisitingBlog._id),
         onModel: 'Video',
         imageCmt: uploadImage ? uploadImage.secure_url : '',
-        videoCmt: '',
       });
 
       await postedComment.save();
@@ -62,7 +61,6 @@ export class CommentService {
     userId: string,
     content: string,
     blogId: string,
-    videoCmt?: Express.Multer.File,
     imageCmt?: Express.Multer.File,
   ) {
     const exisitingUser = await this.userModel.findById(userId);
@@ -74,9 +72,6 @@ export class CommentService {
     const uploadImage = imageCmt
       ? await this.cloudinaryService.uploadImage(imageCmt)
       : null;
-    const uploadVideo = videoCmt
-      ? await this.cloudinaryService.uploadVideo(videoCmt)
-      : null;
 
     if (content === '')
       throw new BadRequestException('Content should not be empty');
@@ -87,7 +82,6 @@ export class CommentService {
       target: new Types.ObjectId(exisitingBlog._id),
       onModel: 'Blog',
       imageCmt: uploadImage ? uploadImage.secure_url : '',
-      videoCmt: uploadVideo ? uploadVideo.secure_url : '',
     });
 
     await postedComment.save();

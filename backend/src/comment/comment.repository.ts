@@ -38,12 +38,14 @@ export class CommentRepository {
           _id: 1,
           user: {
             _id: '$user._id',
-            name: '$user.name',
+            handleName: '$user.handleName',
             avatarUrl: '$user.avatarUrl',
           },
           content: 1,
           videoCmt: 1,
           imageCmt: 1,
+          likes: 1,
+          createdAt: 1,
         },
       },
       {
