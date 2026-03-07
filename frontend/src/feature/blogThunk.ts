@@ -16,7 +16,6 @@ export const uploadBlog = createAsyncThunk<
     formData.append("types", JSON.stringify(data.types));
     formData.append("status", data.status);
     if (imageBlog) formData.append("image_blog", imageBlog);
-    console.log(formData);
 
     const result = await axiosInstance.post("/blog/upload", formData);
     toast.success("Đăng bài viết thành công");
@@ -61,8 +60,6 @@ export const toggleReactBlog = createAsyncThunk<
   { rejectValue: string }
 >("blog/toggleReactBlog", async ({ id, type }, { rejectWithValue }) => {
   try {
-    console.log(type);
-
     const result = await axiosInstance.put(`/blog/react/${id}`, { type });
     return result.data;
   } catch (error: any) {

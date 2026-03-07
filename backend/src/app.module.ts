@@ -10,6 +10,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { BlogModule } from './blog/blog.module';
 import { CommentModule } from './comment/comment.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CommentModule } from './comment/comment.module';
     VideoModule,
     BlogModule,
     CommentModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],

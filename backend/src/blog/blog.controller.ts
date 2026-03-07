@@ -45,7 +45,6 @@ export class BlogController {
   @Get('channel/:id')
   async getBlogs(@Param('id') authorId: string) {
     if (!authorId) return { message: 'AuthorId not found' };
-    console.log(await this.blogRepository.getBlogsForOthers(authorId));
     return await this.blogRepository.getBlogsForOthers(authorId);
   }
 

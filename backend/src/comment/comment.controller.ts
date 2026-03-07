@@ -1,4 +1,3 @@
-import { log } from 'console';
 import {
   BadRequestException,
   Body,
@@ -9,7 +8,6 @@ import {
   Post,
   Req,
   UploadedFile,
-  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';

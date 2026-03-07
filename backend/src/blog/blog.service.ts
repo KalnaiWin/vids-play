@@ -44,8 +44,6 @@ export class BlogService {
       }
     }
 
-    console.log(imageBlog);
-
     let typeIds: Types.ObjectId[] | undefined;
 
     if (data.types?.length) {

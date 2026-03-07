@@ -91,12 +91,7 @@ export const createInfoButton = [
   {
     icon: Radio,
     name: "Livestream",
-    path: "/video/livestream",
-  },
-  {
-    icon: SquarePen,
-    name: "Đăng bài viết",
-    path: "/post/create",
+    path: "/create",
   },
 ];
 

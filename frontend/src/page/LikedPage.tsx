@@ -18,8 +18,6 @@ const LikedPage = () => {
   if (status === "loading") return <p>Loading...</p>;
   if (!likedVideo) return "/";
 
-  console.log(likedVideo);
-
   return (
     <div className="mx-5 p-5 text-white flex w-full h-[92%] gap-5">
       <div className="w-1/3 bg-white min-h-[90%] rounded-xl relative">

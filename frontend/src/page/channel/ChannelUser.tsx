@@ -348,7 +348,6 @@ const EditProfileChannel = ({ userId }: UserProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(description, avatarUrl);
 
     await dispatch(
       updateProfileChannel({ description: description, avatar: avatarUrl }),

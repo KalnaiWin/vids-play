@@ -35,8 +35,6 @@ const EditVideo = () => {
     scheduleTime: "",
   });
 
-  console.log(watchingVideo);
-
   useEffect(() => {
     if (!watchingVideo) return;
 

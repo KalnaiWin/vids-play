@@ -248,7 +248,8 @@ const BlogPage = () => {
                   {blog.dislikes.length}
                 </div>
                 <div className="flex gap-2 items-center">
-                  <MessageCircleIcon />0
+                  <MessageCircleIcon />
+                  {blog.commentCount}
                 </div>
               </div>
             </Link>

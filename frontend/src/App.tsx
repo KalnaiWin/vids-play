@@ -13,6 +13,8 @@ import ChannelUser from "./page/channel/ChannelUser";
 import LikedPage from "./page/LikedPage";
 import BlogPage from "./page/channel/BlogPage";
 import BlogDetail from "./page/channel/BlogDetail";
+import StartLiveStream from "./page/room/StartLiveStream";
+import RoomStreaming from "./page/room/RoomStreaming";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -38,6 +40,8 @@ const App = () => {
         <Route path="/blog/channel/:id" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
       </Route>
+      <Route path="/create" element={<StartLiveStream />} />
+      <Route path="/room/stream/:id" element={<RoomStreaming />} />
     </Routes>
   );
 };
