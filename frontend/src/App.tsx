@@ -4,7 +4,7 @@ import MainPage from "./page/MainPage";
 import UploadVideoPage from "./page/video/UploadVideoPage";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchUser } from "./feature/authThunk";
 import WatchVideo from "./page/video/WatchVideo";
 import ManagementVideo from "./page/video/ManagementVideo";
@@ -39,9 +39,9 @@ const App = () => {
         <Route path="/liked" element={<LikedPage />} />
         <Route path="/blog/channel/:id" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
+        <Route path="/room/stream/:id" element={<RoomStreaming />} />
       </Route>
       <Route path="/create" element={<StartLiveStream />} />
-      <Route path="/room/stream/:id" element={<RoomStreaming />} />
     </Routes>
   );
 };

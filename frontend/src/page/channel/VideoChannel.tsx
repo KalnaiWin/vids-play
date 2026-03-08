@@ -17,11 +17,8 @@ const VideoChannel = () => {
   );
   const [nameVideo, setNameVideo] = useState("");
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (!user) return;
-
     const timeout = setTimeout(() => {
       dispatch(
         getAllVideosForSpecificUser({
@@ -32,7 +29,7 @@ const VideoChannel = () => {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [dispatch, user, nameVideo, statusDelete]);
+  }, [dispatch, nameVideo, statusDelete]);
   return (
     <div className="grid grid-cols-4 w-full gap-5">
       {videosOfUser.map((video) => (

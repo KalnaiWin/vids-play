@@ -31,7 +31,7 @@ const WatchVideo = () => {
   if (!watchingVideo) return <p>Loading...</p>;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col xl:flex-row overflow-y-auto">
+    <div className="fixed inset-0 z-40 bg-slate-950 flex flex-col xl:flex-row overflow-y-auto md:mt-10 mt-20">
       <button
         className="fixed top-4 left-4 z-80 p-2 bg-black/50 hover:bg-zinc-800 text-white rounded-full transition-colors backdrop-blur-md"
         onClick={() => {

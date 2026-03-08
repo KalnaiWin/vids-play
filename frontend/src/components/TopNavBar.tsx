@@ -1,6 +1,6 @@
 import { ArrowBigLeft, Bell, LogOut, Menu, Plus, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { AppDispatch, RootState } from "../store";
 import {
   closeSearch,
@@ -20,6 +20,9 @@ const TopNavBar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [isExpandCreate, setIsExpandCreate] = useState(false);
   const expandCreateBar = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const watchingVideo =
+    location.pathname.includes("watch") || location.pathname.includes("stream");
 
   useEffect(() => {
     const handleResize = () => {
@@ -70,12 +73,22 @@ const TopNavBar = () => {
       {!statusSearch && (
         <>
           <div className="flex items-center gap-5">
-            <div className="hidden xl:block">
-              <Menu
-                className="hover:bg-blue-950 p-2 size-10 rounded-full cursor-pointer"
-                onClick={() => dispatch(toggleNavBar())}
-              />
-            </div>
+            {!watchingVideo && (
+              <div className="hidden xl:block">
+                <Menu
+                  className="hover:bg-blue-950 p-2 size-10 rounded-full cursor-pointer"
+                  onClick={() => dispatch(toggleNavBar())}
+                />
+              </div>
+            )}
+            {watchingVideo && (
+              <div className="xl:block hidden">
+                <Menu
+                  className="hover:bg-blue-950 p-2 size-10 rounded-full cursor-pointer"
+                  onClick={() => dispatch(toogleNavBarResponsive())}
+                />
+              </div>
+            )}
             <div className="block xl:hidden">
               <Menu
                 className="hover:bg-blue-950 p-2 size-10 rounded-full cursor-pointer"
