@@ -24,7 +24,7 @@ export class AuthService {
   async getUser(userId: string) {
     const exsitingUser = await this.userModel
       .findById(userId)
-      .select('name email avatarUrl');
+      .select('name email avatarUrl handleName');
     if (!exsitingUser) throw new NotFoundException('User not found');
     return exsitingUser;
   }

@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { RoomInitialState } from "../types/roominterface";
 import {
   createRoom,
   fetchStreamingRooms,
   fetchStreamingRoomsOfUser,
   joinRoom,
+  toggleReactionRoom,
 } from "../feature/roomThunk";
+import type { RoomInitialState } from "../types/roomInterface";
 
 const initialState: RoomInitialState = {
   streamingRoom: null,
@@ -13,6 +14,7 @@ const initialState: RoomInitialState = {
   myRooms: [],
   status: "idle",
   createStatus: "idle",
+  statusReaction: "idle",
 };
 
 export const roomSlice = createSlice({
@@ -70,6 +72,22 @@ export const roomSlice = createSlice({
       })
       .addCase(fetchStreamingRoomsOfUser.rejected, (state) => {
         state.status = "failed";
+      });
+
+    // Fetch rooms
+    builder
+      .addCase(toggleReactionRoom.pending, (state) => {
+        state.statusReaction = "loading";
+      })
+      .addCase(toggleReactionRoom.fulfilled, (state, action) => {
+        state.statusReaction = "succeeded";
+        if (state.streamingRoom) {
+          state.streamingRoom.likes = action.payload.likes;
+          state.streamingRoom.dislikes = action.payload.dislikes;
+        }
+      })
+      .addCase(toggleReactionRoom.rejected, (state) => {
+        state.statusReaction = "failed";
       });
   },
 });

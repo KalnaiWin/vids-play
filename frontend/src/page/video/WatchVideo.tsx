@@ -7,7 +7,7 @@ import {
   recommendVideos,
   watchVieo,
 } from "../../feature/videoThunk";
-import { timeAgo } from "../../types/helperFunction";
+import { formatDuration, timeAgo } from "../../types/helperFunction";
 import { ArrowBigLeft } from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
 import CommentPage from "../../components/CommentPage";
@@ -31,9 +31,9 @@ const WatchVideo = () => {
   if (!watchingVideo) return <p>Loading...</p>;
 
   return (
-    <div className="fixed inset-0 z-40 bg-slate-950 flex flex-col xl:flex-row overflow-y-auto md:mt-10 mt-20">
+    <div className="fixed inset-0 z-40 bg-slate-950 flex flex-col xl:flex-row overflow-y-auto md:mt-5 mt-20">
       <button
-        className="fixed top-4 left-4 z-80 p-2 bg-black/50 hover:bg-zinc-800 text-white rounded-full transition-colors backdrop-blur-md"
+        className="fixed top-20 left-4 z-80 p-2 bg-black/50 hover:bg-zinc-800 text-white rounded-full transition-colors backdrop-blur-md"
         onClick={() => {
           navigate("/");
         }}
@@ -111,7 +111,7 @@ const WatchVideo = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
                 <div className="absolute bottom-1 right-1 bg-black/80 px-1 py-0.5 rounded text-[10px] text-white">
-                  {v.duration}
+                  {formatDuration(Number(v.duration))}
                 </div>
               </div>
               <div className="flex flex-col min-w-0">

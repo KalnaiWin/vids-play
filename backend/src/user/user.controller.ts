@@ -33,7 +33,7 @@ export class UserController {
   async getUserSubscription(@Req() req: Request) {
     const subscriberId = req.user?.userId;
     if (!subscriberId) return { message: 'SubscriberId not found' };
-    return await this.userService.getUserSubscription(subscriberId);
+    return await this.userRepository.findUserSubscription(subscriberId);
   }
 
   @UseGuards(AuthGuard)
@@ -56,7 +56,6 @@ export class UserController {
     );
   }
 
-  @UseGuards(AuthGuard)
   @Get('channel/:id')
   async fetchChannelUser(@Param('id') channelId: string) {
     if (!mongoose.Types.ObjectId.isValid(channelId)) {

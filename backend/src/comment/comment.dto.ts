@@ -8,3 +8,20 @@ export class InputPostComment {
   @IsIn(['Video', 'Blog'])
   onModel: 'Video' | 'Blog';
 }
+
+export class ChatInput {
+  @IsString()
+  roomId: string;
+
+  @IsString()
+  _id: string;
+
+  @IsString()
+  handleName: string;
+
+  @IsString()
+  avatarUrl: string;
+
+  @IsString()
+  comment: string;
+}

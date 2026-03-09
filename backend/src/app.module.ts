@@ -11,6 +11,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { BlogModule } from './blog/blog.module';
 import { CommentModule } from './comment/comment.module';
 import { RoomModule } from './room/room.module';
+import { ChatGateway } from './chat.gateway';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -34,8 +36,9 @@ import { RoomModule } from './room/room.module';
     BlogModule,
     CommentModule,
     RoomModule,
+    SocketModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway],
 })
 export class AppModule {}

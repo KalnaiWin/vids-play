@@ -19,7 +19,7 @@ export class Comment {
   @Prop({
     type: String,
     required: true,
-    enum: ['Video', 'Blog'],
+    enum: ['Video', 'Blog', 'Room'],
   })
   onModel: string;
 

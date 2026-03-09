@@ -1,7 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../lib/axios";
-import type { RoomInfo, RoomStreamingInfo } from "../types/roominterface";
 import { toast } from "react-toastify";
+import type { RoomInfo, RoomStreamingInfo } from "../types/roomInterface";
+import type { ReactionResponse } from "../types/videoInterface";
 
 export const createRoom = createAsyncThunk<
   RoomInfo,
@@ -56,6 +57,19 @@ export const fetchStreamingRoomsOfUser = createAsyncThunk<
   try {
     const result = await axiosInstance.get(`/room/stream/${id}`);
     return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const toggleReactionRoom = createAsyncThunk<
+  ReactionResponse,
+  { id: string; type: "like" | "dislike" },
+  { rejectValue: string }
+>("video/toggleReactionRoom", async ({ type, id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.post(`/room/reaction/${id}`, { type });
+    return result.data as ReactionResponse;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");
   }

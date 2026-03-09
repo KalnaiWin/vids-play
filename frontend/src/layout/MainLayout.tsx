@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
 import SideNavbar, { ExpandSideNavBar } from "../components/SideNavbar";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,9 @@ const MainLayout = () => {
   const { statusNavBar, statusNavBarReponsive, statusAuth } = useSelector(
     (state: RootState) => state.global,
   );
+  const location = useLocation();
+  const watchingVideo =
+    location.pathname.includes("watch") || location.pathname.includes("stream");
 
   const responsiveNavbar = useRef<HTMLDivElement>(null);
   const authenticateShow = useRef<HTMLDivElement>(null);
@@ -79,7 +82,7 @@ const MainLayout = () => {
 
       <div className="fixed top-16 left-0 w-fit z-40 xl:block hidden">
         <div className="hidden sm:block">
-          {statusNavBar && (
+          {statusNavBar && !watchingVideo && (
             <div className="hidden xl:block w-60">
               <ExpandSideNavBar />
             </div>

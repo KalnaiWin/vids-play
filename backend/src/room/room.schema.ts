@@ -9,6 +9,9 @@ export class Room {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   host: Types.ObjectId;
 
+  @Prop({ type: String, default: '' })
+  description: string;
+
   @Prop({ type: String })
   thumbnail: string;
 
@@ -20,6 +23,12 @@ export class Room {
 
   @Prop({ default: 0 })
   totalViews: number;
+
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  likes: Types.ObjectId[];
+
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  dislikes: Types.ObjectId[];
 
   @Prop({
     enum: ['LIVE', 'STOP', 'WAITING'],

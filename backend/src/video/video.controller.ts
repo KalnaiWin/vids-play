@@ -20,7 +20,6 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserService } from 'src/user/user.service';
 import { VideoService } from './video.service';
 import { BlogRepository } from 'src/blog/blog.repository';
-import { last } from 'rxjs';
 
 @Controller('video')
 export class VideoController {
@@ -98,7 +97,7 @@ export class VideoController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('manage/:id')
   async getAllVideosForSpecificUser(
     @Param('id') userId: string,

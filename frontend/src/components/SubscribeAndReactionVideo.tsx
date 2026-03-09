@@ -4,7 +4,6 @@ import {
   ChevronRight,
   ThumbsDown,
   ThumbsUp,
-  User,
   UserRoundX,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,42 +12,49 @@ import { useState } from "react";
 import { toggleReactionVideo } from "../feature/videoThunk";
 import { subscribeChannel } from "../feature/userThunk";
 import { Link } from "react-router-dom";
+import AvatarPage from "./AvatarPage";
+import { toggleReactionRoom } from "../feature/roomThunk";
 
 const SubscribeAndReactionVideo = () => {
   const { watchingVideo } = useSelector((state: RootState) => state.video);
+  const { streamingRoom } = useSelector((state: RootState) => state.room);
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [openSubscribe, setOpenSubscribe] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const isSubscribed = watchingVideo?.subscriptions.includes(String(user?._id));
+  const isSubscribed =
+    watchingVideo?.subscriptions?.includes(String(user?._id)) ?? false;
 
-  if (!watchingVideo) return <p>Loading...</p>;
+  const content = watchingVideo || streamingRoom;
+
+  const owner = watchingVideo?.owner || streamingRoom?.host;
+  if (!content) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-b border-zinc-800 pb-6">
       <div className="flex items-center gap-4">
-        {watchingVideo.owner.avatarUrl !== "" ? (
-          <Link to={`/channel/${watchingVideo.owner._id}`}>
-            <img
-              src={watchingVideo.owner.avatarUrl}
-              className="size-12 rounded-full border border-zinc-700 object-cover"
-              alt=""
-            />
-          </Link>
-        ) : (
-          <User className="md:size-12 size-10 rounded-full border border-zinc-700 text-white" />
-        )}
+        <AvatarPage
+          name={owner?.name || ""}
+          image={owner?.avatarUrl || ""}
+          size="10"
+        />
         <div>
           <Link
-            to={`/channel/${watchingVideo.owner._id}`}
+            to={`/channel/${owner?._id}`}
             className="font-bold text-white flex items-center gap-1"
           >
-            {watchingVideo.owner.name}
+            {owner?.name}
           </Link>
           <div className="text-xs text-zinc-400">
-            {watchingVideo.subscriptions.length} subscribers
+            {watchingVideo?.subscriptions.length ||
+              streamingRoom?.subscriptions.length}{" "}
+            subscribers
           </div>
         </div>
+        {/* Subscribe */}
         <div className="flex items-center gap-2 ml-4 relative">
           {!isSubscribed ? (
             <button
@@ -140,17 +146,27 @@ const SubscribeAndReactionVideo = () => {
         </div>
       </div>
 
+      {/* React */}
       <div className="flex items-center gap-2">
         <div className="flex bg-zinc-800 rounded-full p-1 overflow-hidden">
           <button
-            onClick={() =>
-              dispatch(
-                toggleReactionVideo({
-                  id: watchingVideo._id,
-                  type: "like",
-                }),
-              )
-            }
+            onClick={() => {
+              if (watchingVideo) {
+                dispatch(
+                  toggleReactionVideo({
+                    id: watchingVideo?._id || "",
+                    type: "like",
+                  }),
+                );
+              } else {
+                dispatch(
+                  toggleReactionRoom({
+                    id: streamingRoom?._id || "",
+                    type: "like",
+                  }),
+                );
+              }
+            }}
             className={`flex items-center gap-2 px-4 py-1.5  transition-colors rounded-l-full border-r border-zinc-700 ${
               watchingVideo?.likes?.includes(user?._id ?? "")
                 ? "bg-blue-200/50 text-blue-800"
@@ -160,18 +176,29 @@ const SubscribeAndReactionVideo = () => {
           >
             <ThumbsUp />
             <span className="text-sm font-medium">
-              {watchingVideo.likes?.length}
+              {watchingVideo?.likes?.length ||
+                streamingRoom?.likes?.length ||
+                0}
             </span>
           </button>
           <button
-            onClick={() =>
-              dispatch(
-                toggleReactionVideo({
-                  id: watchingVideo._id,
-                  type: "dislike",
-                }),
-              )
-            }
+            onClick={() => {
+              if (watchingVideo) {
+                dispatch(
+                  toggleReactionVideo({
+                    id: watchingVideo?._id || "",
+                    type: "dislike",
+                  }),
+                );
+              } else {
+                dispatch(
+                  toggleReactionRoom({
+                    id: streamingRoom?._id || "",
+                    type: "dislike",
+                  }),
+                );
+              }
+            }}
             className={`flex items-center gap-2 px-4 py-1.5 hover:bg-zinc-700 rounded-r-full transition-colors ${
               watchingVideo?.dislikes?.includes(user?._id ?? "")
                 ? "bg-red-200/50 text-red-800"
@@ -180,7 +207,9 @@ const SubscribeAndReactionVideo = () => {
           >
             <ThumbsDown />
             <span className="text-sm font-medium">
-              {watchingVideo.dislikes?.length}
+              {watchingVideo?.dislikes?.length ||
+                streamingRoom?.dislikes?.length ||
+                0}
             </span>
           </button>
         </div>

@@ -10,6 +10,7 @@ import { Subscription } from './subscription.schema';
 import { Video } from 'src/video/video.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UserRepository } from './user.repository';
+import { Room } from 'src/room/room.schema';
 
 @Injectable()
 export class UserService {
@@ -17,15 +18,12 @@ export class UserService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     @InjectModel(Video.name) private videoModel: Model<Video>,
+    @InjectModel(Room.name) private roomModel: Model<Room>,
     @InjectModel(Subscription.name)
     private subscriptionModel: Model<Subscription>,
     private userRepository: UserRepository,
     private cloudinaryService: CloudinaryService,
   ) {}
-
-  async getUserSubscription(subscriberId: string) {
-    return await this.userRepository.findUserSubscription(subscriberId);
-  }
 
   async toggleSubscribe(
     channelId: string,
@@ -105,6 +103,68 @@ export class UserService {
         } else {
           updated = await this.videoModel.findByIdAndUpdate(
             videoId,
+            {
+              $addToSet: { dislikes: userId },
+              $pull: { likes: userId },
+            },
+            { new: true },
+          );
+        }
+        break;
+
+      default:
+        throw new BadRequestException('Invalid reaction type');
+    }
+
+    return {
+      likes: updated!.likes,
+      dislikes: updated!.dislikes,
+    };
+  }
+
+  async toggleReactionRoom(
+    roomId: string,
+    userId: string,
+    type: 'like' | 'dislike',
+  ) {
+    const room = await this.roomModel.findById(roomId);
+    if (!room) throw new NotFoundException('Room not found');
+
+    const liked = room.likes.some((id) => id.toString() === userId);
+    const disliked = room.dislikes.some((id) => id.toString() === userId);
+
+    let updated;
+
+    switch (type) {
+      case 'like':
+        if (liked) {
+          updated = await this.roomModel.findByIdAndUpdate(
+            roomId,
+            { $pull: { likes: userId } },
+            { new: true },
+          );
+        } else {
+          updated = await this.roomModel.findByIdAndUpdate(
+            roomId,
+            {
+              $addToSet: { likes: userId },
+              $pull: { dislikes: userId },
+            },
+            { new: true },
+          );
+        }
+        break;
+
+      case 'dislike':
+        if (disliked) {
+          updated = await this.roomModel.findByIdAndUpdate(
+            roomId,
+            { $pull: { dislikes: userId } },
+            { new: true },
+          );
+        } else {
+          updated = await this.roomModel.findByIdAndUpdate(
+            roomId,
             {
               $addToSet: { dislikes: userId },
               $pull: { likes: userId },

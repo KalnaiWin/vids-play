@@ -14,12 +14,14 @@ import { RoomRepository } from './room.repository';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
+import { UserService } from 'src/user/user.service';
 
 @Controller('room')
 export class RoomController {
   constructor(
     private roomService: RoomService,
     private roomRepository: RoomRepository,
+    private userService: UserService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -45,13 +47,26 @@ export class RoomController {
   @Get('/join/:id')
   async joinRoomStreaming(@Param('id') roomId: string, @Req() req: Request) {
     const userId = req.user?.userId;
-    if (!userId) return { messgae: 'UserId not found' };
+    if (!userId || !roomId) return { messgae: 'UserId or RoomId not found' };
+    return (await this.roomRepository.getJoinedRoom(roomId))[0];
   }
 
-  @UseGuards(AuthGuard)
   @Get('stream/:id')
   async getStreamingRoomsOfUSer(@Param('id') userId: string) {
     if (!userId) return { messgae: 'UserId not found' };
     return this.roomRepository.getStreamingRoomsOfUser(userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('reaction/:id')
+  async toggleReactionVideo(
+    @Param('id') roomId: string,
+    @Req() req: Request,
+    @Body('type') reaction: 'like' | 'dislike',
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+
+    return await this.userService.toggleReactionRoom(roomId, userId, reaction);
   }
 }

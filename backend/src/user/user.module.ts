@@ -7,6 +7,8 @@ import { Video, VideoSchema } from 'src/video/video.schema';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
+import { Room, RoomSchema } from 'src/room/room.schema';
+import { RoomModule } from 'src/room/room.module';
 
 @Module({
   imports: [
@@ -22,6 +24,10 @@ import { UserRepository } from './user.repository';
       {
         name: Video.name,
         schema: VideoSchema,
+      },
+      {
+        name: Room.name,
+        schema: RoomSchema,
       },
     ]),
     CloudinaryModule,

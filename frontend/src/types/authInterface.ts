@@ -3,6 +3,7 @@ export interface UserInfo {
   name: string;
   email: string;
   avatarUrl: string;
+  handleName: string;
 }
 
 export interface authInitialState {
