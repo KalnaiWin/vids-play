@@ -9,7 +9,7 @@ interface avatarProps {
 const AvatarPage = ({ name, size, image }: avatarProps) => {
   return (
     <>
-      {image !== "" ? (
+      {image ? (
         <img
           src={image}
           alt={name}
@@ -22,7 +22,7 @@ const AvatarPage = ({ name, size, image }: avatarProps) => {
           }}
           className={`size-${size} rounded-full uppercase flex items-center justify-center font-bold text-white cursor-pointer`}
         >
-          {name.slice(0, 1)}
+          {name?.slice(0, 1)}
         </div>
       )}
     </>

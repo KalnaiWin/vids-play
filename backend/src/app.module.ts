@@ -11,7 +11,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { BlogModule } from './blog/blog.module';
 import { CommentModule } from './comment/comment.module';
 import { RoomModule } from './room/room.module';
-import { ChatGateway } from './chat.gateway';
 import { SocketModule } from './socket/socket.module';
 
 @Module({
@@ -39,6 +38,6 @@ import { SocketModule } from './socket/socket.module';
     SocketModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ChatGateway],
+  providers: [AppService],
 })
 export class AppModule {}

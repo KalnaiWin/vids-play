@@ -43,11 +43,9 @@ export class RoomController {
     return await this.roomRepository.findAllStreamRooms();
   }
 
-  @UseGuards(AuthGuard)
   @Get('/join/:id')
   async joinRoomStreaming(@Param('id') roomId: string, @Req() req: Request) {
-    const userId = req.user?.userId;
-    if (!userId || !roomId) return { messgae: 'UserId or RoomId not found' };
+    if (!roomId) return { messgae: 'RoomId not found' };
     return (await this.roomRepository.getJoinedRoom(roomId))[0];
   }
 

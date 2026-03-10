@@ -8,7 +8,6 @@ import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVide
 import CommentPage from "../../components/CommentPage";
 import { recommendVideos } from "../../feature/videoThunk";
 import { formatDuration, timeAgo } from "../../types/helperFunction";
-import { io, type Socket } from "socket.io-client";
 import { socket } from "../../socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
@@ -30,25 +29,23 @@ const RoomStreaming = () => {
 
   useEffect(() => {
     if (!id) return;
-
-    socket.emit("joinRoom", id);
-
-    socket.on("message", (msg: Message) => {
+    socket.emit("join-room", id);
+    socket.on("previous-messages", (msgs: Message[]) => {
+      setMessages(msgs);
+    });
+    socket.on("receive-message", (msg: Message) => {
       setMessages((prev) => [...prev, msg]);
     });
-
     return () => {
-      socket.off("message");
+      socket.off("receive-message");
     };
   }, [id]);
-
-  console.log(user);
 
   const handleSubmit = (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
 
-    socket.emit("message", {
+    socket.emit("send-message", {
       roomId: id,
       _id: user?._id,
       handleName: user?.handleName,
@@ -111,7 +108,7 @@ const RoomStreaming = () => {
 
       <div className="w-full xl:w-1/3 xl:pt-16 md:bg-zinc-900/20 md:border-l border-zinc-800 px-2">
         {/* Chat section */}
-        <div className="h-full mb-5 relative">
+        <div className="h-[95%] mb-10 relative">
           <div className="flex flex-col gap-2 bg-slate-950 w-full overflow-y-auto rounded-xl h-[90%] border border-slate-500 py-2">
             {messages.map((msg, idx) => (
               <div
@@ -119,18 +116,22 @@ const RoomStreaming = () => {
                 className="flex gap-3 text-white hover:bg-slate-200/20 px-3 py-1 items-center cursor-pointer w-full"
               >
                 <AvatarPage
-                  name={msg.handleName}
-                  image={msg.avatarUrl}
+                  name={msg?.handleName || "anonymous"}
                   size="6"
+                  image={msg.avatarUrl}
                 />
                 <span className="text-xs text-slate-300 font-semibold">
-                  @{msg.handleName}
+                  {msg.handleName ? (
+                    <p>@{msg.handleName}</p>
+                  ) : (
+                    <p>@{`anonymous`}</p>
+                  )}
                 </span>
                 <p className="text-sm">{msg.comment}</p>
               </div>
             ))}
           </div>
-          <form className="absolute bottom-0 w-full" onSubmit={handleSubmit}>
+          <form className="absolute -bottom-3 w-full" onSubmit={handleSubmit}>
             <textarea
               className="border border-slate-400 w-full bg-slate-900 rounded-md p-1 text-white indent-2 resize-none text-sm"
               placeholder="Viết bình luận"
@@ -149,7 +150,7 @@ const RoomStreaming = () => {
           <h2 className="text-lg font-bold px-2 text-white mb-6">
             Video tiếp theo
           </h2>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mb-20">
             {recommendedVideos.map((v) => (
               <div
                 key={v._id}

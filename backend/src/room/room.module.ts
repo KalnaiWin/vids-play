@@ -8,7 +8,6 @@ import { RoomRepository } from './room.repository';
 import { RoomSchema } from './room.schema';
 import { UserSchema } from 'src/user/user.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { RoomGateway } from './room.gateway';
 
 @Module({
   imports: [
@@ -26,7 +25,7 @@ import { RoomGateway } from './room.gateway';
     ]),
   ],
   controllers: [RoomController],
-  providers: [RoomService, RoomRepository, CloudinaryService, RoomGateway],
+  providers: [RoomService, RoomRepository, CloudinaryService],
   exports: [RoomService],
 })
 export class RoomModule {}

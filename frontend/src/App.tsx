@@ -4,7 +4,7 @@ import MainPage from "./page/MainPage";
 import UploadVideoPage from "./page/video/UploadVideoPage";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./store";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { fetchUser } from "./feature/authThunk";
 import WatchVideo from "./page/video/WatchVideo";
 import ManagementVideo from "./page/video/ManagementVideo";
