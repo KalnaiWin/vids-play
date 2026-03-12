@@ -11,7 +11,6 @@ import {
   MonitorPlay,
   Radio,
   Smile,
-  SquarePen,
   SquarePlay,
   UserCircleIcon,
   Users,
@@ -78,7 +77,7 @@ export const navBarItemsExpandProfile = [
   {
     icon: MonitorPlay,
     name: "Video của bạn",
-    path: "/video",
+    path: "/manage",
   },
 ];
 

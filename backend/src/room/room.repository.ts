@@ -58,6 +58,22 @@ export class RoomRepository {
         $unwind: '$host',
       },
       {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'target',
+          pipeline: [{ $match: { onModel: 'Room' } }, { $count: 'total' }],
+          as: 'commentCount',
+        },
+      },
+      {
+        $addFields: {
+          commentCount: {
+            $ifNull: [{ $arrayElemAt: ['$commentCount.total', 0] }, 0],
+          },
+        },
+      },
+      {
         $project: {
           _id: 1,
           host: {
@@ -72,6 +88,8 @@ export class RoomRepository {
           endedAt: 1,
           description: 1,
           status: 1,
+          likes: 1,
+          commentCount: 1,
         },
       },
     ]);

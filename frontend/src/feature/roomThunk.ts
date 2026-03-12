@@ -66,10 +66,59 @@ export const toggleReactionRoom = createAsyncThunk<
   ReactionResponse,
   { id: string; type: "like" | "dislike" },
   { rejectValue: string }
->("video/toggleReactionRoom", async ({ type, id }, { rejectWithValue }) => {
+>("room/toggleReactionRoom", async ({ type, id }, { rejectWithValue }) => {
   try {
     const result = await axiosInstance.post(`/room/reaction/${id}`, { type });
     return result.data as ReactionResponse;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const editRoom = createAsyncThunk<
+  RoomInfo,
+  { id: string; thumbnail: File | null; title: string },
+  { rejectValue: string }
+>("room/editRoom", async ({ id, thumbnail, title }, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    if (title === "") toast.error("Tiêu đề không được trống");
+    formData.append("title", title);
+    if (thumbnail) formData.append("thumbnail", thumbnail);
+    const result = await axiosInstance.put(`/room/edit/${id}`, formData);
+    toast.success("Chỉnh sửa thành công");
+    return result.data;
+  } catch (error: any) {
+    toast.error("Chỉnh sửa thất bại");
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const deleteRoom = createAsyncThunk<
+  string,
+  { id: string },
+  { rejectValue: string }
+>("room/deleteRoom", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.delete(`/room/del/${id}`);
+    toast.success("Xóa thành công");
+    return result.data;
+  } catch (error: any) {
+    toast.error("Xóa thất bại");
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const changeStatusRoom = createAsyncThunk<
+  RoomStreamingInfo,
+  { id: string; status: "LIVE" | "STOP" | "WAITING" },
+  { rejectValue: string }
+>("room/changeStatusRoom", async ({ id, status }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.put(`/room/change-status/${id}`, {
+      status,
+    });
+    return result.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");
   }

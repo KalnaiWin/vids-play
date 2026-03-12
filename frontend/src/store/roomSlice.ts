@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  changeStatusRoom,
   createRoom,
+  deleteRoom,
   fetchStreamingRooms,
   fetchStreamingRoomsOfUser,
   joinRoom,
@@ -15,6 +17,8 @@ const initialState: RoomInitialState = {
   status: "idle",
   createStatus: "idle",
   statusReaction: "idle",
+  statusDelete: "idle",
+  statusUpdate: "idle",
 };
 
 export const roomSlice = createSlice({
@@ -22,8 +26,34 @@ export const roomSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    // Change room status
     builder
-      // Create room
+      .addCase(changeStatusRoom.pending, (state) => {
+        state.statusUpdate = "loading";
+      })
+      .addCase(changeStatusRoom.fulfilled, (state, action) => {
+        state.statusUpdate = "succeeded";
+        state.streamingRoom = action.payload;
+      })
+      .addCase(changeStatusRoom.rejected, (state) => {
+        state.statusUpdate = "failed";
+      });
+
+    // Delete room
+    builder
+      .addCase(deleteRoom.pending, (state) => {
+        state.statusDelete = "loading";
+      })
+      .addCase(deleteRoom.fulfilled, (state, action) => {
+        state.statusDelete = "succeeded";
+        state.rooms.filter((room) => room._id === action.payload);
+      })
+      .addCase(deleteRoom.rejected, (state) => {
+        state.statusDelete = "failed";
+      });
+
+    // Create room
+    builder
       .addCase(createRoom.pending, (state) => {
         state.createStatus = "loading";
       })
@@ -61,7 +91,7 @@ export const roomSlice = createSlice({
         state.status = "failed";
       });
 
-    // Fetch rooms
+    // Fetch rooms of user
     builder
       .addCase(fetchStreamingRoomsOfUser.pending, (state) => {
         state.status = "loading";
@@ -74,7 +104,7 @@ export const roomSlice = createSlice({
         state.status = "failed";
       });
 
-    // Fetch rooms
+    // Reaction to room
     builder
       .addCase(toggleReactionRoom.pending, (state) => {
         state.statusReaction = "loading";

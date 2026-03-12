@@ -90,6 +90,7 @@ export interface VideosForSpecificUser {
   description: string;
   visibility: string;
   viewCount: number;
+  commentCount: number;
   createdAt: Date;
 }
 

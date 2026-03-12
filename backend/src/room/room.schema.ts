@@ -36,6 +36,9 @@ export class Room {
     index: true,
   })
   status: 'LIVE' | 'STOP' | 'WAITING';
+
+  @Prop({ type: Date, default: null })
+  scheduledAt: Date | null;
 }
 
 export const RoomSchema = SchemaFactory.createForClass(Room);

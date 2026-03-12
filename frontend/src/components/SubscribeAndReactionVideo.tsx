@@ -33,6 +33,8 @@ const SubscribeAndReactionVideo = () => {
     return <p>Loading...</p>;
   }
 
+  if (!watchingVideo && !streamingRoom) return <p>Loading...</p>;
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-b border-zinc-800 pb-6">
       <div className="flex items-center gap-4">
@@ -49,8 +51,9 @@ const SubscribeAndReactionVideo = () => {
             {owner?.name}
           </Link>
           <div className="text-xs text-zinc-400">
-            {watchingVideo?.subscriptions.length ||
-              streamingRoom?.subscriptions.length}{" "}
+            {watchingVideo?.subscriptions?.length ||
+              streamingRoom?.subscriptions?.length ||
+              0}{" "}
             subscribers
           </div>
         </div>

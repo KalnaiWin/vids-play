@@ -1,11 +1,24 @@
 export const formatDuration = (totalSeconds: number) => {
-  const hours = Math.floor(totalSeconds / 3600);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = Math.floor(totalSeconds % 60);
 
-  return `${hours.toString().padStart(2, "0") !== "00" ? `${hours.toString().padStart(2, "0")}:` : ""}${minutes
+  const d = days > 0 ? `${days}:` : "";
+  const h =
+    hours > 0 || days > 0 ? `${hours.toString().padStart(2, "0")}:` : "";
+
+  return `${d}${h}${minutes
     .toString()
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
+export const transferDateToNumberDuration = (date: Date) => {
+  const day = Number(date.getDate() * (3600 * 24));
+  const hour = Number(date.getHours()) * 3600;
+  const minute = Number(date.getMinutes()) * 60;
+  const second = Number(date.getSeconds());
+
+  return day + hour + minute + second;
 };
 
 export const formatViewCount = (count: number) => {
@@ -55,4 +68,17 @@ export const getColorFromFirstLetter = (name: string) => {
   if (["v", "w", "x", "y", "z"].includes(letter)) return "#64748b";
 
   return "#999999";
+};
+
+export const formatColorStatusStream = (text: string) => {
+  switch (text) {
+    case "LIVE":
+      return "text-green-300 bg-green-700";
+    case "STOP":
+      return "text-red-300 bg-red-700";
+    case "WAITING":
+      return "text-blue-300 bg-blue-700";
+    default:
+      break;
+  }
 };

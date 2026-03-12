@@ -2,8 +2,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useState } from "react";
-import { joinRoom } from "../../feature/roomThunk";
-import { ArrowBigLeft } from "lucide-react";
+import { changeStatusRoom, joinRoom } from "../../feature/roomThunk";
+import { ArrowBigLeft, Ban } from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
 import CommentPage from "../../components/CommentPage";
 import { recommendVideos } from "../../feature/videoThunk";
@@ -83,9 +83,39 @@ const RoomStreaming = () => {
           <div className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"></div>
 
           <div className="flex flex-col gap-4">
-            <h1 className="text-xl md:text-2xl font-bold text-white">
-              {streamingRoom?.title}
-            </h1>
+            <div className="w-full flex justify-between">
+              <h1 className="text-xl md:text-2xl font-bold text-white">
+                {streamingRoom?.title}
+              </h1>
+              {streamingRoom.status === "LIVE" ? (
+                <button
+                  className="bg-red-500 text-red-200 font-semibold cursor-pointer rounded-xl px-4"
+                  onClick={() =>
+                    dispatch(
+                      changeStatusRoom({ id: String(id), status: "STOP" }),
+                    )
+                  }
+                >
+                  Dừng Live
+                </button>
+              ) : streamingRoom.status === "STOP" ? (
+                <div className="text-slate-500 text-sm font-semibold rounded-xl px-4 flex items-center gap-3">
+                  <Ban className="size-5" />
+                  Live stream đã kết thúc
+                </div>
+              ) : (
+                <button
+                  className="bg-green-500 text-green-200 font-semibold cursor-pointer rounded-xl px-4"
+                  onClick={() =>
+                    dispatch(
+                      changeStatusRoom({ id: String(id), status: "LIVE" }),
+                    )
+                  }
+                >
+                  Bắt đầu Live
+                </button>
+              )}
+            </div>
 
             <div>
               <SubscribeAndReactionVideo />
@@ -109,7 +139,9 @@ const RoomStreaming = () => {
       <div className="w-full xl:w-1/3 xl:pt-16 md:bg-zinc-900/20 md:border-l border-zinc-800 px-2">
         {/* Chat section */}
         <div className="h-[95%] mb-10 relative">
-          <div className="flex flex-col gap-2 bg-slate-950 w-full overflow-y-auto rounded-xl h-[90%] border border-slate-500 py-2">
+          <div
+            className={`flex flex-col gap-2 bg-slate-950 w-full overflow-y-auto rounded-xl ${user ? "h-[90%]" : "h-full"} border border-slate-500 py-2`}
+          >
             {messages.map((msg, idx) => (
               <div
                 key={`${msg._id}+${idx}`}
@@ -131,20 +163,22 @@ const RoomStreaming = () => {
               </div>
             ))}
           </div>
-          <form className="absolute -bottom-3 w-full" onSubmit={handleSubmit}>
-            <textarea
-              className="border border-slate-400 w-full bg-slate-900 rounded-md p-1 text-white indent-2 resize-none text-sm"
-              placeholder="Viết bình luận"
-              onChange={(e) => setComment(e.target.value)}
-              value={comment}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
-            />
-          </form>
+          {user && (
+            <form className="absolute -bottom-3 w-full" onSubmit={handleSubmit}>
+              <textarea
+                className="border border-slate-400 w-full bg-slate-900 rounded-md p-1 text-white indent-2 resize-none text-sm"
+                placeholder="Viết bình luận"
+                onChange={(e) => setComment(e.target.value)}
+                value={comment}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+              />
+            </form>
+          )}
         </div>
         <div className="flex flex-col">
           <h2 className="text-lg font-bold px-2 text-white mb-6">

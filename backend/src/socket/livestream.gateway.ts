@@ -35,10 +35,6 @@ export class LivestreamGateway
     });
   }
 
-  getAllMessages() {
-    return this.roomMessages;
-  }
-
   @SubscribeMessage('send-message')
   handleSendMessage(client: Socket, message: ChatInput) {
     const messages = this.roomMessages.get(message.roomId) || [];

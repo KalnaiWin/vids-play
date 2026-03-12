@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
   Req,
   UploadedFile,
   UseGuards,
@@ -38,6 +40,29 @@ export class RoomController {
   }
 
   @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  @Put('edit/:id')
+  async editRoom(
+    @Req() req: Request,
+    @Param('id') roomId: string,
+    @Body('title') title: string,
+    @UploadedFile() thumbail: Express.Multer.File,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId || !roomId) return { message: 'UserId or RoomId not found' };
+    return await this.roomService.editRoom(userId, thumbail, title, roomId);
+  }
+
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  @Delete('del/:id')
+  async deleteRoom(@Req() req: Request, @Param('id') roomId: string) {
+    const userId = req.user?.userId;
+    if (!userId || !roomId) return { message: 'UserId or RoomId not found' };
+    return await this.roomService.deleteRoom(roomId, userId);
+  }
+
+  @UseGuards(AuthGuard)
   @Get('stream')
   async getAllRooms() {
     return await this.roomRepository.findAllStreamRooms();
@@ -66,5 +91,17 @@ export class RoomController {
     if (!userId) return { message: 'UserId not found' };
 
     return await this.userService.toggleReactionRoom(roomId, userId, reaction);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('change-status/:id')
+  async changeStatus(
+    @Param('id') roomId: string,
+    @Req() req: Request,
+    @Body('status') status: 'LIVE' | 'WAITING' | 'STOP',
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+    return await this.roomService.changeStatusRoom(userId, roomId, status);
   }
 }

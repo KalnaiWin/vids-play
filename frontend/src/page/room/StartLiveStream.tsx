@@ -20,8 +20,7 @@ const StartLiveStream = () => {
       createRoom({ title: title, thumbnail: file }),
     ).unwrap();
     if (res) {
-      // navigate(`/room/stream/${res._id}`);
-      navigate(`/`);
+      navigate(`/room/stream/${res._id}`);
     }
   };
 

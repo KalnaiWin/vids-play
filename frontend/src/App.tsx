@@ -7,7 +7,6 @@ import type { AppDispatch, RootState } from "./store";
 import { useEffect } from "react";
 import { fetchUser } from "./feature/authThunk";
 import WatchVideo from "./page/video/WatchVideo";
-import ManagementVideo from "./page/video/ManagementVideo";
 import EditVideo from "./page/video/EditVideo";
 import ChannelUser from "./page/channel/ChannelUser";
 import LikedPage from "./page/LikedPage";
@@ -15,6 +14,8 @@ import BlogPage from "./page/channel/BlogPage";
 import BlogDetail from "./page/channel/BlogDetail";
 import StartLiveStream from "./page/room/StartLiveStream";
 import RoomStreaming from "./page/room/RoomStreaming";
+import Management from "./page/video/Management";
+import EditRoom from "./page/room/EditRoom";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -30,16 +31,17 @@ const App = () => {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<MainPage />} />
-        <Route path="/video" element={<ManagementVideo />} />
+        <Route path="/manage" element={<Management />} />
         <Route path="/video/upload" element={<UploadVideoPage />} />
         <Route path="/watch/:id" element={<WatchVideo />} />
-        <Route path="/edit/:id" element={<EditVideo />} />
+        <Route path="/edit/video/:id" element={<EditVideo />} />
         <Route path="/channel/:id" element={<ChannelUser />} />
         <Route path="/liked" element={<LikedPage />} />
         <Route path="/liked" element={<LikedPage />} />
         <Route path="/blog/channel/:id" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/room/stream/:id" element={<RoomStreaming />} />
+        <Route path="/edit/room/:id" element={<EditRoom />} />
       </Route>
       <Route path="/create" element={<StartLiveStream />} />
     </Routes>

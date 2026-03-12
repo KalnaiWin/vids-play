@@ -261,6 +261,22 @@ export class VideoRepository {
           $match: matchStage,
         },
         {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'target',
+            pipeline: [{ $match: { onModel: 'Video' } }, { $count: 'total' }],
+            as: 'commentCount',
+          },
+        },
+        {
+          $addFields: {
+            commentCount: {
+              $ifNull: [{ $arrayElemAt: ['$commentCount.total', 0] }, 0],
+            },
+          },
+        },
+        {
           $project: {
             _id: 1,
             title: 1,
@@ -273,6 +289,7 @@ export class VideoRepository {
             viewCount: 1,
             createdAt: 1,
             scheduledAt: 1,
+            commentCount: 1,
           },
         },
         {

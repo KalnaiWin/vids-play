@@ -7,7 +7,9 @@ export interface RoomStreamingInfo {
     name: string;
     avatarUrl: string;
   };
+  thumbnail: string;
   startedAt: Date;
+  status: string;
   endedAt: Date;
   description: string;
   subscriptions: string[];
@@ -24,10 +26,13 @@ export interface RoomInfo {
     avatarUrl: string;
   };
   thumbnail: string;
+  description: string;
   totalViews: number;
   startedAt: Date;
   endedAt: Date;
   status: string;
+  likes: string[];
+  commentCount: number;
 }
 
 export interface RoomInitialState {
@@ -37,4 +42,6 @@ export interface RoomInitialState {
   status: "idle" | "loading" | "succeeded" | "failed";
   createStatus: "idle" | "loading" | "succeeded" | "failed";
   statusReaction: "idle" | "loading" | "succeeded" | "failed";
+  statusDelete: "idle" | "loading" | "succeeded" | "failed";
+  statusUpdate: "idle" | "loading" | "succeeded" | "failed";
 }
