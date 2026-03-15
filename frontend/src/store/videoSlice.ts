@@ -2,11 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { VideoInitailState } from "../types/videoInterface";
 import {
   deleteVideo,
+  deleteWatchedVideo,
   editVideo,
   getAllVideosForSpecificUser,
   getAllVieos,
+  getHistoryWatchedVideos,
   getHomepageVideos,
   getLikedVideo,
+  insertWatchedVideo,
   recommendVideos,
   toggleReactionVideo,
   uploadVideo,
@@ -20,6 +23,7 @@ const initialState: VideoInitailState = {
   likedVideo: [],
   recommendedVideos: [],
   videosOfUser: [],
+  watchedVideo: [],
   homeVideos: null,
   statusCreating: "idle",
   status: "idle",
@@ -35,6 +39,42 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(deleteWatchedVideo.pending, (state) => {
+        state.statusDelete = "loading";
+      })
+      .addCase(deleteWatchedVideo.fulfilled, (state, action) => {
+        state.statusDelete = "succeeded";
+        state.watchedVideo.filter((vid) => vid._id === action.payload);
+      })
+      .addCase(deleteWatchedVideo.rejected, (state) => {
+        state.statusDelete = "failed";
+      });
+
+    builder
+      .addCase(insertWatchedVideo.pending, (state) => {
+        state.statusUpdate = "loading";
+      })
+      .addCase(insertWatchedVideo.fulfilled, (state, action) => {
+        state.statusUpdate = "succeeded";
+        state.watchedVideo.push(action.payload);
+      })
+      .addCase(insertWatchedVideo.rejected, (state) => {
+        state.statusUpdate = "failed";
+      });
+
+    builder
+      .addCase(getHistoryWatchedVideos.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getHistoryWatchedVideos.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.watchedVideo = action.payload;
+      })
+      .addCase(getHistoryWatchedVideos.rejected, (state) => {
+        state.status = "failed";
+      });
+
     builder
       .addCase(getHomepageVideos.pending, (state) => {
         state.status = "loading";

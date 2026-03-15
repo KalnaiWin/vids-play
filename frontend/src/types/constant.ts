@@ -1,7 +1,7 @@
 import {
-  Bookmark,
   ChartNoAxesColumn,
   Clock,
+  ClockFading,
   DollarSign,
   Eye,
   Flame,
@@ -65,9 +65,9 @@ export const navBarItemsExpandHomePage = [
 
 export const navBarItemsExpandProfile = [
   {
-    icon: Bookmark,
-    name: "Yêu thích",
-    path: "/favourite",
+    icon: ClockFading,
+    name: "Đã xem",
+    path: "/history",
   },
   {
     icon: Flame,

@@ -74,6 +74,23 @@ export interface RecommendVideos {
     avatarUrl: string;
   };
 }
+export interface WatchedVideos {
+  _id: string;
+  video: {
+    _id: string;
+    thumbnailUrl: string;
+    title: string;
+    viewCount: string;
+  };
+  duration: number;
+  progress: number;
+  updatedAt: Date;
+  user: {
+    _id: string;
+    name: string;
+    avatarUrl: string;
+  };
+}
 
 export interface ReactionResponse {
   likes: [];
@@ -107,6 +124,7 @@ export interface VideoInitailState {
   watchingVideo: VideoWatchingInfo | null;
   recommendedVideos: RecommendVideos[];
   videosOfUser: VideosForSpecificUser[];
+  watchedVideo: WatchedVideos[];
   status: "idle" | "loading" | "succeeded" | "failed";
   statusCreating: "idle" | "loading" | "succeeded" | "failed";
   statusReaction: "idle" | "loading" | "succeeded" | "failed";

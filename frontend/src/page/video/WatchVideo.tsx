@@ -4,6 +4,7 @@ import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import {
   countViewVideo,
+  insertWatchedVideo,
   recommendVideos,
   watchVieo,
 } from "../../feature/videoThunk";
@@ -27,6 +28,12 @@ const WatchVideo = () => {
     dispatch(watchVieo({ id: String(id) }));
     dispatch(recommendVideos({ id: String(id) }));
   }, [dispatch, id, statusSubscribe]);
+
+  useEffect(() => {
+    if (!watchingVideo?._id) return;
+
+    dispatch(insertWatchedVideo({ id: watchingVideo._id }));
+  }, [dispatch, watchingVideo?._id]);
 
   if (!watchingVideo) return <p>Loading...</p>;
 

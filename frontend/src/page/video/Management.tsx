@@ -14,11 +14,7 @@ import {
   transferDateToNumberDuration,
 } from "../../types/helperFunction";
 import { Link } from "react-router-dom";
-import {
-  deleteRoom,
-  fetchStreamingRooms,
-  fetchStreamingRoomsOfUser,
-} from "../../feature/roomThunk";
+import { deleteRoom, fetchStreamingRoomsOfUser } from "../../feature/roomThunk";
 
 interface Props {
   state: boolean;

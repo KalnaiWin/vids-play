@@ -16,6 +16,8 @@ import StartLiveStream from "./page/room/StartLiveStream";
 import RoomStreaming from "./page/room/RoomStreaming";
 import Management from "./page/video/Management";
 import EditRoom from "./page/room/EditRoom";
+import TrendingVideosPage from "./page/TrendingVideosPage";
+import HistoryWatchedVideo from "./page/HistoryWatchedVideo";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -32,16 +34,17 @@ const App = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<MainPage />} />
         <Route path="/manage" element={<Management />} />
+        <Route path="/trend" element={<TrendingVideosPage />} />
         <Route path="/video/upload" element={<UploadVideoPage />} />
         <Route path="/watch/:id" element={<WatchVideo />} />
         <Route path="/edit/video/:id" element={<EditVideo />} />
         <Route path="/channel/:id" element={<ChannelUser />} />
         <Route path="/liked" element={<LikedPage />} />
-        <Route path="/liked" element={<LikedPage />} />
         <Route path="/blog/channel/:id" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/room/stream/:id" element={<RoomStreaming />} />
         <Route path="/edit/room/:id" element={<EditRoom />} />
+        <Route path="/history" element={<HistoryWatchedVideo />} />
       </Route>
       <Route path="/create" element={<StartLiveStream />} />
     </Routes>

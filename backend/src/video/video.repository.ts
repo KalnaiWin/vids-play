@@ -48,6 +48,9 @@ export class VideoRepository {
           createdAt: 1,
         },
       },
+      {
+        $sort: { viewCount: -1 },
+      },
     ]);
   }
 

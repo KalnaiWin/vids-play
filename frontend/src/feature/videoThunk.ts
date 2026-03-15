@@ -8,6 +8,7 @@ import {
   type VideoInput,
   type VideosForSpecificUser,
   type VideoWatchingInfo,
+  type WatchedVideos,
 } from "../types/videoInterface";
 import axiosInstance from "../lib/axios";
 import { toast } from "react-toastify";
@@ -202,6 +203,45 @@ export const getHomepageVideos = createAsyncThunk<
 >("video/getHomepageVideos", async ({ id }, { rejectWithValue }) => {
   try {
     const result = await axiosInstance.get(`/video/home/${id}`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const getHistoryWatchedVideos = createAsyncThunk<
+  WatchedVideos[],
+  void,
+  { rejectValue: string }
+>("video/getHistoryWatchedVideos", async (_, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(`/history`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const insertWatchedVideo = createAsyncThunk<
+  WatchedVideos,
+  { id: string },
+  { rejectValue: string }
+>("video/insertWatchedVideo", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.post(`/history/save-watched/${id}`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});
+
+export const deleteWatchedVideo = createAsyncThunk<
+  string,
+  { id: string },
+  { rejectValue: string }
+>("video/deleteWatchedVideo", async ({ id }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.delete(`/history/del/${id}`);
     return result.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");

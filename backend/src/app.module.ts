@@ -12,6 +12,7 @@ import { BlogModule } from './blog/blog.module';
 import { CommentModule } from './comment/comment.module';
 import { RoomModule } from './room/room.module';
 import { SocketModule } from './socket/socket.module';
+import { HistoryModule } from './history/history.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SocketModule } from './socket/socket.module';
     CommentModule,
     RoomModule,
     SocketModule,
+    HistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
