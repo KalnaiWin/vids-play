@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { changeStatusRoom, joinRoom } from "../../feature/roomThunk";
 import { ArrowBigLeft, Ban } from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
@@ -11,6 +11,7 @@ import { formatDuration, timeAgo } from "../../types/helperFunction";
 import { socket } from "../../socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
+import { handleViewer, startCamera, stopCamera } from "../../socket/script";
 
 const RoomStreaming = () => {
   const { id } = useParams();
@@ -26,6 +27,13 @@ const RoomStreaming = () => {
 
   const [comment, setComment] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const hostRef = useRef<HTMLVideoElement | null>(null);
+  const viewerRef = useRef<HTMLVideoElement | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const remoteStreamRef = useRef<MediaStream | null>(null);
+  const isStartingRef = useRef(false);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -65,6 +73,38 @@ const RoomStreaming = () => {
     dispatch(recommendVideos({ id: String(id) }));
   }, [dispatch, id, statusSubscribe]);
 
+  useEffect(() => {
+    if (localStreamRef.current || isStartingRef.current || !streamingRoom)
+      return;
+
+    if (user?._id === streamingRoom?.host._id) {
+      startCamera(
+        hostRef,
+        localStreamRef,
+        isStartingRef,
+        viewerRef,
+        remoteStreamRef,
+        String(streamingRoom._id),
+        peerConnectionRef,
+      );
+    } else {
+      handleViewer(
+        viewerRef,
+        String(streamingRoom._id),
+        peerConnectionRef,
+        remoteStreamRef,
+      );
+    }
+
+    return () => {
+      stopCamera(hostRef, localStreamRef, isStartingRef);
+      socket.off("receive-offer");
+      socket.off("receive-answer");
+      socket.off("receive-ice");
+      peerConnectionRef.current?.close();
+    };
+  }, [streamingRoom]); 
+
   if (!streamingRoom) return <p>Loading...</p>;
 
   return (
@@ -80,8 +120,30 @@ const RoomStreaming = () => {
 
       <div className="flex-1 p-4 md:p-10 md:pt-16 xl:w-2/3 w-full">
         <div className="mx-auto flex flex-col gap-6">
-          <div className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"></div>
-
+          {user?._id !== streamingRoom.host._id ? (
+            <video
+              className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+              autoPlay
+              playsInline
+              id="viewer"
+              ref={viewerRef}
+            />
+          ) : (
+            <video
+              className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+              autoPlay
+              playsInline
+              id="host"
+              ref={hostRef}
+            />
+          )}
+          {/* <video
+            ref={user?._id !== streamingRoom.host._id ? viewerRef : hostRef}
+            id={user?._id !== streamingRoom.host._id ? "viewer" : "host"}
+            autoPlay
+            className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+            playsInline
+          /> */}
           <div className="flex flex-col gap-4">
             <div className="w-full flex justify-between">
               <h1 className="text-xl md:text-2xl font-bold text-white">
@@ -106,11 +168,11 @@ const RoomStreaming = () => {
               ) : (
                 <button
                   className="bg-green-500 text-green-200 font-semibold cursor-pointer rounded-xl px-4"
-                  onClick={() =>
+                  onClick={() => {
                     dispatch(
                       changeStatusRoom({ id: String(id), status: "LIVE" }),
-                    )
-                  }
+                    );
+                  }}
                 >
                   Bắt đầu Live
                 </button>

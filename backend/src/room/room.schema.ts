@@ -32,7 +32,7 @@ export class Room {
 
   @Prop({
     enum: ['LIVE', 'STOP', 'WAITING'],
-    default: 'LIVE',
+    default: 'WAITING',
     index: true,
   })
   status: 'LIVE' | 'STOP' | 'WAITING';

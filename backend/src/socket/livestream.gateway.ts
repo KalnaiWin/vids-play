@@ -47,11 +47,39 @@ export class LivestreamGateway
   joinRoom(@MessageBody() roomId: string, @ConnectedSocket() client: Socket) {
     client.join(roomId);
     const previousMessages = this.roomMessages.get(roomId) || [];
-    client.emit('previous-messages', previousMessages);
+    client.to(roomId).emit('viewer-joined', { viewerId: client.id });
+    client.to(roomId).emit('previous-messages', previousMessages);
   }
 
   @SubscribeMessage('left-room')
   leftRoom(@MessageBody() roomId: string, @ConnectedSocket() client: Socket) {
     client.leave(roomId);
+  }
+
+  @SubscribeMessage('send-offer')
+  getNewOffer(
+    @MessageBody() data: { offer: any; roomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { offer, roomId } = data;
+    client.to(roomId).emit('receive-offer', offer);
+  }
+
+  @SubscribeMessage('send-answer')
+  handleAnswer(
+    @MessageBody() data: { answer: any; roomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { answer, roomId } = data;
+    client.to(roomId).emit('receive-answer', answer);
+  }
+
+  @SubscribeMessage('send-ice')
+  handleIce(
+    @MessageBody() data: { candidate: any; roomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { candidate, roomId } = data;
+    client.to(roomId).emit('receive-ice', candidate);
   }
 }
