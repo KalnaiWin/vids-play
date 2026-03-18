@@ -82,8 +82,6 @@ const RoomStreaming = () => {
         hostRef,
         localStreamRef,
         isStartingRef,
-        viewerRef,
-        remoteStreamRef,
         String(streamingRoom._id),
         peerConnectionRef,
       );
@@ -103,7 +101,7 @@ const RoomStreaming = () => {
       socket.off("receive-ice");
       peerConnectionRef.current?.close();
     };
-  }, [streamingRoom]); 
+  }, [streamingRoom]);
 
   if (!streamingRoom) return <p>Loading...</p>;
 
@@ -137,13 +135,6 @@ const RoomStreaming = () => {
               ref={hostRef}
             />
           )}
-          {/* <video
-            ref={user?._id !== streamingRoom.host._id ? viewerRef : hostRef}
-            id={user?._id !== streamingRoom.host._id ? "viewer" : "host"}
-            autoPlay
-            className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
-            playsInline
-          /> */}
           <div className="flex flex-col gap-4">
             <div className="w-full flex justify-between">
               <h1 className="text-xl md:text-2xl font-bold text-white">
