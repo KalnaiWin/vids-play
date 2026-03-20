@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { socket } from "./socket";
 
 const peerConfiguration = {
@@ -20,7 +21,7 @@ export const startCamera = async (
   const stream = await navigator.mediaDevices.getUserMedia({
     // get camera stream ( browser ask for camera permission )
     video: true,
-    // audio: true,
+    audio: true,
   });
 
   // save stream
@@ -157,4 +158,32 @@ export const stopCamera = (
   if (videoRef.current) {
     videoRef.current.srcObject = null;
   }
+};
+
+export const toggleCamera = (
+  localStreamRef: React.MutableRefObject<MediaStream | null>,
+  setToggleCamera: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  const videoTrack = localStreamRef.current
+    ?.getTracks()
+    .find((track) => track.kind === "video");
+
+  if (!videoTrack) return;
+
+  videoTrack.enabled = !videoTrack.enabled;
+  setToggleCamera(videoTrack.enabled);
+};
+
+export const toggleMicro = (
+  localStreamRef: React.MutableRefObject<MediaStream | null>,
+  setToggleMicro: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  const videoTrack = localStreamRef.current
+    ?.getTracks()
+    .find((track) => track.kind === "audio");
+
+  if (!videoTrack) return;
+
+  videoTrack.enabled = !videoTrack.enabled;
+  setToggleMicro(videoTrack.enabled);
 };

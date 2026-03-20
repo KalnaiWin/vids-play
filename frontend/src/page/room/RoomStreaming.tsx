@@ -3,7 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import { changeStatusRoom, joinRoom } from "../../feature/roomThunk";
-import { ArrowBigLeft, Ban } from "lucide-react";
+import {
+  ArrowBigLeft,
+  Ban,
+  Mic,
+  MicOff,
+  Phone,
+  Video,
+  VideoOff,
+} from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
 import CommentPage from "../../components/CommentPage";
 import { recommendVideos } from "../../feature/videoThunk";
@@ -11,7 +19,13 @@ import { formatDuration, timeAgo } from "../../types/helperFunction";
 import { socket } from "../../socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
-import { handleViewer, startCamera, stopCamera } from "../../socket/script";
+import {
+  handleViewer,
+  startCamera,
+  stopCamera,
+  toggleCamera,
+  toggleMicro,
+} from "../../socket/script";
 
 const RoomStreaming = () => {
   const { id } = useParams();
@@ -34,6 +48,8 @@ const RoomStreaming = () => {
   const remoteStreamRef = useRef<MediaStream | null>(null);
   const isStartingRef = useRef(false);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const [isToggleCamera, setToggleCamera] = useState<boolean>(true);
+  const [isToggleMicro, setToggleMicro] = useState<boolean>(true);
 
   useEffect(() => {
     if (!id) return;
@@ -118,23 +134,44 @@ const RoomStreaming = () => {
 
       <div className="flex-1 p-4 md:p-10 md:pt-16 xl:w-2/3 w-full">
         <div className="mx-auto flex flex-col gap-6">
-          {user?._id !== streamingRoom.host._id ? (
-            <video
-              className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
-              autoPlay
-              playsInline
-              id="viewer"
-              ref={viewerRef}
-            />
-          ) : (
-            <video
-              className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
-              autoPlay
-              playsInline
-              id="host"
-              ref={hostRef}
-            />
-          )}
+          <div className="aspect-video w-full relative">
+            {user?._id !== streamingRoom.host._id ? (
+              <video
+                className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+                autoPlay
+                playsInline
+                id="viewer"
+                ref={viewerRef}
+              />
+            ) : (
+              <video
+                className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+                autoPlay
+                playsInline
+                id="host"
+                ref={hostRef}
+              />
+            )}
+            {user?._id === streamingRoom.host._id && (
+              <div className="absolute z-30 bottom-5 w-full flex justify-center gap-10">
+                <div
+                  className={`size-10 ${isToggleMicro ? "bg-orange-600" : "bg-orange-400"} hover:bg-orange-500 rounded-full flex justify-center items-center`}
+                  onClick={() => toggleMicro(localStreamRef, setToggleMicro)}
+                >
+                  {isToggleMicro ? <Mic /> : <MicOff />}
+                </div>
+                <div
+                  className={`size-10 ${isToggleCamera ? "bg-orange-600" : "bg-orange-400"} hover:bg-orange-500 rounded-full flex justify-center items-center cursor-pointer`}
+                  onClick={() => toggleCamera(localStreamRef, setToggleCamera)}
+                >
+                  {isToggleCamera ? <Video /> : <VideoOff />}
+                </div>
+                <div className="size-10 bg-red-600 rounded-full flex justify-center items-center">
+                  <Phone className="" />
+                </div>
+              </div>
+            )}
+          </div>
           <div className="flex flex-col gap-4">
             <div className="w-full flex justify-between">
               <h1 className="text-xl md:text-2xl font-bold text-white">
