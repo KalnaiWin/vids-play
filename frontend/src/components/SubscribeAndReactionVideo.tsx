@@ -23,6 +23,8 @@ const SubscribeAndReactionVideo = () => {
   const [openSubscribe, setOpenSubscribe] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
+  if (!watchingVideo && !streamingRoom) return <p>Loading...</p>;
+
   const isSubscribed =
     watchingVideo?.subscriptions?.includes(String(user?._id)) ?? false;
 
@@ -32,8 +34,6 @@ const SubscribeAndReactionVideo = () => {
   if (!content) {
     return <p>Loading...</p>;
   }
-
-  if (!watchingVideo && !streamingRoom) return <p>Loading...</p>;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-b border-zinc-800 pb-6">

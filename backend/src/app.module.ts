@@ -13,6 +13,7 @@ import { CommentModule } from './comment/comment.module';
 import { RoomModule } from './room/room.module';
 import { SocketModule } from './socket/socket.module';
 import { HistoryModule } from './history/history.module';
+import { MediasoupModule } from './mediasoup/mediasoup.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { HistoryModule } from './history/history.module';
     RoomModule,
     SocketModule,
     HistoryModule,
+    MediasoupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

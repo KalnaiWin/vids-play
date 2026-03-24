@@ -11,6 +11,7 @@ import {
 import { ChatInput } from '../comment/comment.dto';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import * as mediasoup from 'mediasoup';
 
 @WebSocketGateway(8001, { cors: '*' })
 export class LivestreamGateway
@@ -20,11 +21,41 @@ export class LivestreamGateway
 
   private logger: Logger = new Logger('CommentGateWay');
   private roomMessages: Map<string, ChatInput[]> = new Map();
+  private worker: any;
+  private router: any;
+  private producerTransport: any;
+  private producer: any;
+  private consumerTransports: Map<string, any> = new Map();
+  private consumers: Map<string, any> = new Map();
+  private mediaCodecs: mediasoup.types.RtpCodecCapability[] = [
+    {
+      kind: 'audio',
+      mimeType: 'audio/opus',
+      clockRate: 48000,
+      channels: 2,
+      preferredPayloadType: 111,
+    },
+    {
+      kind: 'video',
+      mimeType: 'video/VP8',
+      clockRate: 90000,
+      preferredPayloadType: 96,
+      parameters: {
+        'x-google-start-bitrate': 1000,
+      },
+    },
+  ];
 
-  afterInit(server: Server) {}
+  async afterInit(server: Server) {
+    this.worker = await mediasoup.createWorker();
+    this.router = await this.worker.createRouter({
+      mediaCodecs: this.mediaCodecs,
+    });
+  }
 
-  handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
+    this.server.emit('connect-success', client.id);
   }
 
   handleDisconnect(client: Socket) {
@@ -56,30 +87,157 @@ export class LivestreamGateway
     client.leave(roomId);
   }
 
-  @SubscribeMessage('send-offer')
-  getNewOffer(
-    @MessageBody() data: { offer: any; roomId: string },
-    @ConnectedSocket() client: Socket,
-  ) {
-    const { offer, roomId } = data;
-    client.to(roomId).emit('receive-offer', offer);
+  createWorker = async () => {
+    this.worker = await mediasoup.createWorker({
+      rtcMinPort: 2000,
+      rtcMaxPort: 2020,
+    });
+    this.worker.on('died', (error: any) => {
+      // console.log('Mediasoup worker has died');
+      setTimeout(() => process.exit(1), 2000);
+    });
+
+    return this.worker;
+  };
+
+  @SubscribeMessage('getRtpCapabilities')
+  getRtpCapabilities(@ConnectedSocket() client: Socket) {
+    const rtpCapabilities = this.router.rtpCapabilities;
+    return rtpCapabilities;
   }
 
-  @SubscribeMessage('send-answer')
-  handleAnswer(
-    @MessageBody() data: { answer: any; roomId: string },
+  @SubscribeMessage('createWebRtcTransport')
+  async createWebRTCTransport(
+    @MessageBody() { sender }: any,
     @ConnectedSocket() client: Socket,
   ) {
-    const { answer, roomId } = data;
-    client.to(roomId).emit('receive-answer', answer);
+    try {
+      const transport = await this.router.createWebRtcTransport({
+        listenIps: [
+          {
+            ip: '0.0.0.0',
+            announcedIp: '127.0.0.1',
+          },
+        ],
+        enableUdp: true,
+        enableTcp: true,
+        preferUdp: true,
+      });
+
+      transport.on('dtlsstatechange', (state) => {
+        if (state === 'closed') transport.close();
+      });
+
+      transport.on('close', () => {
+        console.log('transport closed');
+      });
+
+      if (sender) this.producerTransport = transport;
+      else this.consumerTransports.set(client.id, transport);
+
+      return {
+        id: transport.id,
+        iceParameters: transport.iceParameters,
+        iceCandidates: transport.iceCandidates,
+        dtlsParameters: transport.dtlsParameters,
+      };
+    } catch (error: any) {
+      return { error: error.message };
+    }
   }
 
-  @SubscribeMessage('send-ice')
-  handleIce(
-    @MessageBody() data: { candidate: any; roomId: string },
+  @SubscribeMessage('transport-connect')
+  async transportConnect(
+    @MessageBody() { dtlsParameters }: { dtlsParameters: any },
+  ) {
+    await this.producerTransport.connect({ dtlsParameters });
+    return {};
+  }
+
+  @SubscribeMessage('transport-produce')
+  async transportProduce(
+    @MessageBody() data: { kind: any; rtpParameters: any; appData: any },
     @ConnectedSocket() client: Socket,
   ) {
-    const { candidate, roomId } = data;
-    client.to(roomId).emit('receive-ice', candidate);
+    this.producer = await this.producerTransport.produce({
+      kind: data.kind,
+      rtpParameters: data.rtpParameters,
+    });
+
+    this.producer.on('transportclose', () => {
+      console.log('transport for this producer closed');
+    });
+
+    client.broadcast.emit('producer-ready', { producerId: this.producer.id });
+
+    return { id: this.producer.id };
+  }
+
+  @SubscribeMessage('transport-recv-connect')
+  async transportRecvConnect(
+    @MessageBody() { dtlsParameters }: { dtlsParameters: any },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const consumerTransport = this.consumerTransports.get(client.id);
+    await consumerTransport.connect({ dtlsParameters });
+    return {};
+  }
+
+  @SubscribeMessage('consume')
+  async consume(
+    @MessageBody() { rtpCapabilities }: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      if (
+        !this.router.canConsume({
+          producerId: this.producer.id,
+          rtpCapabilities,
+        })
+      ) {
+        return { error: 'Cannot consume' };
+      }
+
+      const consumerTransport = this.consumerTransports.get(client.id);
+      const consumer = await consumerTransport.consume({
+        producerId: this.producer.id,
+        rtpCapabilities,
+        paused: true,
+      });
+
+      this.consumers.set(client.id, consumer);
+      consumer.on('transportclose', () =>
+        console.log(`Transport close for ${client.id}`),
+      );
+      consumer.on('producerclose', () =>
+        console.log(`Producer close for ${client.id}`),
+      );
+
+      return {
+        id: consumer.id,
+        producerId: this.producer.id,
+        kind: consumer.kind,
+        rtpParameters: consumer.rtpParameters,
+      };
+    } catch (error: any) {
+      return { error: error.message };
+    }
+  }
+
+  @SubscribeMessage('consumer-resume')
+  async consumerResume(@ConnectedSocket() client: Socket) {
+    const consumer = this.consumers.get(client.id);
+    await consumer.resume();
+    return {};
+  }
+
+  @SubscribeMessage('check-producer')
+  checkProducer() {
+    return !!this.producer;
+  }
+
+  @SubscribeMessage('stream-ended')
+  streamEnd(@MessageBody() { roomId }: { roomId: string }) {
+    this.server.to(roomId).emit('stream-ended');
   }
 }

@@ -35,6 +35,7 @@
     "cloudinary": "^2.9.0",
     "cloudinary-video-player": "^3.7.2",
     "cookie-parser": "^1.4.7",
+    "mediasoup": "^3.19.18",
     "mongoose": "^9.1.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

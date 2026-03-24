@@ -3,15 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import { changeStatusRoom, joinRoom } from "../../feature/roomThunk";
-import {
-  ArrowBigLeft,
-  Ban,
-  Mic,
-  MicOff,
-  Phone,
-  Video,
-  VideoOff,
-} from "lucide-react";
+import { ArrowBigLeft, Ban, Mic, MicOff, Video, VideoOff } from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
 import CommentPage from "../../components/CommentPage";
 import { recommendVideos } from "../../feature/videoThunk";
@@ -20,12 +12,19 @@ import { socket } from "../../socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
 import {
-  handleViewer,
-  startCamera,
-  stopCamera,
+  connectRecvTransport,
+  connectSendTransport,
+  createDevice,
+  createRecevTransport,
+  createSendTransport,
+  getLocalStream,
+  getRTPCapabilities,
+  stopStream,
+  streamSuccess,
   toggleCamera,
   toggleMicro,
-} from "../../socket/script";
+  waitForProducer,
+} from "../../socket/livestreamSocketListener";
 
 const RoomStreaming = () => {
   const { id } = useParams();
@@ -45,25 +44,39 @@ const RoomStreaming = () => {
   const hostRef = useRef<HTMLVideoElement | null>(null);
   const viewerRef = useRef<HTMLVideoElement | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
-  const remoteStreamRef = useRef<MediaStream | null>(null);
-  const isStartingRef = useRef(false);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const [isToggleCamera, setToggleCamera] = useState<boolean>(true);
   const [isToggleMicro, setToggleMicro] = useState<boolean>(true);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamEnded, setStreamEnded] = useState(false);
+  const isHost = user?._id === streamingRoom?.host._id;
 
   useEffect(() => {
     if (!id) return;
     socket.emit("join-room", id);
+
     socket.on("previous-messages", (msgs: Message[]) => {
       setMessages(msgs);
     });
+
     socket.on("receive-message", (msg: Message) => {
       setMessages((prev) => [...prev, msg]);
     });
+
+    socket.on("stream-ended", () => {
+      if (!isHost) {
+        setStreamEnded(true);
+        if (viewerRef.current) {
+          viewerRef.current.srcObject = null;
+        }
+        dispatch(joinRoom({ id: String(id) }));
+      }
+    });
+
     return () => {
       socket.off("receive-message");
+      socket.off("stream-ended");
     };
-  }, [id]);
+  }, [id, isHost]);
 
   const handleSubmit = (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
@@ -90,34 +103,21 @@ const RoomStreaming = () => {
   }, [dispatch, id, statusSubscribe]);
 
   useEffect(() => {
-    if (localStreamRef.current || isStartingRef.current || !streamingRoom)
-      return;
-
-    if (user?._id === streamingRoom?.host._id) {
-      startCamera(
-        hostRef,
-        localStreamRef,
-        isStartingRef,
-        String(streamingRoom._id),
-        peerConnectionRef,
-      );
-    } else {
-      handleViewer(
-        viewerRef,
-        String(streamingRoom._id),
-        peerConnectionRef,
-        remoteStreamRef,
-      );
+    if (!isHost) {
+      const joinAsViewer = async () => {
+        try {
+          await getRTPCapabilities();
+          await createDevice();
+          await createRecevTransport();
+          await waitForProducer();
+          await connectRecvTransport(viewerRef);
+        } catch (err) {
+          console.error("joinAsViewer error:", err);
+        }
+      };
+      joinAsViewer();
     }
-
-    return () => {
-      stopCamera(hostRef, localStreamRef, isStartingRef);
-      socket.off("receive-offer");
-      socket.off("receive-answer");
-      socket.off("receive-ice");
-      peerConnectionRef.current?.close();
-    };
-  }, [streamingRoom]);
+  }, [isHost]);
 
   if (!streamingRoom) return <p>Loading...</p>;
 
@@ -131,18 +131,26 @@ const RoomStreaming = () => {
       >
         <ArrowBigLeft />
       </button>
-
       <div className="flex-1 p-4 md:p-10 md:pt-16 xl:w-2/3 w-full">
         <div className="mx-auto flex flex-col gap-6">
           <div className="aspect-video w-full relative">
             {user?._id !== streamingRoom.host._id ? (
-              <video
-                className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
-                autoPlay
-                playsInline
-                id="viewer"
-                ref={viewerRef}
-              />
+              <>
+                <video
+                  className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+                  autoPlay
+                  playsInline
+                  ref={viewerRef}
+                />
+                {streamEnded && (
+                  <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-2xl gap-3">
+                    <Ban className="size-12 text-slate-400" />
+                    <p className="text-white text-lg font-semibold">
+                      Live stream đã kết thúc
+                    </p>
+                  </div>
+                )}
+              </>
             ) : (
               <video
                 className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
@@ -152,22 +160,19 @@ const RoomStreaming = () => {
                 ref={hostRef}
               />
             )}
-            {user?._id === streamingRoom.host._id && (
-              <div className="absolute z-30 bottom-5 w-full flex justify-center gap-10">
+            {user?._id === streamingRoom.host._id && isStreaming && (
+              <div className="absolute z-50 bottom-5 w-full flex justify-center gap-10">
                 <div
-                  className={`size-10 ${isToggleMicro ? "bg-orange-600" : "bg-orange-400"} hover:bg-orange-500 rounded-full flex justify-center items-center`}
+                  className={`size-10 flex rounded-full justify-center items-center cursor-pointer ${isToggleMicro ? "bg-orange-600" : "bg-orange-400"} ...`}
                   onClick={() => toggleMicro(localStreamRef, setToggleMicro)}
                 >
                   {isToggleMicro ? <Mic /> : <MicOff />}
                 </div>
                 <div
-                  className={`size-10 ${isToggleCamera ? "bg-orange-600" : "bg-orange-400"} hover:bg-orange-500 rounded-full flex justify-center items-center cursor-pointer`}
+                  className={`size-10 flex rounded-full justify-center items-center cursor-pointer ${isToggleCamera ? "bg-orange-600" : "bg-orange-400"} ...`}
                   onClick={() => toggleCamera(localStreamRef, setToggleCamera)}
                 >
                   {isToggleCamera ? <Video /> : <VideoOff />}
-                </div>
-                <div className="size-10 bg-red-600 rounded-full flex justify-center items-center">
-                  <Phone className="" />
                 </div>
               </div>
             )}
@@ -177,40 +182,60 @@ const RoomStreaming = () => {
               <h1 className="text-xl md:text-2xl font-bold text-white">
                 {streamingRoom?.title}
               </h1>
-              {streamingRoom.status === "LIVE" ? (
-                <button
-                  className="bg-red-500 text-red-200 font-semibold cursor-pointer rounded-xl px-4"
-                  onClick={() =>
-                    dispatch(
-                      changeStatusRoom({ id: String(id), status: "STOP" }),
-                    )
-                  }
-                >
-                  Dừng Live
-                </button>
-              ) : streamingRoom.status === "STOP" ? (
-                <div className="text-slate-500 text-sm font-semibold rounded-xl px-4 flex items-center gap-3">
-                  <Ban className="size-5" />
-                  Live stream đã kết thúc
-                </div>
-              ) : (
-                <button
-                  className="bg-green-500 text-green-200 font-semibold cursor-pointer rounded-xl px-4"
-                  onClick={() => {
-                    dispatch(
-                      changeStatusRoom({ id: String(id), status: "LIVE" }),
-                    );
-                  }}
-                >
-                  Bắt đầu Live
-                </button>
-              )}
+              {user?._id === streamingRoom.host._id &&
+                (streamingRoom.status === "LIVE" ? (
+                  <button
+                    className="bg-red-500 text-red-200 font-semibold cursor-pointer rounded-xl px-4"
+                    onClick={async () => {
+                      stopStream(localStreamRef);
+                      setIsStreaming(false);
+                      setToggleCamera(true);
+                      setToggleMicro(true);
+
+                      if (hostRef.current) {
+                        hostRef.current.srcObject = null;
+                      }
+
+                      await dispatch(
+                        changeStatusRoom({ id: String(id), status: "STOP" }),
+                      );
+                      socket.emit("stream-ended", { roomId: id });
+                    }}
+                  >
+                    Dừng Live
+                  </button>
+                ) : streamingRoom.status === "STOP" ? (
+                  <div className="text-slate-500 text-sm font-semibold rounded-xl px-4 flex items-center gap-3">
+                    <Ban className="size-5" />
+                    Live stream đã kết thúc
+                  </div>
+                ) : (
+                  <button
+                    className="bg-green-500 text-green-200 font-semibold cursor-pointer rounded-xl px-4"
+                    onClick={async () => {
+                      await getRTPCapabilities();
+                      await createDevice();
+                      const stream = await getLocalStream();
+                      localStreamRef.current = stream;
+                      streamSuccess(stream, hostRef);
+                      await createSendTransport();
+                      await connectSendTransport();
+                      await dispatch(
+                        changeStatusRoom({ id: String(id), status: "LIVE" }),
+                      );
+                      setIsStreaming(true);
+                    }}
+                  >
+                    Bắt đầu Live
+                  </button>
+                ))}
             </div>
 
-            <div>
-              <SubscribeAndReactionVideo />
-            </div>
-
+            {streamingRoom && (
+              <div>
+                <SubscribeAndReactionVideo />
+              </div>
+            )}
             <div className="bg-zinc-900/50 p-4 rounded-xl border text-white border-zinc-800/50 text-sm">
               <div className="font-bold mb-1 flex gap-4">
                 <span>{streamingRoom?.totalViews.toLocaleString()} views</span>
@@ -225,51 +250,56 @@ const RoomStreaming = () => {
           <CommentPage id={streamingRoom?._id} type="Video" />
         </div>
       </div>
-
       <div className="w-full xl:w-1/3 xl:pt-16 md:bg-zinc-900/20 md:border-l border-zinc-800 px-2">
         {/* Chat section */}
-        <div className="h-[95%] mb-10 relative">
-          <div
-            className={`flex flex-col gap-2 bg-slate-950 w-full overflow-y-auto rounded-xl ${user ? "h-[90%]" : "h-full"} border border-slate-500 py-2`}
-          >
-            {messages.map((msg, idx) => (
-              <div
-                key={`${msg._id}+${idx}`}
-                className="flex gap-3 text-white hover:bg-slate-200/20 px-3 py-1 items-center cursor-pointer w-full"
+        {streamingRoom.status !== "STOP" && (
+          <div className="h-[95%] mb-10 relative">
+            <div
+              className={`flex flex-col gap-2 bg-slate-950 w-full overflow-y-auto rounded-xl ${user ? "h-[90%]" : "h-full"} border border-slate-500 py-2`}
+            >
+              {messages.map((msg, idx) => (
+                <div
+                  key={`${msg._id}+${idx}`}
+                  className="flex gap-3 text-white hover:bg-slate-200/20 px-3 py-1 items-center cursor-pointer w-full"
+                >
+                  <AvatarPage
+                    name={msg?.handleName || "anonymous"}
+                    size="6"
+                    image={msg.avatarUrl}
+                  />
+                  <span className="text-xs text-slate-300 font-semibold">
+                    {msg.handleName ? (
+                      <p>@{msg.handleName}</p>
+                    ) : (
+                      <p>@{`anonymous`}</p>
+                    )}
+                  </span>
+                  <p className="text-sm">{msg.comment}</p>
+                </div>
+              ))}
+            </div>
+            {user && (
+              <form
+                className="absolute -bottom-3 w-full"
+                onSubmit={handleSubmit}
               >
-                <AvatarPage
-                  name={msg?.handleName || "anonymous"}
-                  size="6"
-                  image={msg.avatarUrl}
+                <textarea
+                  className="border border-slate-400 w-full bg-slate-900 rounded-md p-1 text-white indent-2 resize-none text-sm"
+                  placeholder="Viết bình luận"
+                  onChange={(e) => setComment(e.target.value)}
+                  value={comment}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }
+                  }}
                 />
-                <span className="text-xs text-slate-300 font-semibold">
-                  {msg.handleName ? (
-                    <p>@{msg.handleName}</p>
-                  ) : (
-                    <p>@{`anonymous`}</p>
-                  )}
-                </span>
-                <p className="text-sm">{msg.comment}</p>
-              </div>
-            ))}
+              </form>
+            )}
           </div>
-          {user && (
-            <form className="absolute -bottom-3 w-full" onSubmit={handleSubmit}>
-              <textarea
-                className="border border-slate-400 w-full bg-slate-900 rounded-md p-1 text-white indent-2 resize-none text-sm"
-                placeholder="Viết bình luận"
-                onChange={(e) => setComment(e.target.value)}
-                value={comment}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-              />
-            </form>
-          )}
-        </div>
+        )}
+
         <div className="flex flex-col">
           <h2 className="text-lg font-bold px-2 text-white mb-6">
             Video tiếp theo
@@ -312,6 +342,7 @@ const RoomStreaming = () => {
           </div>
         </div>
       </div>
+      )
     </div>
   );
 };

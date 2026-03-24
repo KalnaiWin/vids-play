@@ -29,11 +29,13 @@ export const roomSlice = createSlice({
     // Change room status
     builder
       .addCase(changeStatusRoom.pending, (state) => {
-        state.statusUpdate = "loading";
+        // state.statusUpdate = "loading";
       })
       .addCase(changeStatusRoom.fulfilled, (state, action) => {
         state.statusUpdate = "succeeded";
-        state.streamingRoom = action.payload;
+        if (state.streamingRoom) {
+          state.streamingRoom.status = action.payload.status;
+        }
       })
       .addCase(changeStatusRoom.rejected, (state) => {
         state.statusUpdate = "failed";
