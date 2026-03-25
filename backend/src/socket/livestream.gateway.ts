@@ -240,4 +240,9 @@ export class LivestreamGateway
   streamEnd(@MessageBody() { roomId }: { roomId: string }) {
     this.server.to(roomId).emit('stream-ended');
   }
+
+  @SubscribeMessage('start-stream')
+  startStream(@MessageBody() { roomId }: { roomId: string }) {
+    this.server.to(roomId).emit('start-stream');
+  }
 }

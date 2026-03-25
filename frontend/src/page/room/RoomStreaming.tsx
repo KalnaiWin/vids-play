@@ -53,15 +53,12 @@ const RoomStreaming = () => {
   useEffect(() => {
     if (!id) return;
     socket.emit("join-room", id);
-
     socket.on("previous-messages", (msgs: Message[]) => {
       setMessages(msgs);
     });
-
     socket.on("receive-message", (msg: Message) => {
       setMessages((prev) => [...prev, msg]);
     });
-
     socket.on("stream-ended", () => {
       if (!isHost) {
         setStreamEnded(true);
@@ -92,6 +89,31 @@ const RoomStreaming = () => {
     setComment("");
   };
 
+  const isHostRef = useRef(isHost);
+
+  useEffect(() => {
+    isHostRef.current = isHost;
+  }, [isHost]);
+
+  useEffect(() => {
+    const handleStartStream = async () => {
+      if (isHostRef.current) return;
+      try {
+        await getRTPCapabilities();
+        await createDevice();
+        await createRecevTransport();
+        await waitForProducer();
+        await connectRecvTransport(viewerRef);
+      } catch (err) {
+        console.error("joinAsViewer error:", err);
+      }
+    };
+
+    socket.on("start-stream", handleStartStream);
+    return () => {
+      socket.off("start-stream", handleStartStream);
+    };
+  }, []);
   useEffect(() => {
     if (!id) return;
     dispatch(joinRoom({ id: id }));
@@ -101,23 +123,6 @@ const RoomStreaming = () => {
     if (!id) return;
     dispatch(recommendVideos({ id: String(id) }));
   }, [dispatch, id, statusSubscribe]);
-
-  useEffect(() => {
-    if (!isHost) {
-      const joinAsViewer = async () => {
-        try {
-          await getRTPCapabilities();
-          await createDevice();
-          await createRecevTransport();
-          await waitForProducer();
-          await connectRecvTransport(viewerRef);
-        } catch (err) {
-          console.error("joinAsViewer error:", err);
-        }
-      };
-      joinAsViewer();
-    }
-  }, [isHost]);
 
   if (!streamingRoom) return <p>Loading...</p>;
 
@@ -224,6 +229,9 @@ const RoomStreaming = () => {
                         changeStatusRoom({ id: String(id), status: "LIVE" }),
                       );
                       setIsStreaming(true);
+                      socket.emit("start-stream", {
+                        roomId: streamingRoom._id,
+                      });
                     }}
                   >
                     Bắt đầu Live

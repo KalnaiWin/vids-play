@@ -151,7 +151,7 @@ const ChannelUser = () => {
             <AvatarPage
               name={channel.name}
               image={channel.avatarUrl}
-              size="38"
+              size="24"
             />
           </div>
           <div className="flex flex-col text-white w-3/5">

@@ -1,6 +1,4 @@
-import { ArrowUp, Edit, Filter, Trash } from "lucide-react";
-import { analyticVideo } from "../../types/constant";
-import LineChartAnalyticVideo from "./LineChartAnalyticVideo";
+import { Edit, Filter, Trash } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useState } from "react";
@@ -26,7 +24,7 @@ const Management = () => {
   const [isVideoTab, setIsVideoTab] = useState(true);
 
   return (
-    <div className="text-white ml-5 p-5 mb-10">
+    <div className="text-white md:ml-5 md:p-5 p-2 mb-10">
       <div className="flex gap-10 items-start w-full">
         <div className="flex flex-col gap-1 mb-5">
           <h1 className="font-bold text-xl"> Nội dung của kênh</h1>
@@ -48,7 +46,7 @@ const Management = () => {
           </div>
         )}
       </div>
-      <div className="grid xl:grid-cols-4 md:grid-cols-2 grid-cols-1 w-full justify-between gap-2">
+      {/* <div className="grid xl:grid-cols-4 md:grid-cols-2 grid-cols-1 w-full justify-between gap-2">
         {analyticVideo.map((item) => (
           <div
             key={item.name}
@@ -74,7 +72,7 @@ const Management = () => {
             />
           </div>
         ))}
-      </div>
+      </div> */}
       {isVideoTab ? (
         <ManagementVideo state={isVideoTab} />
       ) : (
@@ -108,7 +106,7 @@ const ManagementVideo = ({ state }: Props) => {
   if (statusFetchingVideos === "loading") return <VideoTabSkeleton />;
 
   return (
-    <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden my-10">
+    <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden mb-10">
       <div className="p-4 border-b border-[#1a1a1a] flex flex-wrap items-center justify-between gap-4">
         <div className="flex md:flex-row flex-col items-center gap-4">
           <button className="flex md:w-fit w-full items-center gap-2 text-sm text-gray-400 border border-[#222] px-3 py-1.5 rounded-lg hover:bg-[#1a1a1a] transition-colors">

@@ -240,7 +240,24 @@ export const stopStream = (
   localStreamRef: React.MutableRefObject<MediaStream | null>,
 ) => {
   if (localStreamRef.current) {
-    localStreamRef.current.getTracks().forEach((track) => track.stop()); 
+    localStreamRef.current.getTracks().forEach((track) => track.stop());
     localStreamRef.current = null;
   }
+};
+
+export const startStreamingAgain = async (
+  localStreamRef: React.MutableRefObject<MediaStream | null>,
+  hostRef: React.RefObject<HTMLVideoElement | null>,
+  roomId: string,
+) => {
+  const stream = await getLocalStream();
+  localStreamRef.current = stream;
+
+  await createDevice();
+  await createSendTransport();
+  await connectSendTransport();
+
+  streamSuccess(stream, hostRef);
+
+  socket.emit("resume-stream", { roomId });
 };
