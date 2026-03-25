@@ -6,6 +6,7 @@ import { getHomepageVideos } from "../../feature/videoThunk";
 import { timeAgo } from "../../types/helperFunction";
 import AvatarPage from "../../components/AvatarPage";
 import { MessageCircle, ThumbsDown, ThumbsUp } from "lucide-react";
+import HomeVideoSkeleton from "../../components/loader/video/HomeVideoSkeleton";
 
 const HomepageVideoChannel = () => {
   const { id } = useParams();
@@ -15,8 +16,7 @@ const HomepageVideoChannel = () => {
     return null;
   }
 
-  const { homeVideos } = useSelector((state: RootState) => state.video);
-  const { comments } = useSelector((state: RootState) => state.comment);
+  const { homeVideos, status } = useSelector((state: RootState) => state.video);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -30,66 +30,70 @@ const HomepageVideoChannel = () => {
       <div className="flex flex-col gap-2">
         <h1 className="font-bold text-xl">Video phổ biến</h1>
         <div className="overflow-x-auto">
-          <div className="flex w-full">
-            {homeVideos?.popularVideos.map((video) => (
-              <Link
-                to={`/watch/${video._id}`}
-                key={video._id}
-                className="min-w-[20%] w-[20%] p-2"
-              >
-                <div className="flex flex-col gap-1 cursor-pointer group overflow-hidden rounded-md">
-                  <img
-                    src={video.thumbnailUrl}
-                    alt={video.title}
-                    className="aspect-video rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <h1 className="font-bold mt-2">{video.title}</h1>
-                  <div className="flex gap-1 items-center text-xs text-slate-400">
-                    <p>{video.viewCount} Lượt xem</p>ㆍ{" "}
-                    {timeAgo(video.createdAt)}
+          {status === "loading" ? (
+            <HomeVideoSkeleton />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full">
+              {homeVideos?.popularVideos.map((video) => (
+                <Link
+                  to={`/watch/${video._id}`}
+                  key={video._id}
+                  className="p-2"
+                >
+                  <div className="flex flex-col gap-1 cursor-pointer group overflow-hidden rounded-md">
+                    <img
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      className="aspect-video rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <h1 className="font-bold mt-2">{video.title}</h1>
+                    <div className="flex gap-1 items-center text-xs text-slate-400">
+                      <p>{video.viewCount} Lượt xem</p>ㆍ{" "}
+                      {timeAgo(video.createdAt)}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-2">
         <h1 className="font-bold text-xl">Video mới nhất</h1>
         <div className="overflow-x-auto">
-          <div className="flex w-full">
-            {homeVideos?.latestVideos.map((video) => (
-              <Link
-                to={`/watch/${video._id}`}
-                key={video._id}
-                className="w-[20%] min-w-[20%] p-2"
-              >
-                <div className="flex flex-col gap-1 cursor-pointer group overflow-hidden rounded-md">
-                  <img
-                    src={video.thumbnailUrl}
-                    alt={video.title}
-                    className="aspect-video rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <h1 className="font-bold mt-2">{video.title}</h1>
-                  <div className="flex gap-1 items-center text-xs text-slate-400">
-                    <p>{video.viewCount} Lượt xem</p>ㆍ{" "}
-                    {timeAgo(video.createdAt)}
+          {status === "loading" ? (
+            <HomeVideoSkeleton />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full">
+              {homeVideos?.latestVideos.map((video) => (
+                <Link
+                  to={`/watch/${video._id}`}
+                  key={video._id}
+                  className="p-2"
+                >
+                  <div className="flex flex-col gap-1 cursor-pointer group overflow-hidden rounded-md">
+                    <img
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      className="aspect-video rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <h1 className="font-bold mt-2">{video.title}</h1>
+                    <div className="flex gap-1 items-center text-xs text-slate-400">
+                      <p>{video.viewCount} Lượt xem</p>ㆍ{" "}
+                      {timeAgo(video.createdAt)}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-2">
         <h1 className="font-bold text-xl">Bài đăng</h1>
-        <div className="flex overflow-x-auto gap-4 pb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-2">
           {homeVideos?.blogs.map((blog) => (
-            <Link
-              to={`/blog/${blog._id}`}
-              key={blog._id}
-              className="w-[33.33%] min-w-[33.33%]"
-            >
+            <Link to={`/blog/${blog._id}`} key={blog._id} className="">
               <div
                 className="h-full flex flex-col justify-between 
                       p-4 rounded-xl 

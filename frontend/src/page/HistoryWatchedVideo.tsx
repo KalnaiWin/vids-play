@@ -8,6 +8,7 @@ import {
 import { Play, Shuffle, Trash } from "lucide-react";
 import { timeAgo } from "../types/helperFunction";
 import { Link } from "react-router-dom";
+import HistoryAndLikePageSkeleton from "../components/loader/home/HistoryAndLikePageSkeleton";
 
 const HistoryWatchedVideo = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -20,22 +21,22 @@ const HistoryWatchedVideo = () => {
     dispatch(getHistoryWatchedVideos());
   }, [dispatch, statusDelete]);
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <HistoryAndLikePageSkeleton />;
   if (!watchedVideo) return "/";
 
   return (
-    <div className="mx-5 p-5 text-white flex w-full h-[92%] gap-5">
-      <div className="w-1/3 bg-white min-h-[90%] rounded-xl relative">
+    <div className="lg:mx-5 md:mx-2 lg:p-5 text-white flex w-full h-[92%] gap-5 lg:flex-row flex-col">
+      <div className="lg:w-1/3 w-full bg-white xl:min-h-[90%] min-h-[60%] lg:rounded-xl relative">
         <img
           src={watchedVideo[0]?.video.thumbnailUrl}
           alt={watchedVideo[0]?.video.title}
           className="object-cover h-full opacity-50 blur-md overflow-hiddens rounded-xl"
         />
-        <div className="absolute p-5 z-20 top-0 ">
+        <div className="absolute p-5 z-20 top-0 h-full w-full">
           <img
             src={watchedVideo[0]?.video.thumbnailUrl}
             alt={watchedVideo[0]?.video.title}
-            className="rounded-xl"
+            className="rounded-xl w-full lg:h-[40%] h-[60%] object-cover"
           />
           <h1 className="text-5xl font-black">{user?.name}</h1>
           <div className="flex gap-2 mt-5">
@@ -48,8 +49,8 @@ const HistoryWatchedVideo = () => {
           </div>
         </div>
       </div>
-      <div className="w-2/3 flex flex-col gap-2">
-        {watchedVideo.map((history, idx) => (
+      <div className="lg:w-2/3 w-full flex flex-col gap-2 px-4 mb-30">
+        {watchedVideo.map((history) => (
           <Link
             to={`/watch/${history.video._id}`}
             key={history._id}
@@ -57,6 +58,7 @@ const HistoryWatchedVideo = () => {
           >
             <div
               className="absolute top-2 right-2 z-10"
+              title="Xóa"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -66,7 +68,6 @@ const HistoryWatchedVideo = () => {
               <Trash className="size-7 text-red-700 bg-red-300 rounded-xl p-1 cursor-pointer hover:bg-red-200" />
             </div>
             <div className="flex items-center gap-2">
-              <p className="text-slate-300">{idx}</p>
               <img
                 src={history.video.thumbnailUrl}
                 alt={history.video.title}

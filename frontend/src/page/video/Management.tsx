@@ -15,6 +15,8 @@ import {
 } from "../../types/helperFunction";
 import { Link } from "react-router-dom";
 import { deleteRoom, fetchStreamingRoomsOfUser } from "../../feature/roomThunk";
+import VideoTabSkeleton from "../../components/loader/video/VideoTabSkeleton";
+import LivestreamTabSkeleton from "../../components/loader/video/LivestreamTabSkeleton";
 
 interface Props {
   state: boolean;
@@ -95,17 +97,16 @@ const ManagementVideo = ({ state }: Props) => {
   useEffect(() => {
     if (!user) return;
 
-    const timeout = setTimeout(() => {
-      dispatch(
-        getAllVideosForSpecificUser({
-          id: String(user._id),
-          name: nameVideo,
-        }),
-      );
-    }, 500);
-
-    return () => clearTimeout(timeout);
+    dispatch(
+      getAllVideosForSpecificUser({
+        id: String(user._id),
+        name: nameVideo,
+      }),
+    );
   }, [dispatch, user, nameVideo, statusDelete, state]);
+
+  if (statusFetchingVideos === "loading") return <VideoTabSkeleton />;
+
   return (
     <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden my-10">
       <div className="p-4 border-b border-[#1a1a1a] flex flex-wrap items-center justify-between gap-4">
@@ -224,13 +225,10 @@ const ManagementLiveStream = ({ state }: Props) => {
 
   useEffect(() => {
     if (!user) return;
-
-    const timeout = setTimeout(() => {
-      dispatch(fetchStreamingRoomsOfUser({ id: user._id }));
-    }, 500);
-
-    return () => clearTimeout(timeout);
+    dispatch(fetchStreamingRoomsOfUser({ id: user._id }));
   }, [dispatch, nameVideo, statusDelete, state]);
+
+  if (status === "loading") return <LivestreamTabSkeleton />;
 
   return (
     <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden my-10">

@@ -6,6 +6,7 @@ import { deleteBlog, getBlogDetail } from "../../feature/blogThunk";
 import { Edit, Trash } from "lucide-react";
 import { timeAgo } from "../../types/helperFunction";
 import LikeAndComment from "../../components/LikeAndComment";
+import BlogDetailSkeleton from "../../components/loader/channel/BlogDetailSkeleton";
 
 const blogsDetail = () => {
   const { id } = useParams();
@@ -20,12 +21,12 @@ const blogsDetail = () => {
     dispatch(getBlogDetail({ id: id }));
   }, [dispatch, id]);
 
-  if (status === "loading") return <p>Loading</p>;
+  if (status === "loading") return <BlogDetailSkeleton />;
 
   if (!blogsDetail) return <p>Blog not found</p>;
 
   return (
-    <div className="mx-5 p-10 mb-20">
+    <div className="mx-5 md:p-10 mt-5 mb-20">
       <div className="rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6 text-white border border-slate-500 relative">
         {user?._id === blogsDetail.author._id && (
           <div className="flex gap-2 absolute top-3 right-2">
@@ -78,7 +79,7 @@ const blogsDetail = () => {
           </div>
         )}
         <div className="mt-5">
-          <LikeAndComment blogId={blogsDetail._id} />
+          <LikeAndComment />
         </div>
       </div>
     </div>

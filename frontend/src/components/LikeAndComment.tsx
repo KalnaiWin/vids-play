@@ -4,11 +4,7 @@ import type { AppDispatch, RootState } from "../store";
 import { toggleReactBlog } from "../feature/blogThunk";
 import CommentPage from "./CommentPage";
 
-interface Props {
-  blogId: string;
-}
-
-const LikeAndComment = ({ blogId }: Props) => {
+const LikeAndComment = () => {
   const { blogsDetail } = useSelector((state: RootState) => state.blog);
   const { comments } = useSelector((state: RootState) => state.comment);
   const { user } = useSelector((state: RootState) => state.auth);

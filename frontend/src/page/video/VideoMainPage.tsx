@@ -7,8 +7,10 @@ import {
   formatViewCount,
   timeAgo,
 } from "../../types/helperFunction";
-import { User } from "lucide-react";
+import { Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import AvatarPage from "../../components/AvatarPage";
+import VideoMainPageSkeleton from "../../components/loader/home/VideoMainPageSkeleton";
 
 const VideoMainPage = () => {
   const { videos, status } = useSelector((state: RootState) => state.video);
@@ -20,9 +22,11 @@ const VideoMainPage = () => {
     dispatch(getAllVieos());
   }, [dispatch]);
 
+  if (status === "loading") return <VideoMainPageSkeleton />;
+
   return (
     <div className="text-white min-h-screen mx-10 text-sm">
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {videos.map((video) => (
           <div
             key={video._id}
@@ -42,26 +46,20 @@ const VideoMainPage = () => {
                 {formatDuration(Number(video.duration))}
               </div>
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                  <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                <div className="w-12 h-12 p-2 bg-blue-600 rounded-full flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                  <Play className="size-24" />
                 </div>
               </div>
             </div>
             <div className="flex gap-3 px-1">
               <div>
-                {video?.owner?.avatarUrl !== "" ? (
-                  <img
-                    src={video?.owner?.avatarUrl}
-                    alt={video?.owner?.name}
-                    className="w-10 h-10 rounded-full object-cover border border-zinc-800"
-                  />
-                ) : (
-                  <User className="w-10 h-10 rounded-full object-cover border border-zinc-800" />
-                )}
+                <AvatarPage
+                  name={video.owner.name}
+                  image={video.owner.avatarUrl}
+                  size="10"
+                />
               </div>
-              <div className="flex flex-col min-w-0">
+              <div className="flex flex-col">
                 <h3 className="text-[15px] font-semibold text-zinc-100 leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
                   {video?.title}
                 </h3>

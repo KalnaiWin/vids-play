@@ -7,7 +7,6 @@ import {
   subscribeChannel,
   updateProfileChannel,
 } from "../../feature/userThunk";
-import { getColorFromFirstLetter } from "../../types/helperFunction";
 import {
   BadgeInfoIcon,
   Bell,
@@ -20,7 +19,9 @@ import {
   UserStar,
   Youtube,
 } from "lucide-react";
-import ChannelVideo, { type UserProps } from "./ListTabVideo";
+import ChannelVideo from "./ListTabVideo";
+import AvatarPage from "../../components/AvatarPage";
+import EditChannelSkeleton from "../../components/loader/EditChannelSkeleton";
 
 const ChannelUser = () => {
   const { id } = useParams();
@@ -66,14 +67,14 @@ const ChannelUser = () => {
   const isSubscribed = channel.subscribers.includes(String(user?._id));
 
   return (
-    <div className="mx-30 p-5 text-white relative">
+    <div className="lg:mx-30 md:mx-20 mx-0 p-5 text-white relative">
       {openEdit && (
         <div
           className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
           onClick={() => setOpenEdit(false)}
         >
           <div
-            className="bg-zinc-900 p-6 rounded-lg w-150 max-h-[80vh] min-w-[50vw] overflow-y-auto relative text-sm"
+            className="bg-zinc-900 p-6 rounded-lg w-[75%] md:w-[50%] max-h-[80vh] overflow-y-auto relative text-sm"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -82,14 +83,14 @@ const ChannelUser = () => {
             >
               ✕
             </button>
-            <EditProfileChannel userId={channel._id} />
+            <EditProfileChannel />
           </div>
         </div>
       )}
       {openDescription && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center text-xs">
           <div
-            className="bg-zinc-900 p-6 rounded-lg w-150 max-h-[80vh] overflow-y-auto relative text-sm"
+            className="bg-zinc-900 p-6 rounded-lg max-h-[80vh] md:w-[35%] w-[75%] overflow-y-auto relative"
             ref={descriptionRef}
           >
             <button
@@ -99,14 +100,18 @@ const ChannelUser = () => {
               ✕
             </button>
 
-            <h2 className="text-4xl font-bold mb-4">{channel.name}</h2>
-            <p className="text-xl font-semibold">Mô tả</p>
-            <p className="mt-2 mb-4 whitespace-pre-line">
+            <h2 className="md:text-4xl text-xl  font-bold mb-4">
+              {channel.name}
+            </h2>
+            <p className="md:text-xl text-sm font-semibold">Mô tả</p>
+            <p className="mt-2 mb-4 whitespace-pre-line text-xs">
               {channel.description}
             </p>
             <p className="mt-2 mb-4"></p>
-            <p className="text-xl font-semibold mb-5">Thông tin khác</p>
-            <div className="flex flex-col gap-3">
+            <p className="md:text-xl text-sm font-semibold mb-5 ">
+              Thông tin khác
+            </p>
+            <div className="flex flex-col gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <Youtube />
                 <Link
@@ -141,29 +146,20 @@ const ChannelUser = () => {
         </div>
       )}
       {channel && (
-        <div className="flex gap-8">
-          {channel?.avatarUrl !== "" ? (
-            <img
-              src={`${channel?.avatarUrl}`}
-              alt="Avatar"
-              className="saspect-square size-40 rounded-full object-cover"
+        <div className="flex lg:gap-8 gap-4">
+          <div className="w-fit">
+            <AvatarPage
+              name={channel.name}
+              image={channel.avatarUrl}
+              size="38"
             />
-          ) : (
-            <div
-              style={{
-                backgroundColor: getColorFromFirstLetter(channel?.name),
-              }}
-              className={`size-38 rounded-full text-white flex items-center justify-center font-bold uppercase text-6xl`}
-            >
-              <p>{channel?.name?.slice(0, 1)}</p>
-            </div>
-          )}
-          <div className="flex flex-col text-white">
-            <h1 className="text-5xl font-bold">{channel?.name}</h1>
-            <h2 className="text-lg flex gap-2 items-center">
+          </div>
+          <div className="flex flex-col text-white w-3/5">
+            <h1 className="md:text-5xl text-2xl font-bold ">{channel?.name}</h1>
+            <h2 className="md:text-lg text-xs flex gap-2 md:items-center md:flex-row flex-col">
               @{channel?.handleName}
-              <p className="text-sm text-slate-400">
-                ㆍ{channel.subscribers.length} người đăng ký ㆍ
+              <p className="text-xs text-slate-400">
+                {channel.subscribers.length} người đăng ký ㆍ
                 {channel.totalVideoCount} video
               </p>
             </h2>
@@ -171,7 +167,7 @@ const ChannelUser = () => {
               <div className="flex gap-2 items-center text-slate-400">
                 Tìm hiểu thêm về kênh này
                 <p
-                  className="text-white font-bold text-sm cursor-pointer"
+                  className="text-white font-bold text-xs cursor-pointer"
                   onClick={() => setOpenDescription(true)}
                 >
                   ...xem thêm
@@ -179,10 +175,12 @@ const ChannelUser = () => {
               </div>
             ) : (
               <div className="text-slate-400 flex items-end gap-2">
-                <p className="max-w-70 truncate">{channel.description}</p>
+                <p className="max-w-70 truncate text-xs">
+                  {channel.description}
+                </p>
 
                 <button
-                  className="text-white font-bold text-sm cursor-pointer shrink-0"
+                  className="text-white font-bold text-xs cursor-pointer shrink-0"
                   onClick={() => setOpenDescription(true)}
                 >
                   ...xem thêm
@@ -281,7 +279,7 @@ const ChannelUser = () => {
               </div>
             ) : (
               <button
-                className="bg-white px-3 py-1 rounded-xl font-semibold cursor-pointer text-black w-fit mt-5"
+                className="bg-white px-3 py-1 rounded-xl font-semibold cursor-pointer text-black w-fit mt-5 text-xs"
                 onClick={() => setOpenEdit(true)}
               >
                 Chỉnh sửa
@@ -299,7 +297,7 @@ const ChannelUser = () => {
 
 export default ChannelUser;
 
-const EditProfileChannel = ({ userId }: UserProps) => {
+const EditProfileChannel = () => {
   const navigate = useNavigate();
   const { channel, statusChannel, statusUpdate } = useSelector(
     (state: RootState) => state.user,
@@ -354,12 +352,14 @@ const EditProfileChannel = ({ userId }: UserProps) => {
     );
   };
 
+  if (statusChannel === "loading") return <EditChannelSkeleton />;
+
   return (
     <form
       className="flex flex-col w-full gap-2 items-end"
       onSubmit={handleSubmit}
     >
-      <div className="w-full flex gap-10">
+      <div className="w-full flex md:flex-row flex-col gap-10 justify-center items-center">
         <div className="relative group">
           <div className="absolute-center flex justify-center items-center w-full h-full opacity-0 group-hover:opacity-100 group-hover:bg-gray-600/80 rounded-full">
             <input
@@ -373,22 +373,11 @@ const EditProfileChannel = ({ userId }: UserProps) => {
             />
             <Camera className="size-10" />
           </div>
-          {previewAvatar ? (
-            <img
-              src={`${previewAvatar}`}
-              alt="Avatar"
-              className="aspect-square w-82 rounded-full object-cover"
-            />
-          ) : (
-            <div
-              style={{
-                backgroundColor: getColorFromFirstLetter(String(channel?.name)),
-              }}
-              className={`size-50 rounded-full text-white flex items-center justify-center font-bold uppercase text-6xl`}
-            >
-              <p>{channel?.name?.slice(0, 1)}</p>
-            </div>
-          )}
+          <AvatarPage
+            name={channel?.name || ""}
+            image={previewAvatar || ""}
+            size="50"
+          />
         </div>
         <div className="flex flex-col gap-2 w-full">
           <h1 className="text-xl font-semibold">Mô tả</h1>

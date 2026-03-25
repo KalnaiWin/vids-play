@@ -5,6 +5,7 @@ import { getLikedVideo } from "../feature/videoThunk";
 import { Play, Shuffle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { timeAgo } from "../types/helperFunction";
+import HistoryAndLikePageSkeleton from "../components/loader/home/HistoryAndLikePageSkeleton";
 
 const LikedPage = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -15,22 +16,22 @@ const LikedPage = () => {
     dispatch(getLikedVideo());
   }, [dispatch]);
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <HistoryAndLikePageSkeleton />;
   if (!likedVideo) return "/";
 
   return (
-    <div className="mx-5 p-5 text-white flex w-full h-[92%] gap-5">
-      <div className="w-1/3 bg-white min-h-[90%] rounded-xl relative">
+    <div className="lg:mx-5 md:mx-2 lg:p-5 text-white flex w-full h-[92%] gap-5 lg:flex-row flex-col">
+      <div className="lg:w-1/3 w-full bg-white xl:min-h-[90%] min-h-[60%] lg:rounded-xl relative">
         <img
           src={likedVideo[0]?.thumbnailUrl}
           alt={likedVideo[0]?.title}
           className="object-cover h-full opacity-50 blur-md overflow-hiddens rounded-xl"
         />
-        <div className="absolute p-5 z-20 top-0 ">
+        <div className="absolute p-5 z-20 top-0 h-full w-full">
           <img
             src={likedVideo[0]?.thumbnailUrl}
             alt={likedVideo[0]?.title}
-            className="rounded-xl"
+            className="rounded-xl w-full lg:h-[40%] h-[60%] object-cover"
           />
           <h1 className="text-5xl font-black">{user?.name}</h1>
           <div className="flex gap-2 mt-5">
@@ -43,15 +44,14 @@ const LikedPage = () => {
           </div>
         </div>
       </div>
-      <div className="w-2/3 flex flex-col gap-2">
-        {likedVideo.map((video, idx) => (
+      <div className="lg:w-2/3 w-full flex flex-col gap-2 px-4 mb-30">
+        {likedVideo.map((video) => (
           <Link
             to={`/watch/${video._id}`}
             key={video._id}
             className="flex gap-2 hover:bg-gray-400/40 p-2 rounded-xl"
           >
             <div className="flex items-center gap-2">
-              <p className="text-slate-300">{idx}</p>
               <img
                 src={video.thumbnailUrl}
                 alt={video.title}

@@ -35,15 +35,15 @@ const HomePage = () => {
             </p>
           </div>
           <div className="md:text-7xl text-5xl font-semibold my-5 text-slate-200">
-            Exploring the Far
-            <span className="block">Reaches of the</span>
-            <span className="block text-blue-600">Multiverse</span>
+            Khám phá
+            <span className="block">Tận cùng của</span>
+            <span className="block text-blue-600">Vids Play</span>
           </div>
           <div className="md:w-[60%] w-[80%] md:text-xl text-sm mb-8 text-slate-400">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum labore
-            corrupti odio deserunt, nobis libero odit a, exercitationem
-            laboriosam quos pariatur reiciendis asperiores veritatis culpa esse
-            vero at tenetur quas?
+            Chào mừng bạn đến với nền tảng xem phim trực tuyến hàng đầu. Khám
+            phá kho nội dung khổng lồ từ những thước phim hay, mới lạ, trending, cùng nền tảng livestream độc đáo,
+            tất cả đều hỗ trợ chất lượng hình ảnh sắc nét và đường
+            truyền tốc độ cao.
           </div>
           <div className="flex md:flex-row flex-col gap-3 items-center w-full">
             <button className="text-white bg-blue-500 px-5 py-2 rounded-full text-xl font-medium cursor-pointer hover:bg-blue-600 transition-all md:w-fit w-full">

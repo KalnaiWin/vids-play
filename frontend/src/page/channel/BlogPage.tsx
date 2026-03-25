@@ -16,6 +16,7 @@ import { typeBlogs } from "../../types/constant";
 import { useEffect, useState } from "react";
 import { getBlogs, uploadBlog } from "../../feature/blogThunk";
 import AvatarPage from "../../components/AvatarPage";
+import BlogPageSkeleton from "../../components/loader/channel/BlogPageSkeleton";
 
 const BlogPage = () => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const BlogPage = () => {
   }
 
   const { user } = useSelector((state: RootState) => state.auth);
-  const { uploadStatus, blogs, deleteStatus } = useSelector(
+  const { uploadStatus, blogs, deleteStatus, status } = useSelector(
     (state: RootState) => state.blog,
   );
 
@@ -59,6 +60,9 @@ const BlogPage = () => {
     });
     setFiles(null);
   };
+
+  if (status === "loading")
+    return <BlogPageSkeleton isChannelOwner={isChannelOwner} />;
 
   return (
     <div className="flex flex-col gap-2">

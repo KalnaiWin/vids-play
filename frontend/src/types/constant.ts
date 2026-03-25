@@ -161,7 +161,7 @@ export const typeVideo = [
     component: ShortVideo,
   },
   {
-    name: "Video phát trực tiếp",
+    name: "Phát trực tiếp",
     path: "livestream",
     component: LivestreamPage,
   },
