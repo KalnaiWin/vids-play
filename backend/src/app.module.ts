@@ -14,6 +14,7 @@ import { RoomModule } from './room/room.module';
 import { SocketModule } from './socket/socket.module';
 import { HistoryModule } from './history/history.module';
 import { MediasoupModule } from './mediasoup/mediasoup.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { MediasoupModule } from './mediasoup/mediasoup.module';
     SocketModule,
     HistoryModule,
     MediasoupModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

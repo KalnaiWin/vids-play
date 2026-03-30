@@ -8,7 +8,7 @@ import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVide
 import CommentPage from "../../components/CommentPage";
 import { recommendVideos } from "../../feature/videoThunk";
 import { formatDuration, timeAgo } from "../../types/helperFunction";
-import { socket } from "../../socket/socket";
+import { socket } from "../../lib/socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
 import {
@@ -24,7 +24,7 @@ import {
   toggleCamera,
   toggleMicro,
   waitForProducer,
-} from "../../socket/livestreamSocketListener";
+} from "../../lib/socket/livestreamSocketListener";
 
 const RoomStreaming = () => {
   const { id } = useParams();

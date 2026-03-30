@@ -4,7 +4,7 @@ import type { AppDispatch, RootState } from "../../store";
 import { useEffect } from "react";
 import { fetchStreamingRoomsOfUser } from "../../feature/roomThunk";
 import { timeAgo } from "../../types/helperFunction";
-import { socket } from "../../socket/socket";
+import { socket } from "../../lib/socket/socket";
 import SkeletonUserVideo from "../../components/loader/video/SkeletonUserVideo";
 
 const LivestreamPage = () => {
