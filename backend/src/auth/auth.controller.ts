@@ -40,9 +40,16 @@ export class AuthController {
     return this.authService.login(inputLoginDto, res);
   }
 
+  @UseGuards(AuthGuard)
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    return this.authService.logout(res);
+  async logout(
+    @Req() req: any,
+    @Body('fcmToken') fcmToken: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'Have an account to log out' };
+    return this.authService.logout(userId, fcmToken, res);
   }
 
   @Get('refresh')

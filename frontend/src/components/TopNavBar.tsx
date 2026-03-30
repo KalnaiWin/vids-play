@@ -161,7 +161,11 @@ const TopNavBar = () => {
                 <button
                   title="Đăng xuất"
                   className="text-red-800 bg-red-100 rounded-md p-1 cursor-pointer"
-                  onClick={() => dispatch(logout())}
+                  onClick={async () => {
+                    const fcmToken = localStorage.getItem("current_fcm_token");
+                    localStorage.removeItem("current_fcm_token");
+                    dispatch(logout( String(fcmToken)));
+                  }}
                 >
                   <LogOut />
                 </button>

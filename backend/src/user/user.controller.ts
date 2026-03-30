@@ -76,4 +76,12 @@ export class UserController {
     if (!userId) throw new BadRequestException('Invalid user id');
     return this.userService.updateProfileChannel(userId, avatar, description);
   }
+
+  @UseGuards(AuthGuard)
+  @Put('fcm-token')
+  async saveFcmToken(@Req() req: Request, @Body('fcmToken') fcmToken: string) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+    return await this.userService.saveFcmToken(userId, fcmToken);
+  }
 }

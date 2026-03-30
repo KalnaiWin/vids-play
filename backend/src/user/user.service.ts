@@ -207,4 +207,16 @@ export class UserService {
 
     return { message: 'Update channel successfully' };
   }
+
+  async saveFcmToken(userId: string, fcmToken: string) {
+    const saveFCMTOKEN = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $addToSet: { fcmTokens: fcmToken },
+      },
+      { new: true },
+    );
+    if (saveFCMTOKEN) return saveFCMTOKEN;
+    else throw new BadRequestException('Cant save fcm token');
+  }
 }

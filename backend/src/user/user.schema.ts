@@ -27,6 +27,9 @@ export class User extends Document {
   @Prop({ default: 'Chào mừng tới kênh của mình 😊', maxlength: 160 })
   description: string;
 
+  @Prop({ default: [] })
+  fcmTokens: string[];
+
   @Prop({ default: true })
   isActive: boolean;
 }

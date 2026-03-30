@@ -142,14 +142,20 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async logout(res: Response) {
+  async logout(userId: string, fcmToken: string, res: Response) {
     const cookieOptions = {
       httpOnly: true,
       secure: false,
       sameSite: 'lax' as const,
       path: '/',
     };
-
+    await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: { fcmTokens: fcmToken },
+      },
+      { new: true },
+    );
     res.clearCookie('access_token', cookieOptions);
     res.clearCookie('refresh_token', cookieOptions);
 

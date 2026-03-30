@@ -5,6 +5,7 @@ import type {
   registerInput,
 } from "../types/authInterface";
 import { toast } from "react-toastify";
+import { saveMessagingDeviceToken } from "../lib/firebase/messaging";
 
 export const fetchUser = createAsyncThunk(
   "auth/fetchUser",
@@ -41,6 +42,7 @@ export const login = createAsyncThunk<
 >("auth/login", async (data, { dispatch, rejectWithValue }) => {
   try {
     const res = await axiosInstance.post("/auth/login", data);
+    saveMessagingDeviceToken(res.data._id);
     dispatch(fetchUser());
     toast.success("Đăng nhập thành công. Chào mừng bạn trở lại 😄");
     return res.data;
@@ -50,11 +52,11 @@ export const login = createAsyncThunk<
   }
 });
 
-export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
+export const logout = createAsyncThunk<void, string, { rejectValue: string }>(
   "auth/logout",
-  async (_, { rejectWithValue }) => {
+  async (fcmToken, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/auth/logout");
+      const res = await axiosInstance.post("/auth/logout", { fcmToken });
       toast.success("Đăng xuất thành công. Hẹn gặp lại 👋");
       return res.data;
     } catch (error: any) {

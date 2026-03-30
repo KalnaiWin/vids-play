@@ -132,4 +132,20 @@ export class UserRepository {
       },
     ]);
   }
+
+  async getSubscribersOfChannelId(channelId: string) {
+    return await this.subscriptionModel.aggregate([
+      {
+        $match: {
+          channel: new Types.ObjectId(channelId),
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          subscriber: 1,
+        },
+      },
+    ]);
+  }
 }
