@@ -1,4 +1,4 @@
-import { Edit, Filter, Trash } from "lucide-react";
+import { Edit, Filter, MonitorPlayIcon, Trash } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useState } from "react";
@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { deleteRoom, fetchStreamingRoomsOfUser } from "../../feature/roomThunk";
 import VideoTabSkeleton from "../../components/loader/video/VideoTabSkeleton";
 import LivestreamTabSkeleton from "../../components/loader/video/LivestreamTabSkeleton";
+import { selectLogin } from "../../store/globalSlice";
 
 interface Props {
   state: boolean;
@@ -22,6 +23,27 @@ interface Props {
 
 const Management = () => {
   const [isVideoTab, setIsVideoTab] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  if (!user)
+    return (
+      <div className="flex flex-col md:mx-20 text-center absolute-center items-center justify-center gap-2 text-white">
+        <div className="p-5 rounded-full bg-blue-950 mb-5 flex justify-center items-center">
+          <MonitorPlayIcon className="size-20" />
+        </div>
+        <h1 className="text-xl font-bold">Lưu những video bạn đã tạo</h1>
+        <p className="font-semibold text-slate-400">
+          Đăng nhập để tạo thêm những video thú vui
+        </p>
+        <button
+          className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5"
+          onClick={() => dispatch(selectLogin())}
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
 
   return (
     <div className="text-white md:ml-5 md:p-5 p-2 mb-10">
@@ -129,85 +151,104 @@ const ManagementVideo = ({ state }: Props) => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="text-[11px] font-bold text-gray-500 uppercase tracking-widest border-b border-[#1a1a1a]">
-              <th className="px-6 py-4">Video</th>
-              <th className="px-6 py-4">Trạng thái</th>
-              <th className="px-6 py-4">Ngày đăng</th>
-              <th className="px-6 py-4">Số lượt xem</th>
-              <th className="px-6 py-4">Số bình luận</th>
-              <th className="px-6 py-4">Lượt thích</th>
-              <th className="px-6 py-4">Hoạt động</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#1a1a1a]">
-            {videosOfUser.map((video) => (
-              <tr
-                key={video._id}
-                className="hover:bg-[#161616] transition-colors group"
-              >
-                <td className="px-6 py-4">
-                  <Link
-                    to={`/watch/${video._id}`}
-                    className="flex items-center gap-4 cursor-pointer"
-                  >
-                    <div className="relative">
-                      <img
-                        src={video.thumbnailUrl}
-                        alt={video.title}
-                        className="w-32 aspect-video rounded-lg object-cover"
-                      />
-                      <span className="absolute bottom-1 right-1 bg-black/80 text-[10px] px-1 rounded text-white font-bold">
-                        {formatDuration(Number(video.duration))}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="text-sm font-medium truncate group-hover:text-blue-400 transition-colors line-clamp-1">
-                        {video.title}
-                      </h4>
-                      <p className="text-xs text-gray-500 line-clamp-1">
-                        {video.description}
-                      </p>
-                    </div>
-                  </Link>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${video.visibility !== "PUBLIC" ? "bg-red-500/10 text-red-500 border border-red-500/20" : "bg-green-500/10 text-green-500 border border-green-500/20"}`}
-                  >
-                    {video.visibility}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-xs text-gray-400 font-semibold">
-                  {new Date(video.createdAt).toLocaleDateString("vi-VN")}
-                </td>
-                <td className="px-6 py-4 text-sm font-medium">
-                  {video.viewCount.toLocaleString()}
-                </td>
-                <td className="px-6 py-4 text-sm font-medium">
-                  {video.commentCount}
-                </td>
-                <td className="px-6 py-4 text-sm font-medium">
-                  {video.likes.length}
-                </td>
-                <td className="px-6 py-4 text-sm font-medium">
-                  <div className="flex items-center justify-around">
-                    <Link to={`/edit/video/${video._id}`} title="Chỉnh sửa">
-                      <Edit className="text-blue-600 bg-blue-200 rounded-md p-1 size-7 hover:opacity-80 cursor-pointer" />
-                    </Link>
-                    <button
-                      title="Xóa"
-                      onClick={() => dispatch(deleteVideo({ id: video._id }))}
-                    >
-                      <Trash className="text-red-600 bg-red-200 rounded-md p-1 size-7 hover:opacity-80 cursor-pointer" />
-                    </button>
-                  </div>
-                </td>
+        {videosOfUser.length === 0 ? (
+          <div className="flex flex-col w-full items-center justify-center gap-2 text-white my-20">
+            <div className="p-5 rounded-full bg-blue-950 mb-5 flex justify-center items-center">
+              <MonitorPlayIcon className="size-20" />
+            </div>
+            <h1 className="text-xl font-bold">Lưu những video bạn đã tạo</h1>
+            <p className="font-semibold text-slate-400">
+              Bạn chưa tạo video nào. Tải lên những nội dung video thú vị tại
+              đây
+            </p>
+            <Link
+              to={`/video/upload`}
+              className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5"
+            >
+              Tải video
+            </Link>
+          </div>
+        ) : (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-[11px] font-bold text-gray-500 uppercase tracking-widest border-b border-[#1a1a1a]">
+                <th className="px-6 py-4">Video</th>
+                <th className="px-6 py-4">Trạng thái</th>
+                <th className="px-6 py-4">Ngày đăng</th>
+                <th className="px-6 py-4">Số lượt xem</th>
+                <th className="px-6 py-4">Số bình luận</th>
+                <th className="px-6 py-4">Lượt thích</th>
+                <th className="px-6 py-4">Hoạt động</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#1a1a1a]">
+              {videosOfUser.map((video) => (
+                <tr
+                  key={video._id}
+                  className="hover:bg-[#161616] transition-colors group"
+                >
+                  <td className="px-6 py-4">
+                    <Link
+                      to={`/watch/${video._id}`}
+                      className="flex items-center gap-4 cursor-pointer"
+                    >
+                      <div className="relative">
+                        <img
+                          src={video.thumbnailUrl}
+                          alt={video.title}
+                          className="w-32 aspect-video rounded-lg object-cover"
+                        />
+                        <span className="absolute bottom-1 right-1 bg-black/80 text-[10px] px-1 rounded text-white font-bold">
+                          {formatDuration(Number(video.duration))}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-medium truncate group-hover:text-blue-400 transition-colors line-clamp-1">
+                          {video.title}
+                        </h4>
+                        <p className="text-xs text-gray-500 line-clamp-1">
+                          {video.description}
+                        </p>
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${video.visibility !== "PUBLIC" ? "bg-red-500/10 text-red-500 border border-red-500/20" : "bg-green-500/10 text-green-500 border border-green-500/20"}`}
+                    >
+                      {video.visibility}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-xs text-gray-400 font-semibold">
+                    {new Date(video.createdAt).toLocaleDateString("vi-VN")}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    {video.viewCount.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    {video.commentCount}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    {video.likes.length}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    <div className="flex items-center justify-around">
+                      <Link to={`/edit/video/${video._id}`} title="Chỉnh sửa">
+                        <Edit className="text-blue-600 bg-blue-200 rounded-md p-1 size-7 hover:opacity-80 cursor-pointer" />
+                      </Link>
+                      <button
+                        title="Xóa"
+                        onClick={() => dispatch(deleteVideo({ id: video._id }))}
+                      >
+                        <Trash className="text-red-600 bg-red-200 rounded-md p-1 size-7 hover:opacity-80 cursor-pointer" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
@@ -229,7 +270,7 @@ const ManagementLiveStream = ({ state }: Props) => {
   if (status === "loading") return <LivestreamTabSkeleton />;
 
   return (
-    <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden my-10">
+    <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden">
       <div className="p-4 border-b border-[#1a1a1a] flex flex-wrap items-center justify-between gap-4">
         <div className="flex md:flex-row flex-col items-center gap-4">
           <button className="flex md:w-fit w-full items-center gap-2 text-sm text-gray-400 border border-[#222] px-3 py-1.5 rounded-lg hover:bg-[#1a1a1a] transition-colors">

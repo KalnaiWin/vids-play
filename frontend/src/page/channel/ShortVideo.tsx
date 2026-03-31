@@ -1,7 +1,7 @@
 const ShortVideo = () => {
   return (
     <div>
-      <div>ShortVideo</div>
+      <div>Page này hiện chưa hoàn thiện</div>
     </div>
   );
 };

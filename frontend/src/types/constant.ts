@@ -12,6 +12,7 @@ import {
   Radio,
   Smile,
   SquarePlay,
+  ThumbsUp,
   UserCircleIcon,
   Users,
 } from "lucide-react";
@@ -70,7 +71,7 @@ export const navBarItemsExpandProfile = [
     path: "/history",
   },
   {
-    icon: Flame,
+    icon: ThumbsUp,
     name: "Đã thích",
     path: "/liked",
   },

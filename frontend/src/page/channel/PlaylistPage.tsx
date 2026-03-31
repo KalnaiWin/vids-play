@@ -1,7 +1,7 @@
 const PlaylistPage = () => {
   return (
     <div>
-      <div>PlaylistPage</div>
+      <div>Page này hiện chưa hoàn thiện</div>
     </div>
   );
 };

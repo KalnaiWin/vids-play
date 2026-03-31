@@ -53,8 +53,8 @@ const App = () => {
         <Route path="/room/stream/:id" element={<RoomStreaming />} />
         <Route path="/edit/room/:id" element={<EditRoom />} />
         <Route path="/history" element={<HistoryWatchedVideo />} />
+        <Route path="/create" element={<StartLiveStream />} />
       </Route>
-      <Route path="/create" element={<StartLiveStream />} />
     </Routes>
   );
 };

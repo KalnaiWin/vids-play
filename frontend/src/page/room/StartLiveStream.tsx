@@ -1,14 +1,15 @@
-import { Image, Plus } from "lucide-react";
+import { Image, Mic, Plus } from "lucide-react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../store";
 import { createRoom } from "../../feature/roomThunk";
 import { useNavigate } from "react-router-dom";
+import { selectLogin } from "../../store/globalSlice";
 
 const StartLiveStream = () => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
-
+  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -24,10 +25,25 @@ const StartLiveStream = () => {
     }
   };
 
+  if (!user)
+    return (
+      <div className="p-10 absolute-center md:mx-20 mt-2 bg-slate-900 rounded-xl text-slate-300 text-center flex flex-col items-center justify-center text-sm border border-gray-600">
+        <Mic className="size-20 mb-5" />
+        <p className="font-bold">Tạo phòng livestream tại đây</p>
+        <p className="text-xs">Hãy đăng nhập để được sử dụng chức năng này</p>
+        <button
+          className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5 text-white"
+          onClick={() => dispatch(selectLogin())}
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
+
   return (
-    <div className="relative w-full min-h-screen">
+    <div className="w-full min-h-screen text-white">
       <form
-        className="absolute-center flex flex-col gap-2 w-[20%]"
+        className="absolute-center flex flex-col gap-2  md:mx-20"
         onSubmit={handleSubmit}
       >
         <div className="flex items-center gap-2">

@@ -39,8 +39,8 @@ const SubscribeAndReactionVideo = () => {
     <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-b border-zinc-800 pb-6">
       <div className="flex items-center gap-4">
         <AvatarPage
-          name={owner?.name || ""}
-          image={owner?.avatarUrl || ""}
+          name={watchingVideo?.owner.name || ""}
+          image={watchingVideo?.owner.avatarUrl || ""}
           size="10"
         />
         <div>

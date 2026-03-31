@@ -195,7 +195,7 @@ const TopNavBar = () => {
               </div>
             ) : (
               <div
-                className="rounded-md bg-blue-500 flex items-center justify-center font-bold text-white cursor-pointer px-4 py-1"
+                className="rounded-md bg-blue-500 flex items-center justify-center font-bold text-white cursor-pointer md:px-4 py-1 px-2 md:text-lg text-xs"
                 onClick={() => dispatch(selectLogin())}
               >
                 Đăng nhập

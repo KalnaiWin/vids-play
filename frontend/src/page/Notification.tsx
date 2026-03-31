@@ -5,18 +5,35 @@ import { getNotificationsOfuser } from "../feature/notificationThunk";
 import AvatarPage from "../components/AvatarPage";
 import { Bell } from "lucide-react";
 import { Link } from "react-router-dom";
+import { selectLogin } from "../store/globalSlice";
 
 export const NotificationsNavbar = () => {
   const { notifications } = useSelector(
     (state: RootState) => state.notification,
   );
+  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     dispatch(getNotificationsOfuser());
   }, [dispatch]);
 
-  console.log(notifications);
+  if (!user)
+    return (
+      <div className="p-10 absolute right-0 w-96 mt-2 bg-slate-900 rounded-xl text-slate-300 text-center flex flex-col items-center justify-center text-sm border border-gray-600">
+        <Bell className="size-20 mb-5" />
+        <p className="font-bold">Hiện tại bạn không có thông báo nào</p>
+        <p className="text-xs">
+          Hãy đăng nhập và theo dõi kênh để có được thông tin và video mới
+        </p>
+        <button
+          className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5 text-white"
+          onClick={() => dispatch(selectLogin())}
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
 
   return (
     <div className="absolute right-0 mt-2 w-96 bg-slate-900 text-white shadow-xl rounded-2xl border border-gray-600 overflow-hidden">
@@ -34,7 +51,7 @@ export const NotificationsNavbar = () => {
             </p>
           </div>
         )}
-        {notifications.map((noti) => (
+        {notifications.slice(0, 5).map((noti) => (
           <Link
             to={`${noti.type === "VIDEO" ? `/watch/${noti.refId}` : `/blog/${noti.refId}`}`}
             key={noti._id}

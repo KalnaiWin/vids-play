@@ -45,7 +45,7 @@ const CommentPage = ({ id, type }: Props) => {
   useEffect(() => {
     if (!id) return;
     dispatch(getComments({ id: id }));
-  }, [dispatch, postStatus, deleteStatus]);
+  }, [dispatch, postStatus, deleteStatus, id]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

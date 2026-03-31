@@ -6,11 +6,28 @@ import type { AppDispatch, RootState } from "../../store";
 import { uploadVideo } from "../../feature/videoThunk";
 import type { UploadFiles } from "../../types/videoInterface";
 import { useNavigate } from "react-router-dom";
+import { selectLogin } from "../../store/globalSlice";
 
 const UploadVideoPage = () => {
   const navigate = useNavigate();
   const { statusCreating } = useSelector((state: RootState) => state.video);
+  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
+
+  if (!user)
+    return (
+      <div className="p-10 absolute-center md:mx-20 mt-2 bg-slate-900 rounded-xl text-slate-300 text-center flex flex-col items-center justify-center text-sm border border-gray-600">
+        <Image className="size-20 mb-5" />
+        <p className="font-bold">Đăng nội dung video của bạn tại đây</p>
+        <p className="text-xs">Hãy đăng nhập để được sử dụng chức năng này</p>
+        <button
+          className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5 text-white"
+          onClick={() => dispatch(selectLogin())}
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
 
   const [formData, setFormData] = useState({
     title: "",
