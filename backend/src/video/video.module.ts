@@ -15,6 +15,7 @@ import { VideoService } from './video.service';
 import { ScheduleService } from 'src/schedule/schedule.service';
 import { BlogRepository } from 'src/blog/blog.repository';
 import { BlogSchema } from 'src/blog/blog.schema';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BlogSchema } from 'src/blog/blog.schema';
     }),
     AuthModule,
     UserModule,
+    NotificationModule,
     MongooseModule.forFeature([
       {
         name: 'Video',

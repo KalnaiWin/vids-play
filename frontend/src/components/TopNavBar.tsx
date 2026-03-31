@@ -13,13 +13,16 @@ import { useEffect, useRef, useState } from "react";
 import { createInfoButton } from "../types/constant";
 import { logout } from "../feature/authThunk";
 import AvatarPage from "./AvatarPage";
+import { NotificationsNavbar } from "../page/Notification";
 
 const TopNavBar = () => {
   const { statusSearch } = useSelector((state: RootState) => state.global);
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const [isExpandCreate, setIsExpandCreate] = useState(false);
+  const [isExpandNotification, setIsExpandNotification] = useState(false);
   const expandCreateBar = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const watchingVideo =
     location.pathname.includes("watch") || location.pathname.includes("stream");
@@ -43,7 +46,14 @@ const TopNavBar = () => {
       ) {
         setIsExpandCreate(false);
       }
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsExpandNotification(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -148,7 +158,20 @@ const TopNavBar = () => {
               )}
             </div>
 
-            <Bell className="hover:bg-blue-950 size-10 p-2 rounded-full" />
+            <div className="relative" ref={wrapperRef}>
+              <Bell
+                className="hover:bg-blue-950 size-10 p-2 rounded-full"
+                onClick={() => {
+                  setIsExpandNotification(!isExpandNotification);
+                }}
+              />
+              {isExpandNotification && (
+                <div className="absolute bottom-0 left-30">
+                  <NotificationsNavbar />
+                </div>
+              )}
+            </div>
+
             {user ? (
               <div className="flex items-center gap-2">
                 <Link to={`/channel/${user._id}`} title="Hồ sơ">
@@ -164,7 +187,7 @@ const TopNavBar = () => {
                   onClick={async () => {
                     const fcmToken = localStorage.getItem("current_fcm_token");
                     localStorage.removeItem("current_fcm_token");
-                    dispatch(logout( String(fcmToken)));
+                    dispatch(logout(String(fcmToken)));
                   }}
                 >
                   <LogOut />

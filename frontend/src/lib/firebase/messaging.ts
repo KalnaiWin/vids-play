@@ -1,6 +1,5 @@
-import { getToken } from "firebase/messaging";
-import { db, messaging } from "./firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { getToken, onMessage } from "firebase/messaging";
+import { messaging } from "./firebase";
 import axiosInstance from "../axios";
 
 export const requestNotificationPermission = async (uid: any) => {
@@ -21,9 +20,18 @@ export const saveMessagingDeviceToken = async (uid: any) => {
     console.log("Got the FCM device token: ", fcmToken);
     localStorage.setItem("current_fcm_token", fcmToken);
     await axiosInstance.put("/user/fcm-token", { fcmToken });
-    const tokenRef = doc(db, "fcm_token", uid);
-    await setDoc(tokenRef, { fcmToken });
   } else {
     requestNotificationPermission(uid);
   }
+};
+
+export const listenToForegroundMessages = () => {
+  onMessage(messaging, (payload) => {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.showNotification(payload.notification?.title ?? "", {
+        body: payload.notification?.body,
+        icon: "/icon.png",
+      });
+    });
+  });
 };

@@ -12,12 +12,14 @@ import { Video } from './video.schema';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { VideoRepository } from './video.repository';
 import { VideoInputUpload } from './video.dto';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class VideoService {
   constructor(
     @InjectModel(Video.name) private videoModel: Model<Video>,
     @InjectModel(User.name) private userModel: Model<User>,
+    private notificationService: NotificationService,
     private cloudinaryService: CloudinaryService,
     private videoRepository: VideoRepository,
   ) {}
@@ -70,6 +72,14 @@ export class VideoService {
     });
 
     await newVideo.save();
+
+    await this.notificationService.createNotification({
+      title: newVideo.title,
+      ownerId: userId,
+      refId: String(newVideo._id),
+      image: newVideo.thumbnailUrl,
+      type: 'VIDEO',
+    });
 
     return newVideo;
   }

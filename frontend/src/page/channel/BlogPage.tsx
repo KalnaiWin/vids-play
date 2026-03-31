@@ -213,14 +213,14 @@ const BlogPage = () => {
               className="rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-6 text-white border relative"
             >
               <div className="flex items-center gap-3 mb-4">
-                <img
-                  src={blog.author.avatarUrl}
-                  alt={blog.author.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                <AvatarPage
+                  name={blog?.author?.name}
+                  image={blog?.author?.avatarUrl}
+                  size="10"
                 />
                 <div className="flex gap-2 items-center">
                   <span className="font-semibold text-sm">
-                    {blog.author.name}
+                    {blog?.author?.name}
                   </span>
                   <span className="text-xs text-slate-500">
                     {timeAgo(blog.createdAt)}
@@ -245,11 +245,11 @@ const BlogPage = () => {
               <div className="mt-5 flex gap-5 text-slate-500">
                 <div className="flex gap-2 items-center">
                   <ThumbsUp />
-                  {blog.likes.length}
+                  {blog?.likes?.length}
                 </div>
                 <div className="flex gap-2 items-center">
                   <ThumbsDown />
-                  {blog.dislikes.length}
+                  {blog?.dislikes?.length}
                 </div>
                 <div className="flex gap-2 items-center">
                   <MessageCircleIcon />

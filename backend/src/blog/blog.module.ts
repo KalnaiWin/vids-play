@@ -9,6 +9,8 @@ import { BlogSchema } from './blog.schema';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { VideoModule } from 'src/video/video.module';
 import { BlogService } from './blog.service';
+import { NotificationModule } from 'src/notification/notification.module';
+import { FirebaseAdminModule } from 'src/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { BlogService } from './blog.service';
     UserModule,
     CloudinaryModule,
     VideoModule,
+    NotificationModule,
+    FirebaseAdminModule,
     MongooseModule.forFeature([
       {
         name: 'User',

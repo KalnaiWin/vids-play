@@ -7,6 +7,7 @@ import { Edit, Trash } from "lucide-react";
 import { timeAgo } from "../../types/helperFunction";
 import LikeAndComment from "../../components/LikeAndComment";
 import BlogDetailSkeleton from "../../components/loader/channel/BlogDetailSkeleton";
+import AvatarPage from "../../components/AvatarPage";
 
 const blogsDetail = () => {
   const { id } = useParams();
@@ -39,7 +40,10 @@ const blogsDetail = () => {
             </button>
             <button
               className="bg-red-300 py-1 px-4 rounded-full cursor-pointer flex items-center gap-2 text-red-600 hover:text-red-300 hover:bg-red-600 transition-all duration-75"
-              onClick={() => dispatch(deleteBlog({ id: blogsDetail._id }))}
+              onClick={async () => {
+                await navigate(`/channel/${blogsDetail.author._id}`);
+                await dispatch(deleteBlog({ id: blogsDetail._id }));
+              }}
               title="Xóa bài viết"
             >
               <Trash className="size-5" />
@@ -49,10 +53,10 @@ const blogsDetail = () => {
         )}
 
         <div className="flex items-center gap-3 mb-4">
-          <img
-            src={blogsDetail.author.avatarUrl}
-            alt={blogsDetail.author.name}
-            className="w-10 h-10 rounded-full object-cover"
+          <AvatarPage
+            name={blogsDetail?.author?.name}
+            image={blogsDetail?.author?.avatarUrl}
+            size="10"
           />
           <div className="flex gap-2 items-center">
             <span className="font-semibold text-sm">

@@ -1,16 +1,23 @@
-import { IsDate, IsString, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class InputCreateNotification {
   @IsString()
-  title: string;
-
-  @IsString()
+  @IsNotEmpty()
   ownerId: string;
 
   @IsString()
+  @IsNotEmpty()
   refId: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsOptional()
   image?: string;
+
+  @IsEnum(['VIDEO', 'BLOG'])
+  @IsNotEmpty()
+  type: string;
 }

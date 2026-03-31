@@ -7,6 +7,13 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./store";
 
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/firebase-messaging-sw.js")
+//     .then((reg) => console.log("SW registered:", reg))
+//     .catch((err) => console.error("SW registration failed:", err));
+// }
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>

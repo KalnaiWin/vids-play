@@ -15,6 +15,7 @@ import { SocketModule } from './socket/socket.module';
 import { HistoryModule } from './history/history.module';
 import { MediasoupModule } from './mediasoup/mediasoup.module';
 import { NotificationModule } from './notification/notification.module';
+import { FirebaseAdminModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { NotificationModule } from './notification/notification.module';
     HistoryModule,
     MediasoupModule,
     NotificationModule,
+    FirebaseAdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

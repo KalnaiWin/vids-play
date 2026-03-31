@@ -11,14 +11,14 @@ import { InputUploadBlog, OutputUploadBlog } from './blog.dto';
 import { User } from 'src/user/user.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { VideoRepository } from 'src/video/video.repository';
-import { BlogRepository } from './blog.repository';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class BlogService {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<Blog>,
     @InjectModel(User.name) private userModel: Model<User>,
-    private postRepository: BlogRepository,
+    private notificationService: NotificationService,
     private cloudinaryService: CloudinaryService,
     private videoRepository: VideoRepository,
   ) {}
@@ -59,6 +59,15 @@ export class BlogService {
     });
 
     await newPost.save();
+
+    await this.notificationService.createNotification({
+      title: newPost.description,
+      ownerId: authorId,
+      refId: String(newPost._id),
+      image: newPost.image_blog,
+      type: 'BLOG',
+    });
+
     return {
       id: newPost._id.toString(),
       description: newPost.description,

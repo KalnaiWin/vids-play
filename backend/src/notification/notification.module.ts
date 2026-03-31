@@ -7,13 +7,12 @@ import { UserModule } from 'src/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/user/user.schema';
 import { Notification, NotificationSchema } from './notification.schema';
-import { FirebaseModule } from 'src/firebase/firebase.module';
-
+import { FirebaseAdminModule } from 'src/firebase/firebase.module';
 @Module({
   imports: [
     AuthModule,
     UserModule,
-    // FirebaseModule,
+    FirebaseAdminModule,
     MongooseModule.forFeature([
       {
         name: User.name,

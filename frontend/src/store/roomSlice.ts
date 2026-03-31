@@ -28,7 +28,7 @@ export const roomSlice = createSlice({
   extraReducers(builder) {
     // Change room status
     builder
-      .addCase(changeStatusRoom.pending, (state) => {
+      .addCase(changeStatusRoom.pending, () => {
         // state.statusUpdate = "loading";
       })
       .addCase(changeStatusRoom.fulfilled, (state, action) => {
