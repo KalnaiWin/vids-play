@@ -20,6 +20,8 @@ import TrendingVideosPage from "./page/TrendingVideosPage";
 import HistoryWatchedVideo from "./page/HistoryWatchedVideo";
 import { listenToForegroundMessages } from "./lib/firebase/messaging";
 import WaitingLoaderPage from "./components/loader/WaitingLoaderPage";
+import ShortVideosPage from "./page/ShortVideosPage";
+import WatchingVideoSkeleton from "./components/loader/video/WatchingVideoSkeleton";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -46,6 +48,7 @@ const App = () => {
         <Route path="/trend" element={<TrendingVideosPage />} />
         <Route path="/video/upload" element={<UploadVideoPage />} />
         <Route path="/watch/:id" element={<WatchVideo />} />
+        <Route path="/watch/:id" element={<WatchingVideoSkeleton />} />
         <Route path="/edit/video/:id" element={<EditVideo />} />
         <Route path="/channel/:id" element={<ChannelUser />} />
         <Route path="/liked" element={<LikedPage />} />
@@ -55,6 +58,7 @@ const App = () => {
         <Route path="/edit/room/:id" element={<EditRoom />} />
         <Route path="/history" element={<HistoryWatchedVideo />} />
         <Route path="/create" element={<StartLiveStream />} />
+        <Route path="/short" element={<ShortVideosPage />} />
       </Route>
     </Routes>
   );

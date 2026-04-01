@@ -110,9 +110,20 @@ const ManagementVideo = ({ state }: Props) => {
   const { videosOfUser, statusFetchingVideos, statusDelete } = useSelector(
     (state: RootState) => state.video,
   );
+
+  const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [nameVideo, setNameVideo] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchValue);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchValue]);
 
   useEffect(() => {
     if (!user) return;
@@ -120,10 +131,10 @@ const ManagementVideo = ({ state }: Props) => {
     dispatch(
       getAllVideosForSpecificUser({
         id: String(user._id),
-        name: nameVideo,
+        name: debouncedSearch,
       }),
     );
-  }, [dispatch, user, nameVideo, statusDelete, state]);
+  }, [dispatch, debouncedSearch, statusDelete, state]);
 
   if (statusFetchingVideos === "loading") return <VideoTabSkeleton />;
 
@@ -138,10 +149,10 @@ const ManagementVideo = ({ state }: Props) => {
           <div className="relative">
             <input
               type="text"
-              value={nameVideo}
+              value={searchValue}
               placeholder="Tìm kiếm trong video của bạn"
               className="bg-[#1a1a1a] text-sm px-4 py-1.5 rounded-lg border border-[#222] focus:outline-none focus:border-blue-500 w-64"
-              onChange={(e) => setNameVideo(e.target.value)}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
           </div>
         </div>
@@ -283,7 +294,7 @@ const ManagementLiveStream = ({ state }: Props) => {
               value={nameVideo}
               placeholder="Tìm kiếm trong video của bạn"
               className="bg-[#1a1a1a] text-sm px-4 py-1.5 rounded-lg border border-[#222] focus:outline-none focus:border-blue-500 w-64"
-              onChange={(e) => setNameVideo(e.target.value)}
+              // onChange={(e) => setNameVideo(e.target.value)}
             />
           </div>
         </div>

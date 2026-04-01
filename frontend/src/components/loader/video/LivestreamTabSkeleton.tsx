@@ -1,6 +1,6 @@
 const LivestreamTabSkeleton = () => {
   return (
-    <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden my-10 animate-pulse">
+    <div className="bg-[#111] rounded-2xl border border-[#1a1a1a] overflow-hidden animate-pulse">
       <div className="p-4 border-b border-[#1a1a1a] flex flex-wrap items-center justify-between gap-4">
         <div className="flex md:flex-row flex-col items-center gap-4 w-full md:w-auto">
           <div className="h-8 w-24 bg-[#1a1a1a] rounded-lg"></div>

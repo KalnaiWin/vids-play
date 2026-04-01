@@ -9,6 +9,7 @@ import { User } from 'src/user/user.schema';
 import { Room } from './room.schema';
 import { Model, Types } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class RoomService {
@@ -16,6 +17,7 @@ export class RoomService {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Room.name) private roomModel: Model<Room>,
     private cloudinarySerice: CloudinaryService,
+    private notificationService: NotificationService,
   ) {}
 
   async createRoom(
@@ -41,6 +43,14 @@ export class RoomService {
     });
 
     await newRoom.save();
+
+    await this.notificationService.createNotification({
+      title: newRoom.title,
+      ownerId: userId,
+      refId: String(newRoom._id),
+      image: newRoom.thumbnail,
+      type: 'VIDEO',
+    });
 
     return newRoom;
   }

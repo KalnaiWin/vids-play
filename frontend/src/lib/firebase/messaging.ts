@@ -17,7 +17,6 @@ export const saveMessagingDeviceToken = async (uid: any) => {
     vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
   });
   if (fcmToken) {
-    console.log("Got the FCM device token: ", fcmToken);
     localStorage.setItem("current_fcm_token", fcmToken);
     await axiosInstance.put("/user/fcm-token", { fcmToken });
   } else {

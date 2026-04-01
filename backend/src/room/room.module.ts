@@ -8,11 +8,13 @@ import { RoomRepository } from './room.repository';
 import { RoomSchema } from './room.schema';
 import { UserSchema } from 'src/user/user.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    NotificationModule,
     MongooseModule.forFeature([
       {
         name: 'Room',

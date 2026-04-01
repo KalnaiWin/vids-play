@@ -12,6 +12,7 @@ import { formatDuration, timeAgo } from "../../types/helperFunction";
 import { ArrowBigLeft } from "lucide-react";
 import SubscribeAndReactionVideo from "../../components/SubscribeAndReactionVideo";
 import CommentPage from "../../components/CommentPage";
+import WatchingVideoSkeleton from "../../components/loader/video/WatchingVideoSkeleton";
 
 const WatchVideo = () => {
   const { id } = useParams();
@@ -35,7 +36,8 @@ const WatchVideo = () => {
     dispatch(insertWatchedVideo({ id: watchingVideo._id }));
   }, [dispatch, watchingVideo?._id]);
 
-  if (!watchingVideo) return <p>Loading...</p>;
+  if (status === "loading") return <WatchingVideoSkeleton />;
+  if (!watchingVideo) return "/";
 
   return (
     <div className="fixed inset-0 z-40 bg-slate-950 flex flex-col xl:flex-row overflow-y-auto md:mt-5 mt-20">
