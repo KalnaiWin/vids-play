@@ -81,7 +81,7 @@ const WatchVideo = () => {
               <SubscribeAndReactionVideo />
             </div>
 
-            <div className="bg-zinc-900/50 p-4 rounded-xl border text-white border-zinc-800/50 text-sm">
+            <div className="bg-zinc-900/50 p-4 rounded-xl border text-white border-zinc-800/50 md:text-sm text-xs">
               <div className="font-bold mb-1 flex gap-4">
                 <span>{watchingVideo?.viewCount?.toLocaleString()} views</span>
                 <span>{timeAgo(watchingVideo.createdAt)}</span>

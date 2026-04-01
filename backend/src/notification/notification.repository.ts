@@ -46,4 +46,13 @@ export class NotificationRepository {
       { $limit: limit },
     ]);
   }
+
+  async hasUnreadNotification(userId: string) {
+    const exists = await this.notificationModel.exists({
+      receiver: new Types.ObjectId(userId),
+      isRead: false,
+    });
+
+    return !!exists;
+  }
 }

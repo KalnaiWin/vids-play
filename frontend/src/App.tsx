@@ -19,6 +19,7 @@ import EditRoom from "./page/room/EditRoom";
 import TrendingVideosPage from "./page/TrendingVideosPage";
 import HistoryWatchedVideo from "./page/HistoryWatchedVideo";
 import { listenToForegroundMessages } from "./lib/firebase/messaging";
+import WaitingLoaderPage from "./components/loader/WaitingLoaderPage";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -28,14 +29,14 @@ const App = () => {
     if (status === "idle") {
       dispatch(fetchUser());
     }
-  }, [dispatch, status, user]);
+  }, [dispatch, status]);
 
   useEffect(() => {
     if (!user?._id) return;
-
-    // requestNotificationPermission(user._id);
     listenToForegroundMessages();
   }, [user?._id]);
+
+  if (status === "loading") return <WaitingLoaderPage />;
 
   return (
     <Routes>

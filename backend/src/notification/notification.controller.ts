@@ -38,12 +38,25 @@ export class NotificationController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('/not-read')
+  async checkNotReadNotification(@Req() req: Request) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+    return await this.notificationRepository.hasUnreadNotification(userId);
+  }
+
+  @UseGuards(AuthGuard)
   @Put('/:id')
   async checkReadNotification(
     @Req() req: Request,
     @Param('id') notificationId: string,
   ) {
     const userId = req.user?.userId;
-    if (!userId) return { message: 'UserId not found' };
+    if (!userId || !notificationId)
+      return { message: 'UserId or NotificationId not found' };
+    return await this.notificationService.checkReadNotification(
+      userId,
+      notificationId,
+    );
   }
 }

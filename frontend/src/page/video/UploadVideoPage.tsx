@@ -1,4 +1,4 @@
-import { CloudUpload, Image, Info, XIcon } from "lucide-react";
+import { CloudUpload, Image, Info, Server, User, XIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { formatDuration, generateSlug } from "../../types/helperFunction";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,7 +45,6 @@ const UploadVideoPage = () => {
   });
 
   useEffect(() => {
-    // load duration of video
     if (!files.videoUrl) return;
     const video = document.createElement("video");
     const url = URL.createObjectURL(files.videoUrl);
@@ -97,7 +96,27 @@ const UploadVideoPage = () => {
   };
 
   return (
-    <div className="text-slate-300 mx-5 flex flex-col gap-2">
+    <div className="text-slate-300 mx-5 flex flex-col gap-2 relative">
+      {statusCreating === "loading" && files.videoUrl && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="sm:w-[25%] w-[40%] bg-slate-200 rounded-2xl p-6 flex flex-col items-center gap-6 shadow-xl">
+            <div className="flex items-center w-full justify-between">
+              <div className="bg-blue-600 md:p-3 p-1 rounded-full text-white">
+                <User className="size-6" />
+              </div>
+              <div className="flex-1 mx-4 h-1 bg-white rounded relative overflow-hidden">
+                <div className="upload-bar" />
+              </div>
+              <div className="bg-green-600 md:p-3 p-1 rounded-full text-white">
+                <Server className="size-6" />
+              </div>
+            </div>
+            <p className="text-center text-gray-600 whitespace-pre-wrap md:text-lg text-xs font-medium">
+              Đang tải video lên. Vui lòng chờ trong giây lát.
+            </p>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col gap-1 ml-5 mt-5">
         <h1 className="font-bold text-3xl">Tải video lên</h1>
         <p className="text-sm text-slate-500 font-semibold">
@@ -250,7 +269,7 @@ const UploadVideoPage = () => {
                 controls
                 className="rounded-t-xl"
               />
-              <div className="absolute top-5 left-5 z-60 bg-blue-200 px-2 py-0.5 rounded-md">
+              <div className="absolute top-5 left-5 z-20 bg-blue-200 px-2 py-0.5 rounded-md">
                 <div className="text-xs text-black font-medium">
                   {formatDuration(formData.duration)}
                 </div>

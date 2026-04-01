@@ -14,3 +14,35 @@ export const getNotificationsOfuser = createAsyncThunk<
     return rejectWithValue(error.response?.data || "Error");
   }
 });
+
+export const checkIsReadNotification = createAsyncThunk<
+  NotificationInfo,
+  { id: string },
+  { rejectValue: string }
+>(
+  "/notification/checkIsReadNotification",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const result = await axiosInstance.put(`notification/${id}`);
+      return result.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Error");
+    }
+  },
+);
+
+export const checkHasUnReadNotification = createAsyncThunk<
+  boolean,
+  void,
+  { rejectValue: string }
+>(
+  "/notification/checkHasUnReadNotification",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await axiosInstance.get(`notification/not-read`);
+      return result.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Error");
+    }
+  },
+);

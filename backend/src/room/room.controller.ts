@@ -81,7 +81,7 @@ export class RoomController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('reaction/:id')
+  @Put('reaction/:id')
   async toggleReactionVideo(
     @Param('id') roomId: string,
     @Req() req: Request,

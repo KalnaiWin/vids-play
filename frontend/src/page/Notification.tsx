@@ -1,10 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { useEffect } from "react";
-import { getNotificationsOfuser } from "../feature/notificationThunk";
+import {
+  checkHasUnReadNotification,
+  checkIsReadNotification,
+  getNotificationsOfuser,
+} from "../feature/notificationThunk";
 import AvatarPage from "../components/AvatarPage";
 import { Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { selectLogin } from "../store/globalSlice";
 
 export const NotificationsNavbar = () => {
@@ -14,8 +18,11 @@ export const NotificationsNavbar = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(getNotificationsOfuser());
+    dispatch(checkHasUnReadNotification());
   }, [dispatch]);
 
   if (!user)
@@ -52,16 +59,21 @@ export const NotificationsNavbar = () => {
           </div>
         )}
         {notifications.slice(0, 5).map((noti) => (
-          <Link
-            to={`${noti.type === "VIDEO" ? `/watch/${noti.refId}` : `/blog/${noti.refId}`}`}
+          <button
+            onClick={async () => {
+              await dispatch(checkIsReadNotification({ id: String(noti._id) }));
+              await navigate(
+                `${noti.type === "VIDEO" ? `/watch/${noti.refId}` : `/blog/${noti.refId}`}`,
+              );
+            }}
             key={noti._id}
             className={`flex items-start gap-3 p-4 cursor-pointer transition
-              ${noti.isRead ? "bg-slate-600" : "bg-slate-800"}
-              hover:bg-slate-700`}
+              ${noti.isRead ? "bg-slate-900" : "bg-slate-800"}
+              hover:bg-slate-700 w-full border-b border-slate-600`}
           >
             <AvatarPage name={noti.ownerName} image={noti.avatar} size="10" />
             <div className="flex-1">
-              <div className="text-sm flex flex-col">
+              <div className="text-sm flex flex-col items-start">
                 <span className="font-bold">{noti.ownerName}</span>{" "}
                 <p className="line-clamp-2 text-xs text-slate-300">
                   {noti.title}
@@ -76,9 +88,11 @@ export const NotificationsNavbar = () => {
               )}
             </div>
             {!noti.isRead && (
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+              <div
+                className={`w-2 h-2 rounded-full mt-2 ${noti.isRead ? "" : "bg-blue-500"}`}
+              ></div>
             )}
-          </Link>
+          </button>
         ))}
       </div>
     </div>

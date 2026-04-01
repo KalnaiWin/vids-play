@@ -1,10 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { NotificationState } from "../types/notificationInterface";
-import { getNotificationsOfuser } from "../feature/notificationThunk";
+import {
+  checkHasUnReadNotification,
+  checkIsReadNotification,
+  getNotificationsOfuser,
+} from "../feature/notificationThunk";
 
 const initialState: NotificationState = {
   notifications: [],
   status: "idle",
+  notRead: false,
 };
 
 export const notificationSlice = createSlice({
@@ -21,6 +26,35 @@ export const notificationSlice = createSlice({
         state.notifications = action.payload;
       })
       .addCase(getNotificationsOfuser.rejected, (state) => {
+        state.status = "failed";
+      });
+
+    builder
+      .addCase(checkIsReadNotification.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(checkIsReadNotification.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const index = state.notifications.findIndex(
+          (noti) => noti._id === action.payload._id,
+        );
+        if (index !== -1) {
+          state.notifications[index] = action.payload;
+        }
+      })
+      .addCase(checkIsReadNotification.rejected, (state) => {
+        state.status = "failed";
+      });
+
+    builder
+      .addCase(checkHasUnReadNotification.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(checkHasUnReadNotification.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.notRead = action.payload;
+      })
+      .addCase(checkHasUnReadNotification.rejected, (state) => {
         state.status = "failed";
       });
   },

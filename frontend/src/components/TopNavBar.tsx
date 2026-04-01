@@ -14,10 +14,12 @@ import { createInfoButton } from "../types/constant";
 import { logout } from "../feature/authThunk";
 import AvatarPage from "./AvatarPage";
 import { NotificationsNavbar } from "../page/Notification";
+import { checkHasUnReadNotification } from "../feature/notificationThunk";
 
 const TopNavBar = () => {
   const { statusSearch } = useSelector((state: RootState) => state.global);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { notRead } = useSelector((state: RootState) => state.notification);
   const dispatch = useDispatch<AppDispatch>();
   const [isExpandCreate, setIsExpandCreate] = useState(false);
   const [isExpandNotification, setIsExpandNotification] = useState(false);
@@ -57,6 +59,10 @@ const TopNavBar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    dispatch(checkHasUnReadNotification());
+  }, [dispatch]);
 
   return (
     <div className="w-full flex px-5 py-2 items-center h-full bg-black border-b border-blue-950 text-slate-300 justify-between z-50">
@@ -159,6 +165,9 @@ const TopNavBar = () => {
             </div>
 
             <div className="relative" ref={wrapperRef}>
+              {notRead && (
+                <div className="absolute w-3 h-3 top-1 right-2 rounded-full bg-blue-500"></div>
+              )}
               <Bell
                 className="hover:bg-blue-950 size-10 p-2 rounded-full"
                 onClick={() => {

@@ -68,7 +68,7 @@ export const toggleReactionRoom = createAsyncThunk<
   { rejectValue: string }
 >("room/toggleReactionRoom", async ({ type, id }, { rejectWithValue }) => {
   try {
-    const result = await axiosInstance.post(`/room/reaction/${id}`, { type });
+    const result = await axiosInstance.put(`/room/reaction/${id}`, { type });
     return result.data as ReactionResponse;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");

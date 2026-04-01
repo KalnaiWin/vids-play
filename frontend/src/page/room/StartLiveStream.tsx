@@ -1,4 +1,4 @@
-import { Image, Mic, Plus } from "lucide-react";
+import { Hammer, Image, Mic, Plus, TvMinimal } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
@@ -10,6 +10,7 @@ const StartLiveStream = () => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { createStatus } = useSelector((state: RootState) => state.room);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -41,9 +42,29 @@ const StartLiveStream = () => {
     );
 
   return (
-    <div className="w-full min-h-screen text-white">
+    <div className="w-full min-h-screen text-white relative flex justify-center items-center">
+      {createStatus === "loading" && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="sm:w-[25%] w-[40%] bg-slate-200 rounded-2xl p-6 flex flex-col items-center gap-6 shadow-xl">
+            <div className="flex items-center w-full justify-between">
+              <div className="bg-blue-600 md:p-3 p-1 rounded-full text-white">
+                <Hammer className="size-6" />
+              </div>
+              <div className="flex-1 mx-4 h-1 bg-white rounded relative overflow-hidden">
+                <div className="upload-bar" />
+              </div>
+              <div className="bg-green-600 md:p-3 p-1 rounded-full text-white">
+                <TvMinimal className="size-6" />
+              </div>
+            </div>
+            <p className="text-center text-gray-600 whitespace-pre-wrap md:text-lg text-xs font-medium">
+              Đang tạo phòng livestream. Vui lòng chờ trong giây lát.
+            </p>
+          </div>
+        </div>
+      )}
       <form
-        className="absolute-center flex flex-col gap-2  md:mx-20"
+        className="flex flex-col gap-2 mb-20 md:mr-20 md:w-[30%] w-[60%]"
         onSubmit={handleSubmit}
       >
         <div className="flex items-center gap-2">
@@ -56,30 +77,63 @@ const StartLiveStream = () => {
         <div className="flex flex-col w-full">
           <label className="font-semibold">Tên phòng</label>
           <textarea
-            className="w-full focus:outline-none border border-slate-500 rounded-md bg-slate-100 resize-none p-1"
+            className="w-full focus:outline-none border border-slate-500 rounded-md bg-slate-100 resize-none p-1 text-black"
             rows={2}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-2">
           <label className="font-semibold">Thumbnail phòng</label>
-          <div className="w-full h-52 rounded-md bg-slate-100 border border-dashed border-slate-500 relative">
+
+          <div className="relative w-full h-52 rounded-xl border-2 border-dashed border-slate-400 bg-slate-100 overflow-hidden group cursor-pointer">
             <input
               type="file"
-              className="w-full h-full opacity-0 z-10 absolute"
+              className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
             />
-            <div className="absolute-center flex flex-col gap-2 items-center justify-center text-center text-slate-500 text-sm">
-              <Image className="size-10 bg-slate-200 rounded-full p-2" />
-              Chọn thumbnail cho phòng
-            </div>
+            {file ? (
+              <>
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="thumbnail"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white text-sm">
+                  <p>Đổi thumbnail</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFile(null);
+                  }}
+                  className="absolute top-2 right-2 bg-black/70 text-white rounded-full px-2 py-1 text-xs z-20 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm">
+                <Image className="size-10 bg-slate-200 rounded-full p-2 mb-2" />
+                <p className="font-medium">Chọn thumbnail</p>
+                <p className="text-xs opacity-70">PNG, JPG (max 5MB)</p>
+              </div>
+            )}
           </div>
         </div>
         <button
           type="submit"
-          className="w-full text-center p-2 bg-blue-700 rounded-md text-white cursor-pointer"
+          disabled={createStatus === "loading"}
+          className={`w-full text-center p-2 rounded-md text-white transition
+    ${
+      createStatus === "loading"
+        ? "bg-blue-400 cursor-not-allowed"
+        : "bg-blue-700 hover:bg-blue-800 cursor-pointer"
+    }`}
         >
-          Bắt đầu live stream
+          {createStatus === "loading"
+            ? "Đang tạo stream..."
+            : "Bắt đầu live stream"}
         </button>
       </form>
     </div>

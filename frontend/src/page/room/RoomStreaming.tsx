@@ -49,6 +49,7 @@ const RoomStreaming = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamEnded, setStreamEnded] = useState(false);
   const isHost = user?._id === streamingRoom?.host._id;
+  const chatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -114,6 +115,14 @@ const RoomStreaming = () => {
       socket.off("start-stream", handleStartStream);
     };
   }, []);
+
+  useEffect(() => {
+    chatRef.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   useEffect(() => {
     if (!id) return;
     dispatch(joinRoom({ id: id }));
@@ -131,7 +140,7 @@ const RoomStreaming = () => {
       <button
         className="fixed top-20 left-4 z-80 p-2 bg-black/50 hover:bg-zinc-800 text-white rounded-full transition-colors backdrop-blur-md"
         onClick={() => {
-          navigate("/");
+          navigate(`/channel/${streamingRoom.host._id}`);
         }}
       >
         <ArrowBigLeft />
@@ -182,9 +191,9 @@ const RoomStreaming = () => {
               </div>
             )}
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:gap-4 gap-2">
             <div className="w-full flex justify-between">
-              <h1 className="text-xl md:text-2xl font-bold text-white">
+              <h1 className="text-lg md:text-2xl font-bold text-white">
                 {streamingRoom?.title}
               </h1>
               {user?._id === streamingRoom.host._id &&
@@ -238,13 +247,10 @@ const RoomStreaming = () => {
                   </button>
                 ))}
             </div>
-
-            {streamingRoom && (
-              <div>
-                <SubscribeAndReactionVideo />
-              </div>
-            )}
-            <div className="bg-zinc-900/50 p-4 rounded-xl border text-white border-zinc-800/50 text-sm">
+            <div>
+              <SubscribeAndReactionVideo />
+            </div>
+            <div className="bg-zinc-900/50 p-4 rounded-xl border text-white border-zinc-800/50 md:text-sm text-xs">
               <div className="font-bold mb-1 flex gap-4">
                 <span>{streamingRoom?.totalViews.toLocaleString()} views</span>
                 <span>{timeAgo(streamingRoom?.startedAt || "")}</span>
@@ -255,15 +261,18 @@ const RoomStreaming = () => {
               </button>
             </div>
           </div>
-          <CommentPage id={streamingRoom?._id} type="Video" />
+          <div className="md:block hidden">
+            <CommentPage id={streamingRoom?._id} type="Video" />
+          </div>
         </div>
       </div>
       <div className="w-full xl:w-1/3 xl:pt-16 md:bg-zinc-900/20 md:border-l border-zinc-800 px-2">
         {/* Chat section */}
         {streamingRoom.status !== "STOP" && (
-          <div className="h-[95%] mb-10 relative">
+          <div className="flex flex-col md:h-[95%] h-[45dvh] mb-10">
             <div
-              className={`flex flex-col gap-2 bg-slate-950 w-full overflow-y-auto rounded-xl ${user ? "h-[90%]" : "h-full"} border border-slate-500 py-2`}
+              ref={chatRef}
+              className="flex-1 min-h-0 flex flex-col gap-2 bg-slate-950 w-full rounded-xl border border-slate-500 py-2 overflow-y-auto"
             >
               {messages.map((msg, idx) => (
                 <div
@@ -279,18 +288,16 @@ const RoomStreaming = () => {
                     {msg.handleName ? (
                       <p>@{msg.handleName}</p>
                     ) : (
-                      <p>@{`anonymous`}</p>
+                      <p>@anonymous</p>
                     )}
                   </span>
                   <p className="text-sm">{msg.comment}</p>
                 </div>
               ))}
             </div>
+
             {user && (
-              <form
-                className="absolute -bottom-3 w-full"
-                onSubmit={handleSubmit}
-              >
+              <div className="mt-2 shrink-0">
                 <textarea
                   className="border border-slate-400 w-full bg-slate-900 rounded-md p-1 text-white indent-2 resize-none text-sm"
                   placeholder="Viết bình luận"
@@ -303,10 +310,13 @@ const RoomStreaming = () => {
                     }
                   }}
                 />
-              </form>
+              </div>
             )}
           </div>
         )}
+        <div className="md:hidden block z-40">
+          <CommentPage id={streamingRoom?._id} type="Video" />
+        </div>
 
         <div className="flex flex-col">
           <h2 className="text-lg font-bold px-2 text-white mb-6">
