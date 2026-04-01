@@ -20,6 +20,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserService } from 'src/user/user.service';
 import { VideoService } from './video.service';
 import { BlogRepository } from 'src/blog/blog.repository';
+import type { Express } from 'express';
 
 @Controller('video')
 export class VideoController {

@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from './user.schema';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
+import type { Express } from 'express';
 
 @Controller('user')
 export class UserController {

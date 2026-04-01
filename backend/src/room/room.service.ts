@@ -10,6 +10,7 @@ import { Room } from './room.schema';
 import { Model, Types } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { NotificationService } from 'src/notification/notification.service';
+import type { Express } from 'express';
 
 @Injectable()
 export class RoomService {

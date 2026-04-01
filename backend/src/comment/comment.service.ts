@@ -12,6 +12,7 @@ import { InputPostComment } from './comment.dto';
 import { Video } from 'src/video/video.schema';
 import { Blog } from 'src/blog/blog.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import type { Express } from 'express';
 
 @Injectable()
 export class CommentService {

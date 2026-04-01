@@ -17,6 +17,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { UserService } from 'src/user/user.service';
+import type { Express } from 'express';
 
 @Controller('room')
 export class RoomController {

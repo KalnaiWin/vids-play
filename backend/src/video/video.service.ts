@@ -13,6 +13,7 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { VideoRepository } from './video.repository';
 import { VideoInputUpload } from './video.dto';
 import { NotificationService } from 'src/notification/notification.service';
+import type { Express } from 'express';
 
 @Injectable()
 export class VideoService {

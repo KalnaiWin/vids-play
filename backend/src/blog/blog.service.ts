@@ -12,6 +12,7 @@ import { User } from 'src/user/user.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { VideoRepository } from 'src/video/video.repository';
 import { NotificationService } from 'src/notification/notification.service';
+import type { Express } from 'express';
 
 @Injectable()
 export class BlogService {

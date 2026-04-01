@@ -11,6 +11,7 @@ import { Video } from 'src/video/video.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UserRepository } from './user.repository';
 import { Room } from 'src/room/room.schema';
+import type { Express } from 'express';
 
 @Injectable()
 export class UserService {

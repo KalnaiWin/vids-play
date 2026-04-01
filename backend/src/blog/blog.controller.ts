@@ -20,6 +20,7 @@ import { InputUploadBlog } from './blog.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BlogService } from './blog.service';
 import { BlogRepository } from './blog.repository';
+import type { Express } from 'express';
 
 @Controller('blog')
 export class BlogController {

@@ -17,6 +17,7 @@ import type { Request } from 'express';
 import { InputPostComment } from './comment.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommentRepository } from './comment.repository';
+import type { Express } from 'express';
 
 @Controller('comment')
 export class CommentController {
