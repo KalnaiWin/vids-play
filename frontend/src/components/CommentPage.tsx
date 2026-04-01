@@ -16,7 +16,7 @@ interface Props {
 }
 
 const CommentPage = ({ id, type }: Props) => {
-  const { comments, status, postStatus, deleteStatus } = useSelector(
+  const { comments, postStatus, deleteStatus } = useSelector(
     (state: RootState) => state.comment,
   );
   const { user } = useSelector((state: RootState) => state.auth);

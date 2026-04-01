@@ -113,7 +113,6 @@ const ManagementVideo = ({ state }: Props) => {
 
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [nameVideo, setNameVideo] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -294,7 +293,7 @@ const ManagementLiveStream = ({ state }: Props) => {
               value={nameVideo}
               placeholder="Tìm kiếm trong video của bạn"
               className="bg-[#1a1a1a] text-sm px-4 py-1.5 rounded-lg border border-[#222] focus:outline-none focus:border-blue-500 w-64"
-              // onChange={(e) => setNameVideo(e.target.value)}
+              onChange={(e) => setNameVideo(e.target.value)}
             />
           </div>
         </div>
