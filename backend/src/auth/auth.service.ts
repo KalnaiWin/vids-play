@@ -50,6 +50,7 @@ export class AuthService {
         handle = `${baseHandle}${counter}`;
         counter++;
       }
+      baseHandle = handle;
     }
 
     const newUser = await this.userModel.create({
@@ -146,7 +147,7 @@ export class AuthService {
     const cookieOptions = {
       httpOnly: true,
       secure: false,
-      sameSite: 'lax' as const,
+      sameSite: 'none' as const,
       path: '/',
     };
     await this.userModel.findByIdAndUpdate(
