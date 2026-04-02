@@ -24,7 +24,7 @@ export class Notification {
   image: string;
 
   @Prop({
-    enum: ['VIDEO', 'BLOG'],
+    enum: ['VIDEO', 'BLOG', 'ROOM'],
     default: 'BLOG',
   })
   type: 'BLOG';

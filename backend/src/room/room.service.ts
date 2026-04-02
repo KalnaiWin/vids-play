@@ -50,7 +50,7 @@ export class RoomService {
       ownerId: userId,
       refId: String(newRoom._id),
       image: newRoom.thumbnail,
-      type: 'VIDEO',
+      type: 'ROOM',
     });
 
     return newRoom;

@@ -22,6 +22,7 @@ import { listenToForegroundMessages } from "./lib/firebase/messaging";
 import WaitingLoaderPage from "./components/loader/WaitingLoaderPage";
 import ShortVideosPage from "./page/ShortVideosPage";
 import WatchingVideoSkeleton from "./components/loader/video/WatchingVideoSkeleton";
+import { NotificationsTable } from "./page/Notification";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -59,6 +60,7 @@ const App = () => {
         <Route path="/history" element={<HistoryWatchedVideo />} />
         <Route path="/create" element={<StartLiveStream />} />
         <Route path="/short" element={<ShortVideosPage />} />
+        <Route path="/notification" element={<NotificationsTable />} />
       </Route>
     </Routes>
   );

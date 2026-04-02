@@ -46,3 +46,18 @@ export const checkHasUnReadNotification = createAsyncThunk<
     }
   },
 );
+
+export const deleteNotification = createAsyncThunk<
+  string,
+  { id: string },
+  { rejectValue: string }
+>("/notification/deleteNotification", async ({ id }, { rejectWithValue }) => {
+  try {
+    console.log("called");
+
+    const result = await axiosInstance.delete(`notification/del/${id}`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});

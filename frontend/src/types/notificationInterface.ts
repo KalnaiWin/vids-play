@@ -14,4 +14,5 @@ export interface NotificationState {
   notifications: NotificationInfo[];
   notRead: boolean;
   status: "idle" | "loading" | "succeeded" | "failed";
+  delStatus: "idle" | "loading" | "succeeded" | "failed";
 }

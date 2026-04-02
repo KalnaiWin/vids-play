@@ -25,6 +25,15 @@ export class NotificationService {
     @Inject('FIREBASE_ADMIN') private readonly fcm: admin.messaging.Messaging,
   ) {}
 
+  async deleteNotification(notifId: string, userId: string) {
+    const existingReceiver = await this.userModel.findById(userId);
+    if (!existingReceiver) throw new NotFoundException('Receiver not found');
+
+    const deleted = await this.notificationModel.findByIdAndDelete(notifId);
+    if (!deleted) throw new NotFoundException('Notification not found');
+    return notifId;
+  }
+
   async checkReadNotification(userId: string, notificationId: string) {
     const existingAuthor = await this.userModel.findById(userId);
     if (!existingAuthor) throw new NotFoundException('Author not found');

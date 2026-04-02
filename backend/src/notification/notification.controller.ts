@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -27,6 +28,14 @@ export class NotificationController {
     if (!data.ownerId || !data.refId)
       return { message: 'ChannelId or RefId not found' };
     return this.notificationService.createNotification(data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('/del/:id')
+  async deleteNotification(@Req() req: Request, @Param('id') notifId: string) {
+    const userId = req.user?.userId;
+    if (!userId || !notifId) return { message: 'UserId or NotiId not found' };
+    return await this.notificationService.deleteNotification(notifId, userId);
   }
 
   @UseGuards(AuthGuard)

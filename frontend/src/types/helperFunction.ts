@@ -32,22 +32,22 @@ export const timeAgo = (date: string | Date) => {
   const created = new Date(date);
   const seconds = Math.floor((now.getTime() - created.getTime()) / 1000);
 
-  if (seconds < 60) return `${seconds} seconds ago`;
+  if (seconds < 60) return `${seconds} giây trước`;
 
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} minutes ago`;
+  if (minutes < 60) return `${minutes} phút trước`;
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hours ago`;
+  if (hours < 24) return `${hours} tiếng trước`;
 
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} days ago`;
+  if (days < 30) return `${days} ngày trước`;
 
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months} months ago`;
+  if (months < 12) return `${months} tháng trước`;
 
   const years = Math.floor(months / 12);
-  return `${years} years ago`;
+  return `${years} năm trước`;
 };
 
 export const generateSlug = (value: string) =>
@@ -82,5 +82,3 @@ export const formatColorStatusStream = (text: string) => {
       break;
   }
 };
-
-

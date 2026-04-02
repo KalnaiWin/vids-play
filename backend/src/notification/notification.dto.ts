@@ -17,7 +17,7 @@ export class InputCreateNotification {
   @IsOptional()
   image?: string;
 
-  @IsEnum(['VIDEO', 'BLOG'])
+  @IsEnum(['VIDEO', 'BLOG', 'ROOM'])
   @IsNotEmpty()
   type: string;
 }

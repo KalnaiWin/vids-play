@@ -3,12 +3,14 @@ import type { NotificationState } from "../types/notificationInterface";
 import {
   checkHasUnReadNotification,
   checkIsReadNotification,
+  deleteNotification,
   getNotificationsOfuser,
 } from "../feature/notificationThunk";
 
 const initialState: NotificationState = {
   notifications: [],
   status: "idle",
+  delStatus: "idle",
   notRead: false,
 };
 
@@ -17,6 +19,18 @@ export const notificationSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(deleteNotification.pending, (state) => {
+        state.delStatus = "loading";
+      })
+      .addCase(deleteNotification.fulfilled, (state, action) => {
+        state.delStatus = "succeeded";
+        state.notifications.filter((noti) => noti._id === action.payload);
+      })
+      .addCase(deleteNotification.rejected, (state) => {
+        state.delStatus = "failed";
+      });
+
     builder
       .addCase(getNotificationsOfuser.pending, (state) => {
         state.status = "loading";

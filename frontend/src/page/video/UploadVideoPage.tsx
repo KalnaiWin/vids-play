@@ -179,8 +179,8 @@ const UploadVideoPage = () => {
                   khi đăng lên
                 </div>
               </div>
-              <div className="flex gap-2 w-full h-40">
-                <div className="relative border border-dashed text-slate-500 bg-slate-950 border-slate-500 flex flex-col justify-center items-center w-1/3 rounded-xl">
+              <div className="flex md:flex-row flex-col gap-2 w-full md:h-40 h-10">
+                <div className="relative border border-dashed text-slate-500 bg-slate-950 border-slate-500 flex flex-col justify-center items-center md:w-1/3 h-1/6 md:h-full w-full rounded-xl">
                   <input
                     type="file"
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -194,14 +194,14 @@ const UploadVideoPage = () => {
                   <Image />
                   <p>Tải hình thu nhỏ lên</p>
                 </div>
-                <div className="w-1/3 h-40 rounded-xl overflow-hidden bg-slate-900">
+                <div className="md:w-1/2 w-full h-1/3 md:h-full rounded-xl overflow-hidden bg-slate-900">
                   <img
                     src={thumbnailPreviewUrl || empty}
                     alt="Thumbnail preview"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="w-1/3 border rounded-xl relative overflow-hidden bg-slate-950">
+                <div className="md:w-1/3 w-full h-1/3 md:h-full border rounded-xl relative overflow-hidden bg-slate-950">
                   <h1 className="font-black p-2">Tags</h1>
                   <div className="text-white px-2">
                     {formData.types.length > 0 && formData.types ? (
