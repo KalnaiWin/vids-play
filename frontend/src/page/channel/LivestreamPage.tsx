@@ -6,6 +6,7 @@ import { fetchStreamingRoomsOfUser } from "../../feature/roomThunk";
 import { timeAgo } from "../../types/helperFunction";
 import { socket } from "../../lib/socket/socket";
 import SkeletonUserVideo from "../../components/loader/video/SkeletonUserVideo";
+import empty from "../../asset/Empty.webp";
 
 const LivestreamPage = () => {
   const { id } = useParams();
@@ -35,7 +36,7 @@ const LivestreamPage = () => {
         >
           {room.thumbnail === "" ? (
             <img
-              src={"/src/assets/Empty.webp"}
+              src={empty}
               alt="Empty"
               className="rounded-lg object-cover group-hover:scale-105 h-34"
             />

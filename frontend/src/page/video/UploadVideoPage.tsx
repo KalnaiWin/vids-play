@@ -7,6 +7,7 @@ import { uploadVideo } from "../../feature/videoThunk";
 import type { UploadFiles } from "../../types/videoInterface";
 import { useNavigate } from "react-router-dom";
 import { selectLogin } from "../../store/globalSlice";
+import empty from "../../asset/Empty.webp";
 
 const UploadVideoPage = () => {
   const navigate = useNavigate();
@@ -195,7 +196,7 @@ const UploadVideoPage = () => {
                 </div>
                 <div className="w-1/3 h-40 rounded-xl overflow-hidden bg-slate-900">
                   <img
-                    src={thumbnailPreviewUrl || "/src/assets/Empty.webp"}
+                    src={thumbnailPreviewUrl || empty}
                     alt="Thumbnail preview"
                     className="w-full h-full object-cover"
                   />

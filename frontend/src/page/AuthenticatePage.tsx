@@ -4,6 +4,7 @@ import type { AppDispatch, RootState } from "../store";
 import { ArrowBigRight, Eye, EyeClosed, Lock, Mail, User } from "lucide-react";
 import { resetSelect, selectLogin, selectRegister } from "../store/globalSlice";
 import { login, register } from "../feature/authThunk";
+import logo from "../asset/logo.png";
 
 const AuthenticatePage = () => {
   const { statusAuth } = useSelector((state: RootState) => state.global);
@@ -41,11 +42,7 @@ const AuthenticatePage = () => {
       className="w-full h-full flex flex-col gap-2 items-center"
       onSubmit={handleSubmit}
     >
-      <img
-        src="/src/assets/logo.png"
-        alt="Logo"
-        className="size-16 rounded-md"
-      />
+      <img src={logo} alt="Logo" className="size-16 rounded-md" />
       <h1 className="text-xl font-black">
         {statusAuth === "login" ? "Welcome Back" : "Create Account"}
       </h1>

@@ -16,6 +16,7 @@ import { deleteRoom, fetchStreamingRoomsOfUser } from "../../feature/roomThunk";
 import VideoTabSkeleton from "../../components/loader/video/VideoTabSkeleton";
 import LivestreamTabSkeleton from "../../components/loader/video/LivestreamTabSkeleton";
 import { selectLogin } from "../../store/globalSlice";
+import empty from "../../asset/Empty.webp";
 
 interface Props {
   state: boolean;
@@ -328,7 +329,7 @@ const ManagementLiveStream = ({ state }: Props) => {
                   >
                     <div className="relative">
                       <img
-                        src={room.thumbnail || "/src/assets/Empty.webp"}
+                        src={room.thumbnail || empty}
                         alt={room.title}
                         className="w-32 aspect-video rounded-lg object-cover"
                       />

@@ -1,3 +1,5 @@
+import logo from "../asset/logo.png";
+
 const WaitingLoaderPage = () => {
   return (
     <div className="bg-slate-950 w-full min-h-screen text-white gap-5 flex flex-col justify-center items-center">
@@ -6,7 +8,7 @@ const WaitingLoaderPage = () => {
           Vidsplay
         </div>
         <img
-          src="/src/assets/logo.png"
+          src={logo}
           alt="Logo"
           className="md:size-20 size-10 animate-slide-logo"
         />

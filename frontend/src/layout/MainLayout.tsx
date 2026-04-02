@@ -7,6 +7,7 @@ import { Menu } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { resetSelect, toogleNavBarResponsive } from "../store/globalSlice";
 import AuthenticatePage from "../page/AuthenticatePage";
+import logo from "../asset/logo.png";
 
 const MainLayout = () => {
   const { statusNavBar, statusNavBarReponsive, statusAuth } = useSelector(
@@ -64,7 +65,7 @@ const MainLayout = () => {
                 onClick={() => dispatch(toogleNavBarResponsive())}
               />
               <Link to={"/"} className="flex items-center gap-2 select-none">
-                <img src="/src/assets/logo.png" alt="Logo" className="size-8" />
+                <img src={logo} alt="Logo" className="size-8" />
                 <h1 className="flex items-center">
                   <span className="text-white font-bold uppercase tracking-widest">
                     Vids

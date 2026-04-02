@@ -1,5 +1,6 @@
 import { defaultCategory } from "../types/constant";
 import { useState } from "react";
+import background from "../asset/background_homepage.jpg";
 
 const HomePage = () => {
   const [selectPath, setSelectPath] = useState("");
@@ -19,7 +20,7 @@ const HomePage = () => {
       </div>
       <div className="w-full h-140 relative rounded-xl">
         <img
-          src="/src/assets/background_homepage.jpg"
+          src={background}
           alt="background"
           className="w-full h-full object-cover object-center"
         />
@@ -41,9 +42,9 @@ const HomePage = () => {
           </div>
           <div className="md:w-[60%] w-[80%] md:text-xl text-sm mb-8 text-slate-400">
             Chào mừng bạn đến với nền tảng xem phim trực tuyến hàng đầu. Khám
-            phá kho nội dung khổng lồ từ những thước phim hay, mới lạ, trending, cùng nền tảng livestream độc đáo,
-            tất cả đều hỗ trợ chất lượng hình ảnh sắc nét và đường
-            truyền tốc độ cao.
+            phá kho nội dung khổng lồ từ những thước phim hay, mới lạ, trending,
+            cùng nền tảng livestream độc đáo, tất cả đều hỗ trợ chất lượng hình
+            ảnh sắc nét và đường truyền tốc độ cao.
           </div>
           <div className="flex md:flex-row flex-col gap-3 items-center w-full">
             <button className="text-white bg-blue-500 px-5 py-2 rounded-full text-xl font-medium cursor-pointer hover:bg-blue-600 transition-all md:w-fit w-full">
