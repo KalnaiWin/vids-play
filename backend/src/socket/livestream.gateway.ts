@@ -13,7 +13,8 @@ import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import * as mediasoup from 'mediasoup';
 
-@WebSocketGateway(8001, { cors: '*' })
+// @WebSocketGateway(8001, { cors: '*' })
+@WebSocketGateway({ cors: { origin: process.env.CLIENT_URL } })
 export class LivestreamGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
