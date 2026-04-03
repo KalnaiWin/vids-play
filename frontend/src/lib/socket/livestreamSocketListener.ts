@@ -1,13 +1,18 @@
 import { socket } from "./socket";
 import { Device } from "mediasoup-client";
 
+let isJoining = false;
+
 let device: any;
-let stream: any;
+let cameraStream: any;
+let screenStream: any;
+
 let rtpCapabilites: any;
 let producerTransport: any;
 let consumerTransport: any;
+
+let screenProducer: any;
 let producer: any;
-let consumer: any;
 const encodingParams = {
   encodings: [
     { rid: "r0", maxBitrate: 100000, scalabilityMode: "S1T3" },
@@ -20,19 +25,29 @@ const encodingParams = {
 };
 
 export const getLocalStream = async () => {
-  stream = await navigator.mediaDevices.getUserMedia({
+  cameraStream = await navigator.mediaDevices.getUserMedia({
     audio: true,
     video: true,
   });
-  return stream;
+  screenStream = await navigator.mediaDevices.getDisplayMedia({
+    video: {
+      displaySurface: "monitor",
+    },
+  });
+  return { cameraStream, screenStream };
 };
 
 export const streamSuccess = async (
-  stream: MediaStream,
+  cameraStream: MediaStream,
+  screenStream: MediaStream,
   hostRef: React.RefObject<HTMLVideoElement | null>,
+  screenRef: React.RefObject<HTMLVideoElement | null>,
 ) => {
   if (hostRef.current) {
-    hostRef.current.srcObject = stream;
+    hostRef.current.srcObject = cameraStream;
+  }
+  if (screenRef.current) {
+    screenRef.current.srcObject = screenStream;
   }
 };
 
@@ -115,12 +130,22 @@ export const createSendTransport = async () => {
 };
 
 export const connectSendTransport = async () => {
-  const track = stream.getVideoTracks()[0];
+  const cameraTrack = cameraStream.getVideoTracks()[0];
 
   producer = await producerTransport.produce({
-    track,
+    track: cameraTrack,
     encodings: encodingParams.encodings,
     codecOptions: encodingParams.codecOptions,
+    appData: { type: "camera" },
+  });
+
+  // Screen track
+  const screenTrack = screenStream.getVideoTracks()[0];
+  screenProducer = await producerTransport.produce({
+    track: screenTrack,
+    encodings: encodingParams.encodings,
+    codecOptions: encodingParams.codecOptions,
+    appData: { type: "screen" },
   });
 
   // console.log("Producer: ", producer);
@@ -161,42 +186,40 @@ export const createRecevTransport = async () => {
 };
 
 export const connectRecvTransport = async (
-  remoteVideoRef: React.RefObject<HTMLVideoElement | null>,
+  viewerVideoRef: React.RefObject<HTMLVideoElement | null>,
+  sharedVideoRef: React.RefObject<HTMLVideoElement | null>,
 ) => {
-  const params = await new Promise((resolve) => {
+  const allParams = await new Promise((resolve) => {
     socket.emit(
-      "consume",
+      "consume-all",
       { rtpCapabilities: device.rtpCapabilities },
       (data: any) => resolve(data),
     );
   });
 
-  if ((params as any).error) {
-    return;
+  for (const params of allParams as any[]) {
+    if (params.error) continue;
+
+    const consumer = await consumerTransport.consume({
+      id: params.id,
+      producerId: params.producerId,
+      kind: params.kind,
+      rtpParameters: params.rtpParameters,
+    });
+
+    const { track } = consumer;
+    const type = params.appData?.type; // "camera" or "screen"
+
+    if (type === "camera" && viewerVideoRef.current) {
+      viewerVideoRef.current.srcObject = new MediaStream([track]);
+    } else if (type === "screen" && sharedVideoRef.current) {
+      sharedVideoRef.current.srcObject = new MediaStream([track]);
+    }
+
+    await new Promise((resolve) => {
+      socket.emit("consumer-resume", { consumerId: consumer.id }, resolve);
+    });
   }
-
-  consumer = await consumerTransport.consume({
-    id: (params as any).id,
-    producerId: (params as any).producerId,
-    kind: (params as any).kind,
-    rtpParameters: (params as any).rtpParameters,
-  });
-
-  const { track } = consumer;
-
-  if (remoteVideoRef.current) {
-    remoteVideoRef.current.srcObject = new MediaStream([track]);
-  }
-
-  await new Promise((resolve) => {
-    socket.emit("consumer-resume", {}, resolve);
-  });
-};
-
-export const startViewing = async (
-  videoRef: React.RefObject<HTMLVideoElement | null>,
-) => {
-  await connectRecvTransport(videoRef);
 };
 
 export const waitForProducer = (): Promise<void> => {
@@ -209,55 +232,52 @@ export const waitForProducer = (): Promise<void> => {
 };
 
 export const toggleCamera = async (
-  localStreamRef: React.MutableRefObject<MediaStream | null>,
+  hostRef: React.RefObject<HTMLVideoElement | null>,
   setToggleCamera: React.Dispatch<React.SetStateAction<boolean>>,
+  roomId: string,
 ) => {
-  const videoTrack = localStreamRef.current
-    ?.getTracks()
-    .find((track) => track.kind === "video");
-
+  const videoTrack = cameraStream?.getVideoTracks()[0];
   if (!videoTrack) return;
 
   videoTrack.enabled = !videoTrack.enabled;
   setToggleCamera(videoTrack.enabled);
-};
-
-export const toggleMicro = (
-  localStreamRef: React.MutableRefObject<MediaStream | null>,
-  setToggleMicro: React.Dispatch<React.SetStateAction<boolean>>,
-) => {
-  const videoTrack = localStreamRef.current
-    ?.getTracks()
-    .find((track) => track.kind === "audio");
-
-  if (!videoTrack) return;
-
-  videoTrack.enabled = !videoTrack.enabled;
-  setToggleMicro(videoTrack.enabled);
-};
-
-export const stopStream = (
-  localStreamRef: React.MutableRefObject<MediaStream | null>,
-) => {
-  if (localStreamRef.current) {
-    localStreamRef.current.getTracks().forEach((track) => track.stop());
-    localStreamRef.current = null;
+  socket.emit("camera-toggle", { roomId, enabled: videoTrack.enabled });
+  if (hostRef.current) {
+    hostRef.current.style.visibility = videoTrack.enabled
+      ? "visible"
+      : "hidden";
   }
 };
-
-export const startStreamingAgain = async (
-  localStreamRef: React.MutableRefObject<MediaStream | null>,
-  hostRef: React.RefObject<HTMLVideoElement | null>,
-  roomId: string,
+export const toggleMicro = (
+  setToggleMicro: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
-  const stream = await getLocalStream();
-  localStreamRef.current = stream;
+  const audioTrack = cameraStream?.getAudioTracks()[0];
+  if (!audioTrack) return;
 
-  await createDevice();
-  await createSendTransport();
-  await connectSendTransport();
+  audioTrack.enabled = !audioTrack.enabled;
+  setToggleMicro(audioTrack.enabled);
+};
 
-  streamSuccess(stream, hostRef);
+export const stopStream = () => {
+  cameraStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+  screenStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
 
-  socket.emit("resume-stream", { roomId });
+  cameraStream = null;
+  screenStream = null;
+};
+
+export const joinAsViewer = async (
+  cameraRef: React.RefObject<HTMLVideoElement | null>,
+  sharedRef: React.RefObject<HTMLVideoElement | null>,
+) => {
+  if (isJoining) return;
+  isJoining = true;
+  try {
+    await getRTPCapabilities();
+    await createDevice();
+    await createRecevTransport();
+    await connectRecvTransport(cameraRef, sharedRef);
+  } finally {
+    isJoining = false;
+  }
 };

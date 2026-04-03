@@ -265,10 +265,10 @@ export const NotificationsTable = () => {
               {notifications.map((noti) => (
                 <div
                   key={noti._id}
-                  className="hover:bg-[#161616] transition-colors group border-l-3 border-blue-600 rounded-md flex text-sm items-center"
+                  className="hover:bg-[#161616] transition-colors group border-l-3 border-blue-600 rounded-md flex gap-4 text-sm items-center"
                 >
                   {noti.image && noti.image !== "" && (
-                    <div className="w-1/3">
+                    <div className="w-fit">
                       <div
                         onClick={async () => {
                           await dispatch(

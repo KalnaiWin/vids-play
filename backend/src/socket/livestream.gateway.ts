@@ -22,10 +22,11 @@ export class LivestreamGateway
 
   private logger: Logger = new Logger('CommentGateWay');
   private roomMessages: Map<string, ChatInput[]> = new Map();
+  private cameraEnabled: any;
   private worker: any;
   private router: any;
   private producerTransport: any;
-  private producer: any;
+  private producers: Map<string, any> = new Map();
   private consumerTransports: Map<string, any> = new Map();
   private consumers: Map<string, any> = new Map();
   private mediaCodecs: mediasoup.types.RtpCodecCapability[] = [
@@ -160,18 +161,20 @@ export class LivestreamGateway
     @MessageBody() data: { kind: any; rtpParameters: any; appData: any },
     @ConnectedSocket() client: Socket,
   ) {
-    this.producer = await this.producerTransport.produce({
+    const producer = await this.producerTransport.produce({
       kind: data.kind,
       rtpParameters: data.rtpParameters,
+      appData: data.appData,
     });
 
-    this.producer.on('transportclose', () => {
-      console.log('transport for this producer closed');
+    this.producers.set(producer.id, producer);
+
+    producer.on('transportclose', () => {
+      this.producers.delete(producer.id);
     });
 
-    client.broadcast.emit('producer-ready', { producerId: this.producer.id });
-
-    return { id: this.producer.id };
+    client.broadcast.emit('producer-ready', { producerId: producer.id });
+    return { id: producer.id };
   }
 
   @SubscribeMessage('transport-recv-connect')
@@ -184,57 +187,62 @@ export class LivestreamGateway
     return {};
   }
 
-  @SubscribeMessage('consume')
-  async consume(
+  @SubscribeMessage('consume-all')
+  async consumeAll(
     @MessageBody() { rtpCapabilities }: any,
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      if (
-        !this.router.canConsume({
-          producerId: this.producer.id,
+      const consumers: any[] = [];
+      const consumerTransport = this.consumerTransports.get(client.id);
+
+      for (const [, producer] of this.producers) {
+        // ← iterate producers map
+        if (
+          !this.router.canConsume({ producerId: producer.id, rtpCapabilities })
+        )
+          continue;
+
+        const consumer = await consumerTransport.consume({
+          producerId: producer.id,
           rtpCapabilities,
-        })
-      ) {
-        return { error: 'Cannot consume' };
+          paused: true,
+        });
+
+        this.consumers.set(`${client.id}-${producer.id}`, consumer); // ← key by both
+
+        consumers.push({
+          id: consumer.id,
+          producerId: producer.id,
+          kind: consumer.kind,
+          rtpParameters: consumer.rtpParameters,
+          appData: producer.appData, // ← send type tag to client
+        });
       }
 
-      const consumerTransport = this.consumerTransports.get(client.id);
-      const consumer = await consumerTransport.consume({
-        producerId: this.producer.id,
-        rtpCapabilities,
-        paused: true,
-      });
-
-      this.consumers.set(client.id, consumer);
-      consumer.on('transportclose', () =>
-        console.log(`Transport close for ${client.id}`),
-      );
-      consumer.on('producerclose', () =>
-        console.log(`Producer close for ${client.id}`),
-      );
-
-      return {
-        id: consumer.id,
-        producerId: this.producer.id,
-        kind: consumer.kind,
-        rtpParameters: consumer.rtpParameters,
-      };
+      return consumers;
     } catch (error: any) {
       return { error: error.message };
     }
   }
 
   @SubscribeMessage('consumer-resume')
-  async consumerResume(@ConnectedSocket() client: Socket) {
-    const consumer = this.consumers.get(client.id);
-    await consumer.resume();
-    return {};
+  async consumerResume(
+    @MessageBody() { consumerId }: { consumerId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    for (const [key, consumer] of this.consumers) {
+      if (key.startsWith(client.id) && consumer.id === consumerId) {
+        await consumer.resume();
+        return {};
+      }
+    }
+    return { error: 'Consumer not found' };
   }
 
   @SubscribeMessage('check-producer')
   checkProducer() {
-    return !!this.producer;
+    return this.producers.size > 0;
   }
 
   @SubscribeMessage('stream-ended')
@@ -245,5 +253,19 @@ export class LivestreamGateway
   @SubscribeMessage('start-stream')
   startStream(@MessageBody() { roomId }: { roomId: string }) {
     this.server.to(roomId).emit('start-stream');
+  }
+
+  @SubscribeMessage('get-camera-state')
+  getCameraState() {
+    return { enabled: this.cameraEnabled };
+  }
+
+  @SubscribeMessage('camera-toggle')
+  cameraToggle(
+    @MessageBody() { roomId, enabled }: { roomId: string; enabled: boolean },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.cameraEnabled = enabled; // ← save state
+    client.to(roomId).emit('camera-toggle', { enabled });
   }
 }

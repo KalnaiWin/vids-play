@@ -12,18 +12,16 @@ import { socket } from "../../lib/socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
 import {
-  connectRecvTransport,
   connectSendTransport,
   createDevice,
-  createRecevTransport,
   createSendTransport,
   getLocalStream,
   getRTPCapabilities,
+  joinAsViewer,
   stopStream,
   streamSuccess,
   toggleCamera,
   toggleMicro,
-  waitForProducer,
 } from "../../lib/socket/livestreamSocketListener";
 
 const RoomStreaming = () => {
@@ -42,8 +40,12 @@ const RoomStreaming = () => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   const hostRef = useRef<HTMLVideoElement | null>(null);
+  const screenRef = useRef<HTMLVideoElement | null>(null);
+
+  const cameraRef = useRef<HTMLVideoElement>(null);
   const viewerRef = useRef<HTMLVideoElement | null>(null);
-  const localStreamRef = useRef<MediaStream | null>(null);
+  const sharedRef = useRef<HTMLVideoElement | null>(null);
+
   const [isToggleCamera, setToggleCamera] = useState<boolean>(true);
   const [isToggleMicro, setToggleMicro] = useState<boolean>(true);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -65,6 +67,9 @@ const RoomStreaming = () => {
         setStreamEnded(true);
         if (viewerRef.current) {
           viewerRef.current.srcObject = null;
+        }
+        if (sharedRef.current) {
+          sharedRef.current.srcObject = null;
         }
         dispatch(joinRoom({ id: String(id) }));
       }
@@ -97,22 +102,43 @@ const RoomStreaming = () => {
   }, [isHost]);
 
   useEffect(() => {
+    if (!streamingRoom) return;
+    if (isHostRef.current) return;
+
     const handleStartStream = async () => {
       if (isHostRef.current) return;
       try {
-        await getRTPCapabilities();
-        await createDevice();
-        await createRecevTransport();
-        await waitForProducer();
-        await connectRecvTransport(viewerRef);
+        await joinAsViewer(cameraRef, sharedRef);
       } catch (err) {
         console.error("joinAsViewer error:", err);
       }
     };
 
     socket.on("start-stream", handleStartStream);
+    socket.emit("check-producer", async (exists: boolean) => {
+      if (!exists) return;
+      try {
+        await joinAsViewer(cameraRef, sharedRef);
+        socket.emit("get-camera-state", ({ enabled }: { enabled: boolean }) => {
+          setHostCameraOn(enabled);
+        });
+      } catch (err) {
+        console.error("late join error:", err);
+      }
+    });
+
     return () => {
       socket.off("start-stream", handleStartStream);
+    };
+  }, [streamingRoom]);
+
+  const [hostCameraOn, setHostCameraOn] = useState(true);
+  useEffect(() => {
+    socket.on("camera-toggle", ({ enabled }: { enabled: boolean }) => {
+      setHostCameraOn(enabled);
+    });
+    return () => {
+      socket.off("camera-toggle");
     };
   }, []);
 
@@ -149,13 +175,25 @@ const RoomStreaming = () => {
         <div className="mx-auto flex flex-col gap-6">
           <div className="aspect-video w-full relative">
             {user?._id !== streamingRoom.host._id ? (
-              <>
+              <div className="relative aspect-video w-full bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
                 <video
-                  className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
                   autoPlay
                   playsInline
-                  ref={viewerRef}
+                  ref={sharedRef}
+                  className="aspect-video w-full"
                 />
+                <div
+                  className={`absolute rounded-xl bottom-2 right-2 w-64 h-36 bg-zinc-600 overflow-hidden transition-all duration-200 ${
+                    hostCameraOn ? "opacity-100 visible" : "opacity-0 invisible"
+                  }`}
+                >
+                  <video
+                    autoPlay
+                    playsInline
+                    ref={cameraRef}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 {streamEnded && (
                   <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-2xl gap-3">
                     <Ban className="size-12 text-slate-400" />
@@ -164,27 +202,44 @@ const RoomStreaming = () => {
                     </p>
                   </div>
                 )}
-              </>
+              </div>
             ) : (
-              <video
-                className="aspect-video w-full bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
-                autoPlay
-                playsInline
-                id="host"
-                ref={hostRef}
-              />
+              <div className="relative aspect-video w-full bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
+                <video
+                  autoPlay
+                  playsInline
+                  ref={screenRef}
+                  className="aspect-video w-full"
+                />
+                <div
+                  className={`absolute rounded-xl bottom-2 right-2 w-64 h-36 bg-zinc-600 overflow-hidden transition-all duration-200 ${
+                    isToggleCamera
+                      ? "opacity-100 visible"
+                      : "opacity-0 invisible"
+                  }`}
+                >
+                  <video
+                    autoPlay
+                    playsInline
+                    ref={hostRef}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
             )}
             {user?._id === streamingRoom.host._id && isStreaming && (
               <div className="absolute z-50 bottom-5 w-full flex justify-center gap-10">
                 <div
                   className={`size-10 flex rounded-full justify-center items-center cursor-pointer ${isToggleMicro ? "bg-orange-600" : "bg-orange-400"} ...`}
-                  onClick={() => toggleMicro(localStreamRef, setToggleMicro)}
+                  onClick={() => toggleMicro(setToggleMicro)}
                 >
                   {isToggleMicro ? <Mic /> : <MicOff />}
                 </div>
                 <div
                   className={`size-10 flex rounded-full justify-center items-center cursor-pointer ${isToggleCamera ? "bg-orange-600" : "bg-orange-400"} ...`}
-                  onClick={() => toggleCamera(localStreamRef, setToggleCamera)}
+                  onClick={() =>
+                    toggleCamera(hostRef, setToggleCamera, streamingRoom._id)
+                  }
                 >
                   {isToggleCamera ? <Video /> : <VideoOff />}
                 </div>
@@ -201,15 +256,8 @@ const RoomStreaming = () => {
                   <button
                     className="bg-red-500 text-red-200 font-semibold cursor-pointer rounded-xl px-4"
                     onClick={async () => {
-                      stopStream(localStreamRef);
+                      stopStream();
                       setIsStreaming(false);
-                      setToggleCamera(true);
-                      setToggleMicro(true);
-
-                      if (hostRef.current) {
-                        hostRef.current.srcObject = null;
-                      }
-
                       await dispatch(
                         changeStatusRoom({ id: String(id), status: "STOP" }),
                       );
@@ -229,9 +277,14 @@ const RoomStreaming = () => {
                     onClick={async () => {
                       await getRTPCapabilities();
                       await createDevice();
-                      const stream = await getLocalStream();
-                      localStreamRef.current = stream;
-                      streamSuccess(stream, hostRef);
+                      const { cameraStream, screenStream } =
+                        await getLocalStream();
+                      streamSuccess(
+                        cameraStream,
+                        screenStream,
+                        hostRef,
+                        screenRef,
+                      );
                       await createSendTransport();
                       await connectSendTransport();
                       await dispatch(
