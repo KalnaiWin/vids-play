@@ -119,6 +119,8 @@ export interface HomePageVideo {
 
 export interface VideoInitailState {
   videos: VideoInfo[];
+  nextPage: number;
+  hasMore: boolean;
   homeVideos: HomePageVideo | null;
   likedVideo: RecommendVideos[];
   watchingVideo: VideoWatchingInfo | null;

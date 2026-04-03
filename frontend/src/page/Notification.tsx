@@ -79,10 +79,15 @@ export const NotificationsNavbar = () => {
             >
               <AvatarPage name={noti.ownerName} image={noti.avatar} size="10" />
               <div className="flex-1">
-                <div className="text-sm flex flex-col items-start">
-                  <span className="font-bold">{noti.ownerName}</span>
-                  <p className="line-clamp-2 text-xs text-slate-300">
-                    {noti.title}
+                <div className="text-sm flex justify-between">
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold">{noti.ownerName}</span>
+                    <p className="line-clamp-2 text-xs text-slate-300">
+                      {noti.title}
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {timeAgo(noti.createdAt)}
                   </p>
                 </div>
                 {noti.image && (
@@ -218,13 +223,13 @@ export const NotificationsTable = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-bold 
-              ${
-                noti.type === "ROOM"
-                  ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                  : noti.type === "VIDEO"
-                    ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                    : "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-              }`}
+                              ${
+                                noti.type === "ROOM"
+                                  ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                                  : noti.type === "VIDEO"
+                                    ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                                    : "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                              }`}
                         >
                           {noti.type}
                         </span>

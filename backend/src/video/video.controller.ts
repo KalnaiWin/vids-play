@@ -65,8 +65,8 @@ export class VideoController {
   }
 
   @Get('/')
-  async getAllVideos() {
-    return await this.videoService.getAllVideos();
+  async getAllVideos(@Query('page') page: string) {
+    return await this.videoRepository.findAllVideos(page);
   }
 
   @Get('recommend/:id')

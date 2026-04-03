@@ -85,10 +85,6 @@ export class VideoService {
     return newVideo;
   }
 
-  async getAllVideos() {
-    return await this.videoRepository.findAllVideos();
-  }
-
   async watchVideo(videoId: string) {
     return await this.videoRepository.getDetailWatchingVideo(videoId);
   }

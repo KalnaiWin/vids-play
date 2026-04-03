@@ -17,8 +17,13 @@ export class VideoRepository {
     private userRepository: UserRepository,
   ) {}
 
-  async findAllVideos() {
-    return await this.videoModel.aggregate([
+  async findAllVideos(page: string) {
+    const pageNumber = parseInt(page) || 0;
+    const limit = 12;
+    const skip = pageNumber * limit;
+
+    const videos = await this.videoModel.aggregate([
+      { $match: { visibility: 'PUBLIC' } },
       {
         $lookup: {
           from: 'users',
@@ -27,9 +32,7 @@ export class VideoRepository {
           as: 'owner',
         },
       },
-      {
-        $unwind: '$owner',
-      },
+      { $unwind: '$owner' },
       {
         $project: {
           _id: 1,
@@ -48,10 +51,15 @@ export class VideoRepository {
           createdAt: 1,
         },
       },
-      {
-        $sort: { viewCount: -1 },
-      },
+      { $sort: { viewCount: -1, _id: 1 } },
+      { $skip: skip },
+      { $limit: limit },
     ]);
+
+    return {
+      videos,
+      nextPage: videos.length === limit ? pageNumber + 1 : null,
+    };
   }
 
   async getPopularVideos(ownerId: string) {
@@ -337,7 +345,4 @@ export class VideoRepository {
       },
     ]);
   }
-
-  
-
 }

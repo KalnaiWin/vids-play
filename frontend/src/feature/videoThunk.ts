@@ -46,13 +46,16 @@ export const uploadVideo = createAsyncThunk<
   }
 });
 
-export const getAllVieos = createAsyncThunk<
-  VideoInfo[],
-  void,
+export const getAllVideos = createAsyncThunk<
+  {
+    videos: VideoInfo[];
+    nextPage: number;
+  },
+  { page: string },
   { rejectValue: string }
->("video/getAllVideos", async (_, { rejectWithValue }) => {
+>("video/getAllVideos", async ({ page }, { rejectWithValue }) => {
   try {
-    const result = await axiosInstance.get("/video");
+    const result = await axiosInstance.get(`/video?page=${page}`);
     return result.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data || "Error");

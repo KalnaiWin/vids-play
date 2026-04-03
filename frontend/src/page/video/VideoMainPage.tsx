@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
-import { useEffect } from "react";
-import { getAllVieos } from "../../feature/videoThunk";
+import { useEffect, useRef } from "react";
+import { getAllVideos } from "../../feature/videoThunk";
 import {
   formatDuration,
   formatViewCount,
@@ -12,17 +12,66 @@ import { useNavigate } from "react-router-dom";
 import AvatarPage from "../../components/AvatarPage";
 import VideoMainPageSkeleton from "../../components/loader/home/VideoMainPageSkeleton";
 
-const VideoMainPage = () => {
-  const { videos, status } = useSelector((state: RootState) => state.video);
-  const dispatch = useDispatch<AppDispatch>();
+let didInitialFetch = false;
 
+const VideoMainPage = () => {
+  const { videos, status, hasMore, nextPage } = useSelector(
+    (state: RootState) => state.video,
+  );
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(false);
+  const initialLoadDone = useRef(false);
+
   useEffect(() => {
-    dispatch(getAllVieos());
+    if (didInitialFetch) return;
+    didInitialFetch = true;
+
+    dispatch(getAllVideos({ page: "0" })).finally(() => {
+      initialLoadDone.current = true;
+    });
   }, [dispatch]);
 
-  if (status === "loading") return <VideoMainPageSkeleton />;
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (
+          first.isIntersecting &&
+          hasMore &&
+          !isFetchingRef.current &&
+          initialLoadDone.current &&
+          nextPage !== null &&
+          nextPage > 0
+        ) {
+          isFetchingRef.current = true;
+          dispatch(getAllVideos({ page: String(nextPage) })).finally(() => {
+            isFetchingRef.current = false;
+          });
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, [dispatch, hasMore, nextPage]);
+
+  useEffect(() => {
+    return () => {
+      didInitialFetch = false;
+    };
+  }, []);
+
+  if (status === "loading" && videos.length === 0)
+    return <VideoMainPageSkeleton />;
 
   return (
     <div className="text-white min-h-screen mx-10 text-sm">
@@ -36,11 +85,11 @@ const VideoMainPage = () => {
             }}
           >
             <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 shadow-md transition-shadow group-hover:shadow-blue-500/10">
-              <img
-                src={video.thumbnailUrl}
-                alt={video.title}
+              <video
+                src={video.videoUrl}
+                poster={video.thumbnailUrl}
+                preload="none"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
               />
               <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 rounded text-[11px] font-bold text-white">
                 {formatDuration(Number(video.duration))}
@@ -77,6 +126,14 @@ const VideoMainPage = () => {
             </div>
           </div>
         ))}
+      </div>
+      <div ref={sentinelRef} className="py-8 flex justify-center">
+        {status === "loading" && videos.length > 0 && (
+          <div className="w-8 h-8 border-2 border-zinc-600 border-t-blue-500 rounded-full animate-spin" />
+        )}
+        {!hasMore && videos.length > 0 && (
+          <p className="text-zinc-500 text-sm">You've reached the end</p>
+        )}
       </div>
     </div>
   );

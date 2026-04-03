@@ -4,8 +4,8 @@ import {
   deleteVideo,
   deleteWatchedVideo,
   editVideo,
+  getAllVideos,
   getAllVideosForSpecificUser,
-  getAllVieos,
   getHistoryWatchedVideos,
   getHomepageVideos,
   getLikedVideo,
@@ -19,6 +19,8 @@ import { subscribeChannel } from "../feature/userThunk";
 
 const initialState: VideoInitailState = {
   videos: [],
+  nextPage: 0,
+  hasMore: true,
   watchingVideo: null,
   likedVideo: [],
   recommendedVideos: [],
@@ -198,13 +200,27 @@ export const videoSlice = createSlice({
 
     // Fetch all videos
     builder
-      .addCase(getAllVieos.pending, (state) => {
+      .addCase(getAllVideos.pending, (state, action) => {
+        if (state.status === "loading") return;
         state.status = "loading";
+        if (action.meta.arg.page === "0") {
+          state.videos = [];
+          state.hasMore = true;
+          state.nextPage = 0;
+        }
       })
-      .addCase(getAllVieos.fulfilled, (state, action) => {
-        ((state.status = "succeeded"), (state.videos = action.payload));
+      .addCase(getAllVideos.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const existingIds = new Set(state.videos.map((v) => v._id));
+        const newVideos = action.payload.videos.filter(
+          (v) => !existingIds.has(v._id),
+        );
+
+        state.videos = [...state.videos, ...newVideos];
+        state.nextPage = action.payload.nextPage ?? null;
+        state.hasMore = action.payload.nextPage !== null;
       })
-      .addCase(getAllVieos.rejected, (state) => {
+      .addCase(getAllVideos.rejected, (state) => {
         state.status = "failed";
       });
 
