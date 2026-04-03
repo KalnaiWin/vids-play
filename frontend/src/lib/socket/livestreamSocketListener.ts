@@ -11,7 +11,7 @@ let rtpCapabilites: any;
 let producerTransport: any;
 let consumerTransport: any;
 
-let screenProducer: any;
+// let screenProducer: any;
 let producer: any;
 const encodingParams = {
   encodings: [
@@ -140,13 +140,13 @@ export const connectSendTransport = async () => {
   });
 
   // Screen track
-  const screenTrack = screenStream.getVideoTracks()[0];
-  screenProducer = await producerTransport.produce({
-    track: screenTrack,
-    encodings: encodingParams.encodings,
-    codecOptions: encodingParams.codecOptions,
-    appData: { type: "screen" },
-  });
+  // const screenTrack = screenStream.getVideoTracks()[0];
+  // screenProducer = await producerTransport.produce({
+  //   track: screenTrack,
+  //   encodings: encodingParams.encodings,
+  //   codecOptions: encodingParams.codecOptions,
+  //   appData: { type: "screen" },
+  // });
 
   // console.log("Producer: ", producer);
 
