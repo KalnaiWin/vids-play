@@ -250,3 +250,21 @@ export const deleteWatchedVideo = createAsyncThunk<
     return rejectWithValue(error.response?.data || "Error");
   }
 });
+
+export const getSearchVideos = createAsyncThunk<
+  {
+    videos: VideoInfo[];
+    nextPage: number;
+  },
+  { name: string; page: string },
+  { rejectValue: string }
+>("video/getSearchVideos", async ({ name, page }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(
+      `/video/search/${name}?page=${page}`,
+    );
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});

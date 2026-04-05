@@ -345,4 +345,56 @@ export class VideoRepository {
       },
     ]);
   }
+
+  async getSearchedVideos(name: string, page: string) {
+    const pageNumber = parseInt(page) || 0;
+    const limit = 12;
+    const skip = pageNumber * limit;
+
+    const searchTerm = name.toLowerCase().trim().replace(/\s+/g, ' ');
+
+    const videos = await this.videoModel.aggregate([
+      {
+        $match: {
+          visibility: 'PUBLIC',
+          title: { $regex: searchTerm, $options: 'i' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'owner',
+          foreignField: '_id',
+          as: 'owner',
+        },
+      },
+      { $unwind: '$owner' },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          'owner._id': 1,
+          'owner.name': 1,
+          'owner.avatarUrl': 1,
+          duration: 1,
+          thumbnailUrl: 1,
+          videoUrl: 1,
+          visibility: 1,
+          viewCount: 1,
+          likeCount: 1,
+          dislikeCount: 1,
+          createdAt: 1,
+        },
+      },
+      { $sort: { viewCount: -1, _id: 1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    return {
+      videos,
+      nextPage: videos.length === limit ? pageNumber + 1 : null,
+    };
+  }
 }

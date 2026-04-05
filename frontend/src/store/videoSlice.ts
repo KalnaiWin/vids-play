@@ -9,6 +9,7 @@ import {
   getHistoryWatchedVideos,
   getHomepageVideos,
   getLikedVideo,
+  getSearchVideos,
   insertWatchedVideo,
   recommendVideos,
   toggleReactionVideo,
@@ -41,6 +42,18 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(getSearchVideos.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getSearchVideos.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.videos = action.payload.videos;
+      })
+      .addCase(getSearchVideos.rejected, (state) => {
+        state.status = "failed";
+      });
+
     builder
       .addCase(deleteWatchedVideo.pending, (state) => {
         state.statusDelete = "loading";

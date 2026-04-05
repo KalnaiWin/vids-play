@@ -23,6 +23,7 @@ import WaitingLoaderPage from "./components/loader/WaitingLoaderPage";
 import ShortVideosPage from "./page/ShortVideosPage";
 import WatchingVideoSkeleton from "./components/loader/video/WatchingVideoSkeleton";
 import { NotificationsTable } from "./page/Notification";
+import SearchPage from "./page/SearchPage";
 
 const App = () => {
   const { status, user } = useSelector((state: RootState) => state.auth);
@@ -61,6 +62,7 @@ const App = () => {
         <Route path="/create" element={<StartLiveStream />} />
         <Route path="/short" element={<ShortVideosPage />} />
         <Route path="/notification" element={<NotificationsTable />} />
+        <Route path="/search/:name" element={<SearchPage />} />
       </Route>
     </Routes>
   );

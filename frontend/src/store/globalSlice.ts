@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { GlobalState } from "../types/globalInterface";
 
 const initialState: GlobalState = {
+  search: "",
   statusNavBar: true,
   statusSearch: false,
   statusNavBarReponsive: false,
@@ -20,6 +21,9 @@ export const globalSlice = createSlice({
     },
     toggleSearch: (state) => {
       state.statusSearch = !state.statusSearch;
+    },
+    search: (state, action) => {
+      state.search = action.payload;
     },
     toogleNavBarResponsive: (state) => {
       state.statusNavBarReponsive = !state.statusNavBarReponsive;
@@ -42,6 +46,7 @@ export const {
   closeSearch,
   toogleNavBarResponsive,
   selectRegister,
+  search,
   selectLogin,
   resetSelect,
 } = globalSlice.actions;

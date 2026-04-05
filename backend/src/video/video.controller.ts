@@ -69,6 +69,15 @@ export class VideoController {
     return await this.videoRepository.findAllVideos(page);
   }
 
+  @Get('/search/:name')
+  async getSearchedVideos(
+    @Param('name') name: string,
+    @Query('page') page: string,
+  ) {
+    if (!name || name === '') return;
+    return await this.videoRepository.getSearchedVideos(name, page);
+  }
+
   @Get('recommend/:id')
   async getRecommendedVideos(@Param('id') videoId: string) {
     if (!videoId) return { message: 'Video not found' };

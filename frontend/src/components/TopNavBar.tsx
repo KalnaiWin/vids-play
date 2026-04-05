@@ -1,9 +1,10 @@
 import { ArrowBigLeft, Bell, LogOut, Menu, Plus, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../store";
 import {
   closeSearch,
+  globalSlice,
   selectLogin,
   toggleNavBar,
   toggleSearch,
@@ -18,7 +19,9 @@ import { checkHasUnReadNotification } from "../feature/notificationThunk";
 import logo from "../asset/logo.png";
 
 const TopNavBar = () => {
+  const navigate = useNavigate();
   const { statusSearch } = useSelector((state: RootState) => state.global);
+  const [isSearch, setSearch] = useState("");
   const { user } = useSelector((state: RootState) => state.auth);
   const { notRead } = useSelector((state: RootState) => state.notification);
   const dispatch = useDispatch<AppDispatch>();
@@ -130,10 +133,24 @@ const TopNavBar = () => {
                 type="text"
                 className="rounded-l-full w-full focus:outline-blue-600 indent-3 p-1"
                 placeholder="Tìm kiếm"
+                value={isSearch}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && isSearch.trim()) {
+                    dispatch(globalSlice.actions.search(isSearch));
+                    navigate(`/search/${isSearch.trim()}`);
+                  }
+                }}
               />
             </div>
             <div className="w-1/12 flex items-center justify-center p-1 bg-slate-700">
-              <Search className="rounded-r-full" />
+              <Search
+                onClick={() => {
+                  dispatch(globalSlice.actions.search(isSearch));
+                  navigate(`/search/${isSearch}`);
+                }}
+                className="rounded-r-full"
+              />
             </div>
           </div>
           <div className="flex items-center gap-2">
