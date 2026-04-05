@@ -18,7 +18,8 @@ import * as mediasoup from 'mediasoup';
 export class LivestreamGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() 
+  server!: Server;
 
   private logger: Logger = new Logger('CommentGateWay');
   private roomMessages: Map<string, ChatInput[]> = new Map();
@@ -265,7 +266,7 @@ export class LivestreamGateway
     @MessageBody() { roomId, enabled }: { roomId: string; enabled: boolean },
     @ConnectedSocket() client: Socket,
   ) {
-    this.cameraEnabled = enabled; // ← save state
+    this.cameraEnabled = enabled; 
     client.to(roomId).emit('camera-toggle', { enabled });
   }
 }

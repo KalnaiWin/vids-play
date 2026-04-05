@@ -15,6 +15,8 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "strictPropertyInitialization": false,
+    "ignoreDeprecations": "6.0",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

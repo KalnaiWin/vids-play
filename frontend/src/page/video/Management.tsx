@@ -127,7 +127,6 @@ const ManagementVideo = ({ state }: Props) => {
 
   useEffect(() => {
     if (!user) return;
-
     dispatch(
       getAllVideosForSpecificUser({
         id: String(user._id),
