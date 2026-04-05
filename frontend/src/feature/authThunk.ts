@@ -26,6 +26,7 @@ export const register = createAsyncThunk<
 >("auth/register", async (data, { dispatch, rejectWithValue }) => {
   try {
     const res = await axiosInstance.post("/auth/register", data);
+    saveMessagingDeviceToken(res.data._id);
     dispatch(fetchUser());
     toast.success("Đăng ký thành công, Chúc bạn vui vẻ 😊");
     return res.data;
