@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Types } from 'mongoose';
-import { Video } from 'src/video/video.schema';
+import { Video } from '../video/video.schema';
 import { TypeInput } from './video.dto';
-import { Type } from 'src/utils/type.schema';
-import { Subscription } from 'src/user/subscription.schema';
-import { UserRepository } from 'src/user/user.repository';
+import { Type } from '../utils/type.schema';
+import { Subscription } from '../user/subscription.schema';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class VideoRepository {

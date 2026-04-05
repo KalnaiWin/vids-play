@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
-import { TypeInput } from 'src/video/video.dto';
+import { TypeInput } from '../video/video.dto';
 
 export class InputUploadBlog {
   @IsString()

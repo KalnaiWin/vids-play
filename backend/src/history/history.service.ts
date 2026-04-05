@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { HistoryRepository } from './history.repository';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/user.schema';
+import { User } from '../user/user.schema';
 import { Model, Types } from 'mongoose';
-import { Video } from 'src/video/video.schema';
+import { Video } from '../video/video.schema';
 import { History } from './history.schema';
 
 @Injectable()

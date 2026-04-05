@@ -15,11 +15,11 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { VideoInputUpload } from './video.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { VideoService } from './video.service';
-import { BlogRepository } from 'src/blog/blog.repository';
+import { BlogRepository } from '../blog/blog.repository';
 import type { Express } from 'express';
 
 @Controller('video')

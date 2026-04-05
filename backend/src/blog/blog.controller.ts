@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { Blog } from './blog.schema';
 import type { Request } from 'express';
 import { InputUploadBlog } from './blog.dto';

@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import type { Request } from 'express';
 import { InputPostComment } from './comment.dto';
 import { FileInterceptor } from '@nestjs/platform-express';

@@ -1,14 +1,14 @@
 import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
-import { AuthModule } from 'src/auth/auth.module';
-import { UserModule } from 'src/user/user.module';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
 import { RoomController } from './room.controller';
 import { RoomService } from './room.service';
 import { RoomRepository } from './room.repository';
 import { RoomSchema } from './room.schema';
-import { UserSchema } from 'src/user/user.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { NotificationModule } from 'src/notification/notification.module';
+import { UserSchema } from '../user/user.schema';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [

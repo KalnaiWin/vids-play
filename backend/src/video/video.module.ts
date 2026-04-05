@@ -4,18 +4,18 @@ import { VideoRepository } from './video.repository';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VideoSchema } from './video.schema';
-import { UserSchema } from 'src/user/user.schema';
+import { UserSchema } from '../user/user.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { TypeSchema } from '../utils/type.schema';
-import { AuthModule } from 'src/auth/auth.module';
-import { UserModule } from 'src/user/user.module';
-import { SubscriptionSchema } from 'src/user/subscription.schema';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { SubscriptionSchema } from '../user/subscription.schema';
 import { VideoService } from './video.service';
-import { ScheduleService } from 'src/schedule/schedule.service';
-import { BlogRepository } from 'src/blog/blog.repository';
-import { BlogSchema } from 'src/blog/blog.schema';
-import { NotificationModule } from 'src/notification/notification.module';
+import { ScheduleService } from '../schedule/schedule.service';
+import { BlogRepository } from '../blog/blog.repository';
+import { BlogSchema } from '../blog/blog.schema';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { User } from 'src/user/user.schema';
-import { Video } from 'src/video/video.schema';
+import { User } from '../user/user.schema';
+import { Video } from '../video/video.schema';
 import { History } from './history.schema';
 
 @Injectable()

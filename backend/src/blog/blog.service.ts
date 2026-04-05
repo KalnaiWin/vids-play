@@ -8,10 +8,10 @@ import { Blog } from './blog.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { InputUploadBlog, OutputUploadBlog } from './blog.dto';
-import { User } from 'src/user/user.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { VideoRepository } from 'src/video/video.repository';
-import { NotificationService } from 'src/notification/notification.service';
+import { User } from '../user/user.schema';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { VideoRepository } from '../video/video.repository';
+import { NotificationService } from '../notification/notification.service';
 import type { Express } from 'express';
 
 @Injectable()

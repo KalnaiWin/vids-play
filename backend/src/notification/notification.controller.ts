@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { NotificationService } from './notification.service';
 import { InputCreateNotification } from './notification.dto';
 import type { Request } from 'express';

@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { User } from 'src/user/user.schema';
+import { User } from '../user/user.schema';
 import { Comment } from './comment.schema';
 import { InputPostComment } from './comment.dto';
-import { Video } from 'src/video/video.schema';
-import { Blog } from 'src/blog/blog.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Video } from '../video/video.schema';
+import { Blog } from '../blog/blog.schema';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import type { Express } from 'express';
 
 @Injectable()

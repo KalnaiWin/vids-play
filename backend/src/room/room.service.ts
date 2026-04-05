@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/user.schema';
+import { User } from '../user/user.schema';
 import { Room } from './room.schema';
 import { Model, Types } from 'mongoose';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { NotificationService } from 'src/notification/notification.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { NotificationService } from '../notification/notification.service';
 import type { Express } from 'express';
 
 @Injectable()

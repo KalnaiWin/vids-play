@@ -7,10 +7,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Model, Types } from 'mongoose';
 import { Subscription } from './subscription.schema';
-import { Video } from 'src/video/video.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Video } from '../video/video.schema';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { UserRepository } from './user.repository';
-import { Room } from 'src/room/room.schema';
+import { Room } from '../room/room.schema';
 import type { Express } from 'express';
 
 @Injectable()

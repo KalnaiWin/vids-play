@@ -3,12 +3,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { UserService } from './user.service';
 import { Subscription, SubscriptionSchema } from './subscription.schema';
-import { Video, VideoSchema } from 'src/video/video.schema';
-import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { Video, VideoSchema } from '../video/video.schema';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
-import { Room, RoomSchema } from 'src/room/room.schema';
-import { RoomModule } from 'src/room/room.module';
+import { Room, RoomSchema } from '../room/room.schema';
+import { RoomModule } from '../room/room.module';
 
 @Module({
   imports: [

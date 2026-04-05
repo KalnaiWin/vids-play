@@ -8,7 +8,7 @@ import { InputLoginDto, InputRegisterDto, UserPayload } from './auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
-import { User } from 'src/user/user.schema';
+import { User } from '../user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';

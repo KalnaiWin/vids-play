@@ -7,11 +7,11 @@ import {
 } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { InputCreateNotification } from './notification.dto';
-import { User } from 'src/user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Notification } from './notification.schema';
-import { UserRepository } from 'src/user/user.repository';
 import * as admin from 'firebase-admin';
+import { User } from '../user/user.schema';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class NotificationService {

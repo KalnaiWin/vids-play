@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { HistorySerice } from './history.service';
 import { HistoryRepository } from './history.repository';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import type { Request } from 'express';
 
 @Controller('history')

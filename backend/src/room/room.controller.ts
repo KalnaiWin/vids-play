@@ -13,10 +13,10 @@ import {
 } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { RoomRepository } from './room.repository';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import type { Express } from 'express';
 
 @Controller('room')

@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { User } from 'src/user/user.schema';
+import { User } from '../user/user.schema';
 import { Video } from './video.schema';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { VideoRepository } from './video.repository';
 import { VideoInputUpload } from './video.dto';
-import { NotificationService } from 'src/notification/notification.service';
+import { NotificationService } from '../notification/notification.service';
 import type { Express } from 'express';
 
 @Injectable()

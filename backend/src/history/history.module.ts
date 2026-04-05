@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from 'src/auth/auth.module';
-import { UserModule } from 'src/user/user.module';
-import { UserSchema } from 'src/user/user.schema';
-import { VideoModule } from 'src/video/video.module';
-import { VideoSchema } from 'src/video/video.schema';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { UserSchema } from '../user/user.schema';
+import { VideoModule } from '../video/video.module';
+import { VideoSchema } from '../video/video.schema';
 import { HistoryController } from './history.controller';
 import { HistorySerice } from './history.service';
 import { HistoryRepository } from './history.repository';

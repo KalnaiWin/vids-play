@@ -86,7 +86,7 @@ const HistoryWatchedVideo = () => {
               </div>
             </div>
           </div>
-          <div className="lg:w-2/3 w-full flex flex-col gap-2 px-4 mb-30">
+          <div className="lg:w-2/3 w-full flex flex-col gap-2 px-4 mb-50">
             {watchedVideo.map((history) => (
               <Link
                 to={`/watch/${history.video._id}`}
