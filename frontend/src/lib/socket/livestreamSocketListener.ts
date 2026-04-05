@@ -88,7 +88,7 @@ export const createSendTransport = async () => {
   }
 
   producerTransport = device.createSendTransport(transportParams);
-
+  
   // console.log("Transport created:", producerTransport);
 
   producerTransport.on(

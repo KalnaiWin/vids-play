@@ -376,10 +376,10 @@ const EditProfileChannel = () => {
           <AvatarPage
             name={channel?.name || ""}
             image={previewAvatar || ""}
-            size="50"
+            size="20"
           />
         </div>
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 w-4/5">
           <h1 className="text-xl font-semibold">Mô tả</h1>
           <textarea
             value={description}
