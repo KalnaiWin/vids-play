@@ -40,6 +40,9 @@ const App = () => {
     listenToForegroundMessages();
   }, [user?._id]);
 
+  const ip = fetch("https://api.ipify.org").then((r) => r.text());
+  console.log("Server public IP:", ip);
+
   if (status === "loading") return <WaitingLoaderPage />;
 
   return (

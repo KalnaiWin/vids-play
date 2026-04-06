@@ -18,7 +18,7 @@ import * as mediasoup from 'mediasoup';
 export class LivestreamGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer() 
+  @WebSocketServer()
   server!: Server;
 
   private logger: Logger = new Logger('CommentGateWay');
@@ -119,12 +119,20 @@ export class LivestreamGateway
         listenIps: [
           {
             ip: '0.0.0.0',
-            announcedIp: '127.0.0.1',
+            announcedIp: process.env.ANNOUNCED_IP,
           },
         ],
         enableUdp: true,
         enableTcp: true,
         preferUdp: true,
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          {
+            urls: 'turn:your-turn-server.com:3478',
+            username: 'user',
+            credential: 'pass',
+          },
+        ],
       });
 
       transport.on('dtlsstatechange', (state) => {
@@ -266,7 +274,7 @@ export class LivestreamGateway
     @MessageBody() { roomId, enabled }: { roomId: string; enabled: boolean },
     @ConnectedSocket() client: Socket,
   ) {
-    this.cameraEnabled = enabled; 
+    this.cameraEnabled = enabled;
     client.to(roomId).emit('camera-toggle', { enabled });
   }
 }
