@@ -22,7 +22,8 @@ async function bootstrap() {
   );
 
   app.useStaticAssets(join(__dirname, '..', '..', 'frontend', 'build'));
-  app.use('/{*path}', (req, res) => {
+  app.use('/{*path}', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api')) return next();
     res.sendFile(
       join(__dirname, '..', '..', 'frontend', 'build', 'index.html'),
     );
