@@ -21,13 +21,12 @@ async function bootstrap() {
     }),
   );
 
-    // Serve frontend static files
-  app.useStaticAssets(join(__dirname, '..', 'build'));
-  // Catch-all — must be last
+  app.useStaticAssets(join(__dirname, '..', '..', 'frontend', 'build'));
   app.use('/{*path}', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'build', 'index.html'));
+    res.sendFile(
+      join(__dirname, '..', '..', 'frontend', 'build', 'index.html'),
+    );
   });
-
 
   await app.listen(process.env.PORT ?? 8080);
 }
