@@ -11,8 +11,7 @@ let rtpCapabilites: any;
 let producerTransport: any;
 let consumerTransport: any;
 
-// let screenProducer: any;
-let producer: any;
+let producer: any[] = [];
 const encodingParams = {
   encodings: [
     { rid: "r0", maxBitrate: 100000, scalabilityMode: "S1T3" },
@@ -88,7 +87,7 @@ export const createSendTransport = async () => {
   }
 
   producerTransport = device.createSendTransport(transportParams);
-  
+
   // console.log("Transport created:", producerTransport);
 
   producerTransport.on(
@@ -132,31 +131,35 @@ export const createSendTransport = async () => {
 export const connectSendTransport = async () => {
   const cameraTrack = cameraStream.getVideoTracks()[0];
 
-  producer = await producerTransport.produce({
-    track: cameraTrack,
-    encodings: encodingParams.encodings,
-    codecOptions: encodingParams.codecOptions,
-    appData: { type: "camera" },
-  });
+  producer.push(
+    await producerTransport.produce({
+      track: cameraTrack,
+      encodings: encodingParams.encodings,
+      codecOptions: encodingParams.codecOptions,
+      appData: { type: "camera" },
+    }),
+  );
 
   // Screen track
-  // const screenTrack = screenStream.getVideoTracks()[0];
-  // screenProducer = await producerTransport.produce({
-  //   track: screenTrack,
-  //   encodings: encodingParams.encodings,
-  //   codecOptions: encodingParams.codecOptions,
-  //   appData: { type: "screen" },
-  // });
+  const screenTrack = screenStream.getVideoTracks()[0];
+  producer.push(
+    await producerTransport.produce({
+      track: screenTrack,
+      encodings: encodingParams.encodings,
+      codecOptions: encodingParams.codecOptions,
+      appData: { type: "screen" },
+    }),
+  );
 
   // console.log("Producer: ", producer);
 
-  producer.on("trackended", () => {
-    // console.log("track ended");
-  });
+  // producer.on("trackended", () => {
+  //   console.log("track ended");
+  // });
 
-  producer.on("transportclose", () => {
-    // console.log("transport ended");
-  });
+  // producer.on("transportclose", () => {
+  //   console.log("transport ended");
+  // });
 };
 
 export const createRecevTransport = async () => {
