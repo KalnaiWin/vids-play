@@ -25,10 +25,9 @@ async function bootstrap() {
   app.use('/{*path}', (req, res, next) => {
     if (req.originalUrl.startsWith('/api')) return next();
     res.sendFile(
-      join(__dirname, '..', '..', 'frontend', 'build', 'index.html'),
+      join(__dirname, '..', '..', 'frontend', 'build', 'dist', 'index.html'),
     );
   });
-
   await app.listen(process.env.PORT ?? 8080);
 }
 bootstrap();
