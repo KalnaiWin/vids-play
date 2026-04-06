@@ -115,6 +115,20 @@ export class LivestreamGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+      const twilioResponse = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Tokens.json`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: 'Basic ' + btoa(`${accountSid}:${authToken}`),
+          },
+        },
+      );
+      const twilioData = await twilioResponse.json();
+
       const transport = await this.router.createWebRtcTransport({
         listenIps: [
           {
@@ -125,14 +139,6 @@ export class LivestreamGateway
         enableUdp: true,
         enableTcp: true,
         preferUdp: true,
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          {
-            urls: 'turn:your-turn-server.com:3478',
-            username: 'user',
-            credential: 'pass',
-          },
-        ],
       });
 
       transport.on('dtlsstatechange', (state) => {
@@ -151,6 +157,7 @@ export class LivestreamGateway
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
+        iceServers: twilioData.ice_servers,
       };
     } catch (error: any) {
       return { error: error.message };
