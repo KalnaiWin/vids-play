@@ -7,15 +7,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // Serve frontend static files
-  app.useStaticAssets(join(__dirname, '..', 'build'));
-
-  // Catch-all — must be last
-  app.use('*', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'build', 'index.html'));
-  });
-  
   app.use(cookieParser());
   app.enableCors({
     origin: process.env.CLIENT_URL,
@@ -29,6 +20,15 @@ async function bootstrap() {
       forbidNonWhitelisted: false,
     }),
   );
+
+    // Serve frontend static files
+  app.useStaticAssets(join(__dirname, '..', 'build'));
+  // Catch-all — must be last
+  app.use('/{*path}', (req, res) => {
+    res.sendFile(join(__dirname, '..', 'build', 'index.html'));
+  });
+
+
   await app.listen(process.env.PORT ?? 8080);
 }
 bootstrap();
