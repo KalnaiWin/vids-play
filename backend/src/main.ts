@@ -21,11 +21,11 @@ async function bootstrap() {
     }),
   );
 
-  app.useStaticAssets(join(__dirname, '..', '..', 'frontend', 'build'));
+  app.useStaticAssets(join(__dirname, '..', '..', '..', 'frontend', 'dist'));
   app.use('/{*path}', (req, res, next) => {
     if (req.originalUrl.startsWith('/api')) return next();
     res.sendFile(
-      join(__dirname, '..', '..', 'frontend', 'build', 'dist', 'index.html'),
+      join(__dirname, '..', '..', '..', 'frontend', 'dist', 'index.html'),
     );
   });
   await app.listen(process.env.PORT ?? 8080);
