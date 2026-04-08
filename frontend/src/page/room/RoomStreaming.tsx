@@ -12,14 +12,15 @@ import { socket } from "../../lib/socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
 import {
-  connectSendTransport,
-  createDevice,
-  createSendTransport,
-  getLocalStream,
-  getRTPCapabilities,
+  // connectSendTransport,
+  // createDevice,
+  // createSendTransport,
+  // getLocalStream,
+  // getRTPCapabilities,
   joinAsViewer,
+  startAsHost,
   stopStream,
-  streamSuccess,
+  // streamSuccess,
   toggleCamera,
   toggleMicro,
 } from "../../lib/socket/livestreamSocketListener";
@@ -43,7 +44,6 @@ const RoomStreaming = () => {
   const screenRef = useRef<HTMLVideoElement | null>(null);
 
   const cameraRef = useRef<HTMLVideoElement>(null);
-  const viewerRef = useRef<HTMLVideoElement | null>(null);
   const sharedRef = useRef<HTMLVideoElement | null>(null);
 
   const [isToggleCamera, setToggleCamera] = useState<boolean>(true);
@@ -65,12 +65,10 @@ const RoomStreaming = () => {
     socket.on("stream-ended", () => {
       if (!isHost) {
         setStreamEnded(true);
-        if (viewerRef.current) {
-          viewerRef.current.srcObject = null;
-        }
-        if (sharedRef.current) {
-          sharedRef.current.srcObject = null;
-        }
+        // LiveKit tracks detach automatically on disconnect
+        // Just clear the video elements
+        if (cameraRef.current) cameraRef.current.srcObject = null;
+        if (sharedRef.current) sharedRef.current.srcObject = null;
         dispatch(joinRoom({ id: String(id) }));
       }
     });
@@ -102,35 +100,19 @@ const RoomStreaming = () => {
   }, [isHost]);
 
   useEffect(() => {
-    if (!streamingRoom) return;
-    if (isHostRef.current) return;
+    if (!streamingRoom || isHostRef.current) return;
 
     const handleStartStream = async () => {
-      if (isHostRef.current) return;
-      try {
-        await joinAsViewer(cameraRef, sharedRef);
-      } catch (err) {
-        console.error("joinAsViewer error:", err);
-      }
+      await joinAsViewer(String(streamingRoom._id), cameraRef, sharedRef);
     };
 
     socket.on("start-stream", handleStartStream);
-    socket.emit("check-producer", async (exists: boolean) => {
-      if (!exists) return;
-      try {
-        await joinAsViewer(cameraRef, sharedRef);
-        socket.emit("get-camera-state", ({ enabled }: { enabled: boolean }) => {
-          setHostCameraOn(enabled);
-        });
-      } catch (err) {
-        console.error("late join error:", err);
-      }
-    });
 
+    // In case viewer was already on the page when host started
     return () => {
       socket.off("start-stream", handleStartStream);
     };
-  }, [streamingRoom]);
+  }, [streamingRoom, isHostRef]);
 
   const [hostCameraOn, setHostCameraOn] = useState(true);
   useEffect(() => {
@@ -141,13 +123,6 @@ const RoomStreaming = () => {
       socket.off("camera-toggle");
     };
   }, []);
-
-  useEffect(() => {
-    chatRef.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages]);
 
   useEffect(() => {
     if (!id) return;
@@ -256,7 +231,7 @@ const RoomStreaming = () => {
                   <button
                     className="bg-red-500 text-red-200 font-semibold cursor-pointer rounded-xl px-4"
                     onClick={async () => {
-                      stopStream();
+                      await stopStream(String(streamingRoom._id));
                       setIsStreaming(false);
                       await dispatch(
                         changeStatusRoom({ id: String(id), status: "STOP" }),
@@ -275,21 +250,14 @@ const RoomStreaming = () => {
                   <button
                     className="bg-green-500 text-green-200 font-semibold cursor-pointer rounded-xl px-4"
                     onClick={async () => {
-                      await getRTPCapabilities();
-                      await createDevice();
-                      const { cameraStream, screenStream } =
-                        await getLocalStream();
-                      streamSuccess(
-                        cameraStream,
-                        screenStream,
+                      await startAsHost(
+                        String(streamingRoom._id),
                         hostRef,
                         screenRef,
                       );
-                      await createSendTransport();
-                      await connectSendTransport();
-                      await dispatch(
-                        changeStatusRoom({ id: String(id), status: "LIVE" }),
-                      );
+                      // await dispatch(
+                      //   changeStatusRoom({ id: String(id), status: "LIVE" }),
+                      // );
                       setIsStreaming(true);
                       socket.emit("start-stream", {
                         roomId: streamingRoom._id,

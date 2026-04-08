@@ -12,6 +12,7 @@ import { ChatInput } from '../comment/comment.dto';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import * as mediasoup from 'mediasoup';
+import { AccessToken } from 'livekit-server-sdk';
 
 // @WebSocketGateway(8001, { cors: '*' })
 @WebSocketGateway({ cors: { origin: process.env.CLIENT_URL } })
@@ -261,15 +262,15 @@ export class LivestreamGateway
     return this.producers.size > 0;
   }
 
-  @SubscribeMessage('stream-ended')
-  streamEnd(@MessageBody() { roomId }: { roomId: string }) {
-    this.server.to(roomId).emit('stream-ended');
-  }
+  // @SubscribeMessage('stream-ended')
+  // streamEnd(@MessageBody() { roomId }: { roomId: string }) {
+  //   this.server.to(roomId).emit('stream-ended');
+  // }
 
-  @SubscribeMessage('start-stream')
-  startStream(@MessageBody() { roomId }: { roomId: string }) {
-    this.server.to(roomId).emit('start-stream');
-  }
+  // @SubscribeMessage('start-stream')
+  // startStream(@MessageBody() { roomId }: { roomId: string }) {
+  //   this.server.to(roomId).emit('start-stream');
+  // }
 
   @SubscribeMessage('get-camera-state')
   getCameraState() {
@@ -283,5 +284,60 @@ export class LivestreamGateway
   ) {
     this.cameraEnabled = enabled;
     client.to(roomId).emit('camera-toggle', { enabled });
+  }
+
+  // Generate token for host
+  @SubscribeMessage('get-host-token')
+  async getHostToken(
+    @MessageBody() { roomId }: { roomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const at = new AccessToken(
+      process.env.LIVEKIT_API_KEY,
+      process.env.LIVEKIT_API_SECRET,
+      { identity: `host-${client.id}` },
+    );
+
+    at.addGrant({
+      roomJoin: true,
+      room: roomId,
+      canPublish: true,
+      canSubscribe: true,
+    });
+
+    return { token: await at.toJwt() };
+  }
+
+  // Generate token for viewer
+  @SubscribeMessage('get-viewer-token')
+  async getViewerToken(
+    @MessageBody() { roomId }: { roomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const at = new AccessToken(
+      process.env.LIVEKIT_API_KEY,
+      process.env.LIVEKIT_API_SECRET,
+      { identity: `viewer-${client.id}` },
+    );
+
+    at.addGrant({
+      roomJoin: true,
+      room: roomId,
+      canPublish: false,
+      canSubscribe: true,
+    });
+
+    return { token: await at.toJwt() };
+  }
+
+  // Keep your existing room events
+  @SubscribeMessage('stream-ended')
+  streamEnd(@MessageBody() { roomId }: { roomId: string }) {
+    this.server.to(roomId).emit('stream-ended');
+  }
+
+  @SubscribeMessage('start-stream')
+  startStream(@MessageBody() { roomId }: { roomId: string }) {
+    this.server.to(roomId).emit('start-stream');
   }
 }

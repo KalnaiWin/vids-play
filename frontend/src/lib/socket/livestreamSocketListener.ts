@@ -1,286 +1,173 @@
 import { socket } from "./socket";
-import { Device } from "mediasoup-client";
+import {
+  Room,
+  RoomEvent,
+  Track,
+  LocalVideoTrack,
+  LocalAudioTrack,
+  createLocalVideoTrack,
+  createLocalAudioTrack,
+} from "livekit-client";
 
-let isJoining = false;
+const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
 
-let device: any;
-let cameraStream: any;
-let screenStream: any;
+let room: Room;
+let cameraTrack: LocalVideoTrack;
+let screenTrack: LocalVideoTrack;
+let audioTrack: LocalAudioTrack;
 
-let rtpCapabilites: any;
-let producerTransport: any;
-let consumerTransport: any;
+// ── HOST ─────────────────────────────────────────────────────────────────────
 
-let producer: any[] = [];
-const encodingParams = {
-  encodings: [
-    { rid: "r0", maxBitrate: 100000, scalabilityMode: "S1T3" },
-    { rid: "r1", maxBitrate: 300000, scalabilityMode: "S1T3" },
-    { rid: "r2", maxBitrate: 900000, scalabilityMode: "S1T3" },
-  ],
-  codecOptions: {
-    videoGoogleStartBitrate: 1000,
-  },
-};
-
-export const getLocalStream = async () => {
-  cameraStream = await navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true,
-  });
-  screenStream = await navigator.mediaDevices.getDisplayMedia({
-    video: {
-      displaySurface: "monitor",
-    },
-  });
-  return { cameraStream, screenStream };
-};
-
-export const streamSuccess = async (
-  cameraStream: MediaStream,
-  screenStream: MediaStream,
+export const startAsHost = async (
+  roomId: string,
   hostRef: React.RefObject<HTMLVideoElement | null>,
   screenRef: React.RefObject<HTMLVideoElement | null>,
 ) => {
-  if (hostRef.current) {
-    hostRef.current.srcObject = cameraStream;
-  }
-  if (screenRef.current) {
-    screenRef.current.srcObject = screenStream;
-  }
-};
-
-export const getRTPCapabilities = (): Promise<any> => {
-  return new Promise((resolve) => {
-    socket.emit("getRtpCapabilities", (rtpCapabilities: any) => {
-      // console.log("Router RTP Capabilities:", rtpCapabilities);
-      resolve(rtpCapabilities);
-      rtpCapabilites = rtpCapabilities;
-    });
-  });
-};
-
-export const createDevice = async () => {
-  try {
-    device = new Device();
-    const rtpCapabilities = rtpCapabilites;
-    await device.load({
-      routerRtpCapabilities: rtpCapabilities,
-    });
-
-    // console.log("Device created:", device);
-  } catch (error: any) {
-    console.log(error);
-  }
-};
-
-export const createSendTransport = async () => {
-  const transportParams = await new Promise((resolve) => {
-    socket.emit("createWebRtcTransport", { sender: true }, (data: any) =>
-      resolve(data),
-    );
+  const { token } = await new Promise<{ token: string }>((resolve) => {
+    socket.emit("get-host-token", { roomId }, resolve);
   });
 
-  if ((transportParams as any).error) {
-    console.log((transportParams as any).error);
-    return;
-  }
+  if (room) await room.disconnect().catch(() => {});
 
-  producerTransport = device.createSendTransport(transportParams);
+  room = new Room();
 
-  // console.log("Transport created:", producerTransport);
+  await room.connect(LIVEKIT_URL, token);
 
-  producerTransport.on(
-    "connect",
-    async ({ dtlsParameters }: any, callback: any, errback: any) => {
-      try {
-        await new Promise((resolve) => {
-          socket.emit("transport-connect", { dtlsParameters }, resolve);
-        });
-        callback();
-      } catch (error) {
-        errback(error);
-      }
-    },
-  );
-
-  producerTransport.on(
-    "produce",
-    async (parameters: any, callback: any, errback: any) => {
-      try {
-        const { id } = await new Promise<{ id: string }>((resolve) => {
-          socket.emit(
-            "transport-produce",
-            {
-              kind: parameters.kind,
-              rtpParameters: parameters.rtpParameters,
-              appData: parameters.appData,
-            },
-            (data: { id: string }) => resolve(data),
-          );
-        });
-
-        callback({ id });
-      } catch (error) {
-        errback(error);
-      }
-    },
-  );
-};
-
-export const connectSendTransport = async () => {
-  const cameraTrack = cameraStream.getVideoTracks()[0];
-
-  producer.push(
-    await producerTransport.produce({
-      track: cameraTrack,
-      encodings: encodingParams.encodings,
-      codecOptions: encodingParams.codecOptions,
-      appData: { type: "camera" },
-    }),
-  );
-
-  // Screen track
-  const screenTrack = screenStream.getVideoTracks()[0];
-  producer.push(
-    await producerTransport.produce({
-      track: screenTrack,
-      encodings: encodingParams.encodings,
-      codecOptions: encodingParams.codecOptions,
-      appData: { type: "screen" },
-    }),
-  );
-
-  // console.log("Producer: ", producer);
-
-  // producer.on("trackended", () => {
-  //   console.log("track ended");
-  // });
-
-  // producer.on("transportclose", () => {
-  //   console.log("transport ended");
-  // });
-};
-
-export const createRecevTransport = async () => {
-  const transportParams = await new Promise((resolve) => {
-    socket.emit("createWebRtcTransport", { sender: false }, (data: any) =>
-      resolve(data),
-    );
+  // Camera
+  cameraTrack = await createLocalVideoTrack({ facingMode: "user" });
+  await room.localParticipant.publishTrack(cameraTrack, {
+    name: "camera",
+    source: Track.Source.Camera,
   });
 
-  // console.log(transportParams);
+  // Audio
+  audioTrack = await createLocalAudioTrack();
+  await room.localParticipant.publishTrack(audioTrack, {
+    source: Track.Source.Microphone,
+  });
 
-  consumerTransport = device.createRecvTransport(transportParams);
+  // Screen share
+  const screenPub = await room.localParticipant.setScreenShareEnabled(true, {
+    video: { displaySurface: "monitor" },
+  });
+  screenTrack = screenPub?.videoTrack as LocalVideoTrack;
 
-  consumerTransport.on(
-    "connect",
-    async ({ dtlsParameters }: any, callback: any, errback: any) => {
-      try {
-        await new Promise((resolve) => {
-          socket.emit("transport-recv-connect", { dtlsParameters }, resolve);
-        });
-        callback();
-      } catch (error) {
-        errback(error);
-      }
-    },
-  );
+  // Attach locally
+  if (hostRef.current) cameraTrack.attach(hostRef.current);
+  if (screenRef.current && screenTrack) screenTrack.attach(screenRef.current);
+
+  // Emit AFTER everything is published
+  socket.emit("start-stream", { roomId });
 };
+// ── VIEWER ────────────────────────────────────────────────────────────────────
 
-export const connectRecvTransport = async (
-  viewerVideoRef: React.RefObject<HTMLVideoElement | null>,
-  sharedVideoRef: React.RefObject<HTMLVideoElement | null>,
+export const joinAsViewer = async (
+  roomId: string,
+  cameraRef: React.RefObject<HTMLVideoElement | null>,
+  sharedRef: React.RefObject<HTMLVideoElement | null>,
 ) => {
-  const allParams = await new Promise((resolve) => {
-    socket.emit(
-      "consume-all",
-      { rtpCapabilities: device.rtpCapabilities },
-      (data: any) => resolve(data),
-    );
+  const { token } = await new Promise<{ token: string }>((resolve) => {
+    socket.emit("get-viewer-token", { roomId }, resolve);
   });
 
-  for (const params of allParams as any[]) {
-    if (params.error) continue;
-
-    const consumer = await consumerTransport.consume({
-      id: params.id,
-      producerId: params.producerId,
-      kind: params.kind,
-      rtpParameters: params.rtpParameters,
-    });
-
-    const { track } = consumer;
-    const type = params.appData?.type; // "camera" or "screen"
-
-    if (type === "camera" && viewerVideoRef.current) {
-      viewerVideoRef.current.srcObject = new MediaStream([track]);
-    } else if (type === "screen" && sharedVideoRef.current) {
-      sharedVideoRef.current.srcObject = new MediaStream([track]);
-    }
-
-    await new Promise((resolve) => {
-      socket.emit("consumer-resume", { consumerId: consumer.id }, resolve);
-    });
+  if (room) {
+    await room.disconnect().catch(() => {});
   }
-};
 
-export const waitForProducer = (): Promise<void> => {
-  return new Promise((resolve) => {
-    socket.emit("check-producer", (exists: boolean) => {
-      if (exists) return resolve();
-      socket.once("producer-ready", () => resolve());
+  room = new Room();
+
+  const audioElements: HTMLAudioElement[] = [];
+
+  room.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
+    console.log(
+      `🎯 TrackSubscribed: ${track.kind} - ${track.source} from ${participant.identity}`,
+    );
+
+    if (track.kind === Track.Kind.Video) {
+      if (track.source === Track.Source.Camera && cameraRef.current) {
+        track.attach(cameraRef.current);
+        console.log("📹 Camera attached");
+      } else if (
+        track.source === Track.Source.ScreenShare &&
+        sharedRef.current
+      ) {
+        track.attach(sharedRef.current);
+        console.log("🖥️ Screen attached");
+      }
+    } else if (track.kind === Track.Kind.Audio) {
+      const audioEl = track.attach() as HTMLAudioElement;
+      audioEl.style.display = "none";
+      document.body.appendChild(audioEl);
+      audioElements.push(audioEl);
+
+      console.log(
+        "🔊 ✅ Audio track attached & added to DOM → should play now!",
+      );
+    }
+  });
+
+  await room.connect(LIVEKIT_URL, token);
+  console.log("✅ Viewer connected to room");
+
+  // === RECOVER EXISTING AUDIO TRACKS ===
+  room.remoteParticipants.forEach((participant) => {
+    participant.trackPublications.forEach((pub) => {
+      // ← Correct property
+      if (pub.kind === Track.Kind.Audio && pub.track) {
+        const audioEl = pub.track.attach() as HTMLAudioElement;
+        audioEl.style.display = "none";
+        document.body.appendChild(audioEl);
+        audioElements.push(audioEl);
+
+        console.log(`🔊 Recovered existing audio from ${participant.identity}`);
+      }
     });
   });
+
+  // Cleanup when component unmounts (optional)
+  return () => {
+    audioElements.forEach((el) => {
+      el.pause();
+      el.remove();
+    });
+  };
 };
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────────
 
 export const toggleCamera = async (
   hostRef: React.RefObject<HTMLVideoElement | null>,
   setToggleCamera: React.Dispatch<React.SetStateAction<boolean>>,
   roomId: string,
 ) => {
-  const videoTrack = cameraStream?.getVideoTracks()[0];
-  if (!videoTrack) return;
+  if (!cameraTrack) return;
 
-  videoTrack.enabled = !videoTrack.enabled;
-  setToggleCamera(videoTrack.enabled);
-  socket.emit("camera-toggle", { roomId, enabled: videoTrack.enabled });
+  const willEnable = cameraTrack.isMuted;
+  willEnable ? await cameraTrack.unmute() : await cameraTrack.mute();
+  setToggleCamera(willEnable);
+
+  socket.emit("camera-toggle", { roomId, enabled: willEnable });
+
   if (hostRef.current) {
-    hostRef.current.style.visibility = videoTrack.enabled
-      ? "visible"
-      : "hidden";
+    hostRef.current.style.visibility = willEnable ? "visible" : "hidden";
   }
 };
+
 export const toggleMicro = (
   setToggleMicro: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
-  const audioTrack = cameraStream?.getAudioTracks()[0];
   if (!audioTrack) return;
 
-  audioTrack.enabled = !audioTrack.enabled;
-  setToggleMicro(audioTrack.enabled);
+  const willEnable = audioTrack.isMuted;
+  willEnable ? audioTrack.unmute() : audioTrack.mute();
+  setToggleMicro(willEnable);
 };
 
-export const stopStream = () => {
-  cameraStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-  screenStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-
-  cameraStream = null;
-  screenStream = null;
-};
-
-export const joinAsViewer = async (
-  cameraRef: React.RefObject<HTMLVideoElement | null>,
-  sharedRef: React.RefObject<HTMLVideoElement | null>,
-) => {
-  if (isJoining) return;
-  isJoining = true;
-  try {
-    await getRTPCapabilities();
-    await createDevice();
-    await createRecevTransport();
-    await connectRecvTransport(cameraRef, sharedRef);
-  } finally {
-    isJoining = false;
-  }
+export const stopStream = async (roomId: string) => {
+  socket.emit("stream-ended", { roomId });
+  await room?.disconnect();
+  room = undefined as any;
+  cameraTrack = undefined as any;
+  screenTrack = undefined as any;
+  audioTrack = undefined as any;
 };
