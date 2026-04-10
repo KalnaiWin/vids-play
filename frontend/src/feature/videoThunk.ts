@@ -268,3 +268,19 @@ export const getSearchVideos = createAsyncThunk<
     return rejectWithValue(error.response?.data || "Error");
   }
 });
+
+export const getSubscriptionVideos = createAsyncThunk<
+  {
+    videos: VideoInfo[];
+    nextPage: number;
+  },
+  { page: string },
+  { rejectValue: string }
+>("video/getSubscriptionVideos", async ({ page }, { rejectWithValue }) => {
+  try {
+    const result = await axiosInstance.get(`/video/subscription?page=${page}`);
+    return result.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Error");
+  }
+});

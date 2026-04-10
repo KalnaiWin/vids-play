@@ -128,6 +128,17 @@ export class VideoController {
     return await this.videoRepository.likedVideo(String(userId));
   }
 
+  @UseGuards(AuthGuard)
+  @Get('subscription')
+  async getSubscriptionVideos(
+    @Req() req: Request,
+    @Query('page') page: string,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) return { message: 'UserId not found' };
+    return await this.videoRepository.findAllSubscriptionVideos(userId, page);
+  }
+
   @Get(':id')
   async watchVideo(@Param('id') videoId: string) {
     if (!videoId) return { message: 'Video not found' };

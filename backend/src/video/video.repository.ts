@@ -397,4 +397,68 @@ export class VideoRepository {
       nextPage: videos.length === limit ? pageNumber + 1 : null,
     };
   }
+
+  async findAllSubscriptionVideos(userId: string, page: string) {
+    const pageNumber = parseInt(page) || 0;
+    const limit = 12;
+    const skip = pageNumber * limit;
+
+    const videos = await this.subscriptionModel.aggregate([
+      {
+        $match: {
+          subscriber: new Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'videos',
+          localField: 'channel',
+          foreignField: 'owner',
+          as: 'videos',
+        },
+      },
+      { $unwind: '$videos' },
+      {
+        $match: {
+          'videos.visibility': 'PUBLIC',
+          'videos.isActive': true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'videos.owner',
+          foreignField: '_id',
+          as: 'owner',
+        },
+      },
+      { $unwind: '$owner' },
+      {
+        $project: {
+          _id: '$videos._id',
+          title: '$videos.title',
+          owner: {
+            _id: '$owner._id',
+            name: '$owner.name',
+            avatarUrl: '$owner.avatarUrl',
+          },
+          description: '$videos.description',
+          duration: '$videos.duration',
+          thumbnailUrl: '$videos.thumbnailUrl',
+          videoUrl: '$videos.videoUrl',
+          visibility: '$videos.visibility',
+          viewCount: '$videos.viewCount',
+          createdAt: '$videos.createdAt',
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    return {
+      videos,
+      nextPage: videos.length === limit ? pageNumber + 1 : null,
+    };
+  }
 }

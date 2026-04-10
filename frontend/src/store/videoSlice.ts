@@ -10,6 +10,7 @@ import {
   getHomepageVideos,
   getLikedVideo,
   getSearchVideos,
+  getSubscriptionVideos,
   insertWatchedVideo,
   recommendVideos,
   toggleReactionVideo,
@@ -20,6 +21,7 @@ import { subscribeChannel } from "../feature/userThunk";
 
 const initialState: VideoInitailState = {
   videos: [],
+  subscriptionVideos: [],
   nextPage: 0,
   hasMore: true,
   watchingVideo: null,
@@ -42,6 +44,18 @@ export const videoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    builder
+      .addCase(getSubscriptionVideos.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getSubscriptionVideos.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.subscriptionVideos = action.payload.videos;
+      })
+      .addCase(getSubscriptionVideos.rejected, (state) => {
+        state.status = "failed";
+      });
+
     builder
       .addCase(getSearchVideos.pending, (state) => {
         state.status = "loading";

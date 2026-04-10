@@ -119,6 +119,7 @@ export interface HomePageVideo {
 
 export interface VideoInitailState {
   videos: VideoInfo[];
+  subscriptionVideos: VideoInfo[];
   nextPage: number;
   hasMore: boolean;
   homeVideos: HomePageVideo | null;
