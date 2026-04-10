@@ -128,9 +128,6 @@ const VideoMainPage = () => {
         ))}
       </div>
       <div ref={sentinelRef} className="py-8 flex justify-center">
-        {status === "loading" && videos.length > 0 && (
-          <div className="w-8 h-8 border-2 border-zinc-600 border-t-blue-500 rounded-full animate-spin" />
-        )}
         {!hasMore && videos.length > 0 && (
           <p className="text-zinc-500 text-sm">You've reached the end</p>
         )}

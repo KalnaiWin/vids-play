@@ -3,12 +3,9 @@ import { messaging } from "./firebase";
 import axiosInstance from "../axios";
 
 export const requestNotificationPermission = async (uid: any) => {
-  console.log("Requesting notification permission... ");
   const permission = await Notification.requestPermission();
   if (permission === "granted") {
     await saveMessagingDeviceToken(uid);
-  } else {
-    console.log("Unable to get permission to notify");
   }
 };
 

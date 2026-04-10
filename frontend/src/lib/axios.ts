@@ -11,11 +11,7 @@ const axiosInstance = axios.create({
 export default axiosInstance;
 
 export const generateRefreshToken = async () => {
-  try {
-    await axiosInstance.get("/auth/refresh");
-  } catch (error: any) {
-    console.error(error);
-  }
+  await axiosInstance.get("/auth/refresh");
 };
 
 axiosInstance.interceptors.response.use(

@@ -21,8 +21,6 @@ const SearchPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  console.log(search);
-
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
   const initialLoadDone = useRef(false);

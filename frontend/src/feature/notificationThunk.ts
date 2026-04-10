@@ -53,8 +53,6 @@ export const deleteNotification = createAsyncThunk<
   { rejectValue: string }
 >("/notification/deleteNotification", async ({ id }, { rejectWithValue }) => {
   try {
-    console.log("called");
-
     const result = await axiosInstance.delete(`notification/del/${id}`);
     return result.data;
   } catch (error: any) {

@@ -78,36 +78,26 @@ export const joinAsViewer = async (
 
   const audioElements: HTMLAudioElement[] = [];
 
-  room.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
-    console.log(
-      `🎯 TrackSubscribed: ${track.kind} - ${track.source} from ${participant.identity}`,
-    );
+  room.on(RoomEvent.TrackSubscribed, (track, _publication) => {
 
     if (track.kind === Track.Kind.Video) {
       if (track.source === Track.Source.Camera && cameraRef.current) {
         track.attach(cameraRef.current);
-        console.log("📹 Camera attached");
       } else if (
         track.source === Track.Source.ScreenShare &&
         sharedRef.current
       ) {
         track.attach(sharedRef.current);
-        console.log("🖥️ Screen attached");
       }
     } else if (track.kind === Track.Kind.Audio) {
       const audioEl = track.attach() as HTMLAudioElement;
       audioEl.style.display = "none";
       document.body.appendChild(audioEl);
       audioElements.push(audioEl);
-
-      console.log(
-        "🔊 ✅ Audio track attached & added to DOM → should play now!",
-      );
     }
   });
 
   await room.connect(LIVEKIT_URL, token);
-  console.log("✅ Viewer connected to room");
 
   // === RECOVER EXISTING AUDIO TRACKS ===
   room.remoteParticipants.forEach((participant) => {
@@ -118,8 +108,6 @@ export const joinAsViewer = async (
         audioEl.style.display = "none";
         document.body.appendChild(audioEl);
         audioElements.push(audioEl);
-
-        console.log(`🔊 Recovered existing audio from ${participant.identity}`);
       }
     });
   });

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { fetchSubscriptions } from "../feature/userThunk";
 import { getColorFromFirstLetter } from "../types/helperFunction";
+import { ChevronRight } from "lucide-react";
 
 const SideNavbar = () => {
   const { pathname } = useLocation();
@@ -67,7 +68,13 @@ export const ExpandSideNavBar = () => {
       </div>
       {/* Subscription */}
       <div className="flex flex-col gap-2 items-start px-2 w-full h-fit overflow-y-auto">
-        <h1 className="font-black text-white text-xl pb-3">Kênh đăng ký</h1>
+        <Link
+          to={`/subscription`}
+          className="font-black text-white text-xl pb-3 flex items-center gap-2 hover:text-white/80"
+        >
+          Kênh đăng ký
+          <ChevronRight className="size-6" />
+        </Link>
         <div className="w-full flex flex-col gap-2">
           {subscription &&
             subscription.map((sub) => (
