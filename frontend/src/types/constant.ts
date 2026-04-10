@@ -42,7 +42,7 @@ export const navbarItems = [
   {
     icon: UserCircleIcon,
     name: "Hồ sơ",
-    path: "/profile",
+    path: "/channel",
   },
 ];
 

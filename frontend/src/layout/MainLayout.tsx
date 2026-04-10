@@ -58,7 +58,7 @@ const MainLayout = () => {
 
       {statusNavBarReponsive && (
         <div className="fixed top-0 left-0 w-full h-full z-60 bg-black/50">
-          <div className="md:w-[20%] w-[45%]" ref={responsiveNavbar}>
+          <div className="md:w-[20%] w-[45%] " ref={responsiveNavbar}>
             <div className="flex items-center gap-5 bg-slate-950 py-3 px-5">
               <Menu
                 className="hover:bg-blue-950 p-2 size-10 rounded-full cursor-pointer text-white"
@@ -76,7 +76,9 @@ const MainLayout = () => {
                 </h1>
               </Link>
             </div>
-            <ExpandSideNavBar />
+            <div className="h-full overflow-y-auto overflow-x-hidden w-full">
+              <ExpandSideNavBar />
+            </div>
           </div>
         </div>
       )}

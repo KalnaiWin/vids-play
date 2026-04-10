@@ -12,13 +12,18 @@ import { getColorFromFirstLetter } from "../types/helperFunction";
 
 const SideNavbar = () => {
   const { pathname } = useLocation();
+  const user = useSelector((state: RootState) => state.auth);
 
   return (
     <div className="w-full bg-black md:min-h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs p-1">
       {navbarItems.map((item) => (
         <Link
           key={item.name}
-          to={item.path}
+          to={
+            item.path === "/channel"
+              ? `${item.path}/${user.user?._id}`
+              : item.path
+          }
           className={`flex flex-col items-center justify-center gap-2  py-5 px-1 rounded-md ${pathname === item.path ? "bg-blue-500 text-white" : "hover:bg-blue-950"}`}
         >
           <item.icon />
@@ -45,7 +50,7 @@ export const ExpandSideNavBar = () => {
   }, [dispatch, user]);
 
   return (
-    <div className="w-full bg-black md:min-h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs py-3">
+    <div className="w-full bg-black h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs py-3">
       {/* Home Page */}
       <div className="flex flex-col gap-2 items-start px-2 w-full">
         <h1 className="font-black text-white text-xl pb-3">Trang chủ</h1>
@@ -61,7 +66,7 @@ export const ExpandSideNavBar = () => {
         ))}
       </div>
       {/* Subscription */}
-      <div className="flex flex-col gap-2 items-start px-2 w-full">
+      <div className="flex flex-col gap-2 items-start px-2 w-full h-fit overflow-y-auto">
         <h1 className="font-black text-white text-xl pb-3">Kênh đăng ký</h1>
         <div className="w-full flex flex-col gap-2">
           {subscription &&
