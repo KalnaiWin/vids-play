@@ -10,8 +10,12 @@ const axiosInstance = axios.create({
 
 export default axiosInstance;
 
-export const generateRefreshToken = async () => {
-  await axiosInstance.get("/auth/refresh");
+let isRefreshing = false;
+let failedQueue: { resolve: Function; reject: Function }[] = [];
+
+const processQueue = (error: any) => {
+  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve()));
+  failedQueue = [];
 };
 
 axiosInstance.interceptors.response.use(
@@ -19,21 +23,33 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes("auth/refresh")
-    ) {
+    if (originalRequest.url?.includes("auth/refresh")) {
+      window.dispatchEvent(new Event("auth:logout"));
+      return Promise.resolve({ data: null }); 
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => axiosInstance(originalRequest))
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        await axiosInstance.get("/auth/refresh", {
-          withCredentials: true,
-        });
-
+        await axiosInstance.get("/auth/refresh", { withCredentials: true });
+        processQueue(null);
         return axiosInstance(originalRequest);
       } catch (err) {
-        return Promise.reject(err);
+        processQueue(err);
+        window.dispatchEvent(new Event("auth:logout"));
+        return Promise.resolve({ data: null }); 
+      } finally {
+        isRefreshing = false;
       }
     }
 
