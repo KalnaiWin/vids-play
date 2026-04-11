@@ -4,17 +4,12 @@ import {
   WebSocketServer,
   MessageBody,
   ConnectedSocket,
-  OnGatewayInit,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { ChatInput } from '../comment/comment.dto';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import * as mediasoup from 'mediasoup';
 import { AccessToken } from 'livekit-server-sdk';
 
-// @WebSocketGateway(8001, { cors: '*' })
 @WebSocketGateway({ cors: { origin: process.env.CLIENT_URL } })
 export class LivestreamGateway {
   @WebSocketServer()
@@ -22,7 +17,6 @@ export class LivestreamGateway {
 
   private logger: Logger = new Logger('CommentGateWay');
   private roomMessages: Map<string, ChatInput[]> = new Map();
-  private cameraEnabled: any;
   private activeRooms: Set<string> = new Set();
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -66,7 +60,6 @@ export class LivestreamGateway {
     @MessageBody() { roomId, enabled }: { roomId: string; enabled: boolean },
     @ConnectedSocket() client: Socket,
   ) {
-    this.cameraEnabled = enabled;
     client.to(roomId).emit('camera-toggle', { enabled });
   }
 
@@ -117,8 +110,8 @@ export class LivestreamGateway {
   // Keep your existing room events
   @SubscribeMessage('stream-ended')
   streamEnd(@MessageBody() { roomId }: { roomId: string }) {
-    this.activeRooms.delete(roomId); 
-    this.roomMessages.delete(roomId); 
+    this.activeRooms.delete(roomId);
+    this.roomMessages.delete(roomId);
     this.server.to(roomId).emit('stream-ended');
   }
 
