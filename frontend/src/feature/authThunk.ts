@@ -6,11 +6,12 @@ import type {
 } from "../types/authInterface";
 import { toast } from "react-toastify";
 import { saveMessagingDeviceToken } from "../lib/firebase/messaging";
+import { isLikelyAuthenticated, setAuthFlag } from "../types/utils/auth";
 
 export const fetchUser = createAsyncThunk(
   "auth/fetchUser",
   async (_, { rejectWithValue }) => {
-    // if (!document.cookie.includes("is_logged_in=true")) return null;
+    if (!isLikelyAuthenticated()) return null;
     try {
       const res = await axiosInstance.get("/auth/me");
       return res.data;
@@ -44,6 +45,7 @@ export const login = createAsyncThunk<
 >("auth/login", async (data, { dispatch, rejectWithValue }) => {
   try {
     const res = await axiosInstance.post("/auth/login", data);
+    setAuthFlag();
     saveMessagingDeviceToken(res.data._id);
     dispatch(fetchUser());
     toast.success("Đăng nhập thành công. Chào mừng bạn trở lại 😄");

@@ -17,6 +17,7 @@ import AvatarPage from "./AvatarPage";
 import { NotificationsNavbar } from "../page/Notification";
 import { checkHasUnReadNotification } from "../feature/notificationThunk";
 import logo from "../asset/logo.png";
+import { clearAuthFlag } from "../types/utils/auth";
 
 const TopNavBar = () => {
   const navigate = useNavigate();
@@ -214,6 +215,7 @@ const TopNavBar = () => {
                   onClick={async () => {
                     const fcmToken = localStorage.getItem("current_fcm_token");
                     localStorage.removeItem("current_fcm_token");
+                    clearAuthFlag();
                     dispatch(logout(String(fcmToken)));
                   }}
                 >
