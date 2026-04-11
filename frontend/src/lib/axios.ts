@@ -22,37 +22,44 @@ axiosInstance.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    const url = originalRequest?.url ?? "";
 
-    if (originalRequest.url?.includes("auth/refresh")) {
+    if (url.includes("auth/refresh")) {
       window.dispatchEvent(new Event("auth:logout"));
-      return Promise.resolve({ data: null }); 
+      return Promise.resolve({ data: null });
     }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => axiosInstance(originalRequest))
-          .catch((err) => Promise.reject(err));
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        await axiosInstance.get("/auth/refresh", { withCredentials: true });
-        processQueue(null);
-        return axiosInstance(originalRequest);
-      } catch (err) {
-        processQueue(err);
-        window.dispatchEvent(new Event("auth:logout"));
-        return Promise.resolve({ data: null }); 
-      } finally {
-        isRefreshing = false;
-      }
+    if (status !== 401) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    if (originalRequest._retry) {
+      window.dispatchEvent(new Event("auth:logout"));
+      return Promise.resolve({ data: null });
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then(() => axiosInstance(originalRequest))
+        .catch(() => Promise.resolve({ data: null }));
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      await axiosInstance.get("/auth/refresh", { withCredentials: true });
+      processQueue(null);
+      return axiosInstance(originalRequest);
+    } catch {
+      processQueue(new Error("Refresh failed"));
+      window.dispatchEvent(new Event("auth:logout"));
+      return Promise.resolve({ data: null });
+    } finally {
+      isRefreshing = false;
+    }
   },
 );

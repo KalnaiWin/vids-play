@@ -144,12 +144,14 @@ export class AuthService {
   }
 
   async logout(userId: string, fcmToken: string, res: Response) {
+    const isProduction = process.env.NODE_ENV === 'production';
     const cookieOptions = {
       httpOnly: true,
-      secure: false,
-      sameSite: 'none' as const,
+      secure: isProduction,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
       path: '/',
     };
+
     await this.userModel.findByIdAndUpdate(
       userId,
       {
