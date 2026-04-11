@@ -79,7 +79,6 @@ export const joinAsViewer = async (
   const audioElements: HTMLAudioElement[] = [];
 
   room.on(RoomEvent.TrackSubscribed, (track, _publication) => {
-
     if (track.kind === Track.Kind.Video) {
       if (track.source === Track.Source.Camera && cameraRef.current) {
         track.attach(cameraRef.current);
@@ -102,6 +101,8 @@ export const joinAsViewer = async (
   // === RECOVER EXISTING AUDIO TRACKS ===
   room.remoteParticipants.forEach((participant) => {
     participant.trackPublications.forEach((pub) => {
+      if (!pub.track || !pub.isSubscribed) return;
+
       // ← Correct property
       if (pub.kind === Track.Kind.Audio && pub.track) {
         const audioEl = pub.track.attach() as HTMLAudioElement;

@@ -12,15 +12,9 @@ import { socket } from "../../lib/socket/socket";
 import type { Message } from "../../types/commentInterface";
 import AvatarPage from "../../components/AvatarPage";
 import {
-  // connectSendTransport,
-  // createDevice,
-  // createSendTransport,
-  // getLocalStream,
-  // getRTPCapabilities,
   joinAsViewer,
   startAsHost,
   stopStream,
-  // streamSuccess,
   toggleCamera,
   toggleMicro,
 } from "../../lib/socket/livestreamSocketListener";
@@ -51,6 +45,7 @@ const RoomStreaming = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamEnded, setStreamEnded] = useState(false);
   const isHost = user?._id === streamingRoom?.host._id;
+  const hasJoinedRef = useRef(false);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -103,14 +98,20 @@ const RoomStreaming = () => {
     if (!streamingRoom || isHostRef.current) return;
 
     const handleStartStream = async () => {
+      if (hasJoinedRef.current) return;
+      hasJoinedRef.current = true;
       await joinAsViewer(String(streamingRoom._id), cameraRef, sharedRef);
     };
 
+    // Case 1: Viewer joins while stream is already live (late joiner)
+    if (streamingRoom.status === "LIVE") handleStartStream();
+
+    // Case 2: Viewer is on page when host starts streaming
     socket.on("start-stream", handleStartStream);
 
-    // In case viewer was already on the page when host started
     return () => {
       socket.off("start-stream", handleStartStream);
+      hasJoinedRef.current = false;
     };
   }, [streamingRoom, isHostRef]);
 
@@ -255,9 +256,9 @@ const RoomStreaming = () => {
                         hostRef,
                         screenRef,
                       );
-                      await dispatch(
-                        changeStatusRoom({ id: String(id), status: "LIVE" }),
-                      );
+                      // await dispatch(
+                      //   changeStatusRoom({ id: String(id), status: "LIVE" }),
+                      // );
                       setIsStreaming(true);
                       socket.emit("start-stream", {
                         roomId: streamingRoom._id,
