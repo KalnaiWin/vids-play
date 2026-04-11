@@ -133,7 +133,7 @@ export class AuthService {
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax' as const,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
       path: '/',
     };
 
@@ -142,7 +142,7 @@ export class AuthService {
     res.cookie('is_logged_in', 'true', {
       httpOnly: false,
       secure: isProduction,
-      sameSite: 'lax' as const,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
       path: '/',
     });
 
@@ -151,6 +151,7 @@ export class AuthService {
 
   async logout(userId: string, fcmToken: string, res: Response) {
     const isProduction = process.env.NODE_ENV === 'production';
+
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
@@ -160,19 +161,19 @@ export class AuthService {
 
     await this.userModel.findByIdAndUpdate(
       userId,
-      {
-        $pull: { fcmTokens: fcmToken },
-      },
+      { $pull: { fcmTokens: fcmToken } },
       { new: true },
     );
+
     res.clearCookie('access_token', cookieOptions);
     res.clearCookie('refresh_token', cookieOptions);
     res.clearCookie('is_logged_in', {
       httpOnly: false,
       secure: isProduction,
-      sameSite: 'lax' as const,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
       path: '/',
     });
+
     return { message: 'Logout successfully' };
   }
 
