@@ -129,24 +129,23 @@ export class AuthService {
     const isProduction = process.env.NODE_ENV === 'production';
     const accessToken = this.generateAccessToken(String(userId));
     const refreshToken = this.generateRefreshToken(String(userId));
-    res.cookie('access_token', accessToken, {
+
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // change true in production
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: isProduction,
+      sameSite: 'lax' as const,
       path: '/',
-    });
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      path: '/',
-    });
+    };
+
+    res.cookie('access_token', accessToken, cookieOptions);
+    res.cookie('refresh_token', refreshToken, cookieOptions);
     res.cookie('is_logged_in', 'true', {
       httpOnly: false,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'lax' as const,
       path: '/',
     });
+
     return { accessToken, refreshToken };
   }
 
@@ -171,7 +170,7 @@ export class AuthService {
     res.clearCookie('is_logged_in', {
       httpOnly: false,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'lax' as const,
       path: '/',
     });
     return { message: 'Logout successfully' };
