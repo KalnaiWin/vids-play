@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { User } from '../user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -130,20 +130,18 @@ export class AuthService {
     const accessToken = this.generateAccessToken(String(userId));
     const refreshToken = this.generateRefreshToken(String(userId));
 
-    const cookieOptions = {
+    const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? ('none' as const) : ('lax' as const),
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
     };
 
     res.cookie('access_token', accessToken, cookieOptions);
     res.cookie('refresh_token', refreshToken, cookieOptions);
     res.cookie('is_logged_in', 'true', {
+      ...cookieOptions,
       httpOnly: false,
-      secure: isProduction,
-      sameSite: isProduction ? ('none' as const) : ('lax' as const),
-      path: '/',
     });
 
     return { accessToken, refreshToken };
@@ -152,10 +150,10 @@ export class AuthService {
   async logout(userId: string, fcmToken: string, res: Response) {
     const isProduction = process.env.NODE_ENV === 'production';
 
-    const cookieOptions = {
+    const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? ('none' as const) : ('lax' as const),
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
     };
 
@@ -168,10 +166,8 @@ export class AuthService {
     res.clearCookie('access_token', cookieOptions);
     res.clearCookie('refresh_token', cookieOptions);
     res.clearCookie('is_logged_in', {
+      ...cookieOptions,
       httpOnly: false,
-      secure: isProduction,
-      sameSite: isProduction ? ('none' as const) : ('lax' as const),
-      path: '/',
     });
 
     return { message: 'Logout successfully' };

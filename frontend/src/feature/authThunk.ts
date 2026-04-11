@@ -13,7 +13,6 @@ export const fetchUser = createAsyncThunk(
     if (!document.cookie.includes("is_logged_in=true")) return null;
     try {
       const res = await axiosInstance.get("/auth/me");
-      if (!res.data) return null;
       return res.data;
     } catch (error: any) {
       return rejectWithValue(null);
