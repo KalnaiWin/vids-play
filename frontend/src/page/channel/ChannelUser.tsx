@@ -15,6 +15,7 @@ import {
   Globe,
   TrendingUp,
   TvMinimalPlay,
+  UserCircle2,
   UserRoundX,
   UserStar,
   Youtube,
@@ -22,6 +23,7 @@ import {
 import ChannelVideo from "./ListTabVideo";
 import AvatarPage from "../../components/AvatarPage";
 import EditChannelSkeleton from "../../components/loader/EditChannelSkeleton";
+import { selectLogin } from "../../store/globalSlice";
 
 const ChannelUser = () => {
   const { id } = useParams();
@@ -63,6 +65,25 @@ const ChannelUser = () => {
 
   if (statusChannel === "loading") return <p>Loading...</p>;
   if (!channel) return null;
+
+  if (!user)
+    return (
+      <div className="flex flex-col md:mx-20 text-center absolute-center items-center justify-center gap-2 text-white">
+        <div className="p-5 rounded-full bg-blue-950 mb-5 flex justify-center items-center">
+          <UserCircle2 className="size-20" />
+        </div>
+        <h1 className="text-xl font-bold">Hồ sơ</h1>
+        <p className="font-semibold text-slate-400">
+          Hãy đăng nhập để thay đổi, xem, thông tin hồ sơ của bạn
+        </p>
+        <button
+          className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5"
+          onClick={() => dispatch(selectLogin())}
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
 
   const isSubscribed = channel.subscribers.includes(String(user?._id));
 

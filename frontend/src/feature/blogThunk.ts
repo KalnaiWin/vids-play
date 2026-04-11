@@ -11,7 +11,6 @@ export const uploadBlog = createAsyncThunk<
 >("blog/uploadBlog", async ({ data, imageBlog }, { rejectWithValue }) => {
   try {
     const formData = new FormData();
-
     formData.append("description", data.description);
     formData.append("types", JSON.stringify(data.types));
     formData.append("status", data.status);

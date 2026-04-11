@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   navbarItems,
   navBarItemsExpandHomePage,
@@ -10,26 +10,33 @@ import type { AppDispatch, RootState } from "../store";
 import { fetchSubscriptions } from "../feature/userThunk";
 import { getColorFromFirstLetter } from "../types/helperFunction";
 import { ChevronRight } from "lucide-react";
+import { selectLogin } from "../store/globalSlice";
 
 const SideNavbar = () => {
   const { pathname } = useLocation();
   const user = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   return (
     <div className="w-full bg-black md:min-h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs p-1">
       {navbarItems.map((item) => (
-        <Link
+        <div
           key={item.name}
-          to={
-            item.path === "/channel"
-              ? `${item.path}/${user.user?._id}`
-              : item.path
-          }
           className={`flex flex-col items-center justify-center gap-2  py-5 px-1 rounded-md ${pathname === item.path ? "bg-blue-500 text-white" : "hover:bg-blue-950"}`}
+          onClick={() => {
+            if (user.user || item.path === "/") {
+              navigate(
+                item.path === "/channel"
+                  ? `${item.path}/${user.user?._id}`
+                  : item.path,
+              );
+            } else dispatch(selectLogin());
+          }}
         >
           <item.icon />
           <p>{item.name}</p>
-        </Link>
+        </div>
       ))}
     </div>
   );
@@ -43,6 +50,7 @@ export const ExpandSideNavBar = () => {
   const { subscription } = useSelector((state: RootState) => state.user);
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -51,25 +59,27 @@ export const ExpandSideNavBar = () => {
   }, [dispatch, user]);
 
   return (
-    <div className="w-full bg-black h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs py-3">
+    <div className="w-full bg-black h-screen border-r border-blue-950 flex flex-col gap-3 text-white/80 text-xs py-3 overflow-y-auto">
       {/* Home Page */}
       <div className="flex flex-col gap-2 items-start px-2 w-full">
         <h1 className="font-black text-white text-xl pb-3">Trang chủ</h1>
         {navBarItemsExpandHomePage.map((item) => (
-          <Link
+          <div
             key={item.name}
-            to={item.path}
             className={`flex items-center gap-2 hover:bg-blue-950 py-3 px-2 rounded-md w-full ${pathname === item.path ? "bg-blue-500 text-white" : "hover:bg-blue-950"} `}
+            onClick={() => {
+              navigate(item.path);
+            }}
           >
             <item.icon />
             <p>{item.name}</p>
-          </Link>
+          </div>
         ))}
       </div>
       {/* Subscription */}
-      <div className="flex flex-col gap-2 items-start px-2 w-full h-fit overflow-y-auto">
+      <div className="flex flex-col gap-2 items-start px-2 w-full h-fit ">
         <Link
-          to={`/subscription`}
+          to={user ? `/subscription` : "/"}
           className="font-black text-white text-xl pb-3 flex items-center gap-2 hover:text-white/80"
         >
           Kênh đăng ký
@@ -77,7 +87,7 @@ export const ExpandSideNavBar = () => {
         </Link>
         <div className="w-full flex flex-col gap-2">
           {subscription &&
-            subscription.map((sub) => (
+            subscription.slice(0, 10).map((sub) => (
               <Link
                 to={`/channel/${sub.channelId}`}
                 key={sub._id}
@@ -107,7 +117,7 @@ export const ExpandSideNavBar = () => {
         </div>
       </div>
       {/* Profile */}
-      <div className="flex flex-col gap-2 items-start px-2 w-full">
+      <div className="flex flex-col gap-2 items-start px-2 w-full mb-20">
         <h1 className="font-black text-white text-xl pb-3">Hồ sơ</h1>
         {navBarItemsExpandProfile.map((item) => (
           <Link

@@ -39,8 +39,10 @@ const LikedPage = () => {
   if (!likedVideo) return "/";
 
   return (
-    <div className="lg:mx-5 md:mx-2 lg:p-5 text-white flex w-full h-full gap-5 flex-col mb-100 lg:mb-60">
-      <h1 className="text-2xl font-extrabold">Video đã thích</h1>
+    <div className="lg:mx-5 md:mx-2 lg:p-5 text-white flex w-full h-full gap-5 flex-col mb-165 md:mb-130">
+      <h1 className="text-2xl font-extrabold mx-5 mt-5 lg:mx-0 lg:mt-0">
+        Video đã thích
+      </h1>
       <div className="flex lg:flex-row flex-col h-full">
         {likedVideo.length === 0 ? (
           <div className="flex flex-col absolute-center items-center justify-center gap-2">

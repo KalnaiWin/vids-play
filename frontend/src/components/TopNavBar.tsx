@@ -65,7 +65,7 @@ const TopNavBar = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(checkHasUnReadNotification());
+    if (user) dispatch(checkHasUnReadNotification());
   }, [dispatch]);
 
   return (

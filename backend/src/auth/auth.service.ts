@@ -126,6 +126,7 @@ export class AuthService {
 
   generateTokenAuth(userId: string, res: Response) {
     if (!userId) throw new BadRequestException('Invalid user ID');
+    const isProduction = process.env.NODE_ENV === 'production';
     const accessToken = this.generateAccessToken(String(userId));
     const refreshToken = this.generateRefreshToken(String(userId));
     res.cookie('access_token', accessToken, {
@@ -138,6 +139,12 @@ export class AuthService {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/',
+    });
+    res.cookie('is_logged_in', 'true', {
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
     });
     return { accessToken, refreshToken };
@@ -161,7 +168,12 @@ export class AuthService {
     );
     res.clearCookie('access_token', cookieOptions);
     res.clearCookie('refresh_token', cookieOptions);
-
+    res.clearCookie('is_logged_in', {
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
+    });
     return { message: 'Logout successfully' };
   }
 

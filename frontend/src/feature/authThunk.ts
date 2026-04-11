@@ -10,12 +10,13 @@ import { saveMessagingDeviceToken } from "../lib/firebase/messaging";
 export const fetchUser = createAsyncThunk(
   "auth/fetchUser",
   async (_, { rejectWithValue }) => {
+    if (!document.cookie.includes("is_logged_in=true")) return null;
     try {
       const res = await axiosInstance.get("/auth/me");
-      if (!res.data) return rejectWithValue("No user");
+      if (!res.data) return null;
       return res.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Error");
+      return rejectWithValue(null);
     }
   },
 );

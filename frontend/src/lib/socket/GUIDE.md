@@ -6,7 +6,7 @@
 1. startAsHost ( active when host click start live )
 	1.1. Send request to backend to create an access token
 		- Access token is a key to grant permission ( join room, stream, watch )
-		- Its payload include `( api_key, api_secret, identity )`, `identity`: who this user is in LiveKit
+		- Its payload include `( api_key, api_secret, identity ),` `identity`: who this user is in LiveKit
 		- `addGrant`: define what user can do:
 			+ join room, which room they can join
 			+ canPulish: allow user to send video, audio ( stream )

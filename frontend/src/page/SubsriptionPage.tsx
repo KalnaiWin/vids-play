@@ -10,9 +10,10 @@ import {
   timeAgo,
 } from "../types/helperFunction";
 import { getSubscriptionVideos } from "../feature/videoThunk";
-import { Play } from "lucide-react";
+import { ClockFading, Play } from "lucide-react";
 import AvatarPage from "../components/AvatarPage";
 import SubscriptionSkeleton from "../components/loader/home/SubscriptionSkeleton";
+import { selectLogin } from "../store/globalSlice";
 
 let didInitialFetch = false;
 
@@ -82,107 +83,152 @@ const SubsriptionPage = () => {
     };
   }, []);
 
+  if (!user)
+    return (
+      <div className="flex flex-col md:mx-20 text-center absolute-center items-center justify-center gap-2 text-white">
+        <div className="p-5 rounded-full bg-blue-950 mb-5 flex justify-center items-center">
+          <ClockFading className="size-20" />
+        </div>
+        <h1 className="text-xl font-bold">Lưu những kênh bạn quan tâm</h1>
+        <p className="font-semibold text-slate-400">
+          Hãy đăng nhập để lưu những kênh có nội dung bạn yêu thích
+        </p>
+        <button
+          className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 cursor-pointer mt-5"
+          onClick={() => dispatch(selectLogin())}
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
+
   if (status === "loading") return <SubscriptionSkeleton />;
 
   return (
-    <div className="text-white md:mx-5 p-5 flex flex-col gap-5">
-      <div className="flex flex-col">
-        <h1 className="font-black text-white text-xl pb-3">Kênh đăng ký</h1>
-        <div className="w-full flex gap-5 overflow-x-auto">
-          {subscription &&
-            subscription.map((sub) => (
-              <Link
-                to={`/channel/${sub.channelId}`}
-                key={sub._id}
-                className="flex flex-col justify-center items-center gap-2 w-fit hover:bg-slate-200/30 rounded-md cursor-pointer md:py-2 md:px-3"
-              >
-                <div>
-                  {sub.avatarUrl !== "" ? (
-                    <img
-                      src={sub.avatarUrl}
-                      alt="avatar"
-                      className="size-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        backgroundColor: getColorFromFirstLetter(sub?.name),
-                      }}
-                      className="size-10 rounded-full object-cover flex justify-center items-center font-bold text-white text-sm"
-                    >
-                      {sub?.name?.slice(0, 1)}
+    <div className="text-white md:mx-5 p-5">
+      {subscriptionVideos.length > 0 ? (
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col">
+            <h1 className="font-black text-white text-xl pb-3">Kênh đăng ký</h1>
+            <div className="w-full flex gap-5 overflow-x-auto">
+              {subscription &&
+                subscription.map((sub) => (
+                  <Link
+                    to={`/channel/${sub.channelId}`}
+                    key={sub._id}
+                    className="flex flex-col justify-center items-center gap-2 w-fit hover:bg-slate-200/30 rounded-md cursor-pointer md:py-2 md:px-3"
+                  >
+                    <div>
+                      {sub.avatarUrl !== "" ? (
+                        <img
+                          src={sub.avatarUrl}
+                          alt="avatar"
+                          className="size-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            backgroundColor: getColorFromFirstLetter(sub?.name),
+                          }}
+                          className="size-10 rounded-full object-cover flex justify-center items-center font-bold text-white text-sm"
+                        >
+                          {sub?.name?.slice(0, 1)}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <h1 className="text-white md:text-lg text-sm">{sub.name}</h1>
-              </Link>
-            ))}
-        </div>
-      </div>
-      <div className="flex flex-col mb-10">
-        <h1 className="font-black text-white text-xl pb-3">Video mới nhất</h1>
-        <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subscriptionVideos.map((video) => (
-              <div
-                key={video._id}
-                className="group flex flex-col gap-3 cursor-pointer transition-transform duration-200"
-                onClick={() => {
-                  navigate(`/watch/${video._id}`);
-                }}
-              >
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 shadow-md transition-shadow group-hover:shadow-blue-500/10">
-                  <video
-                    src={video.videoUrl}
-                    poster={video.thumbnailUrl}
-                    preload="none"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 rounded text-[11px] font-bold text-white">
-                    {formatDuration(Number(video.duration))}
-                  </div>
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-12 h-12 p-2 bg-blue-600 rounded-full flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                      <Play className="size-24" />
+                    <h1 className="text-white md:text-lg text-sm">
+                      {sub.name}
+                    </h1>
+                  </Link>
+                ))}
+            </div>
+          </div>
+          <div className="flex flex-col mb-10">
+            <h1 className="font-black text-white text-xl pb-3">
+              Video mới nhất
+            </h1>
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {subscriptionVideos.map((video) => (
+                  <div
+                    key={video._id}
+                    className="group flex flex-col gap-3 cursor-pointer transition-transform duration-200"
+                    onClick={() => {
+                      navigate(`/watch/${video._id}`);
+                    }}
+                  >
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 shadow-md transition-shadow group-hover:shadow-blue-500/10">
+                      <video
+                        src={video.videoUrl}
+                        poster={video.thumbnailUrl}
+                        preload="none"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 rounded text-[11px] font-bold text-white">
+                        {formatDuration(Number(video.duration))}
+                      </div>
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="w-12 h-12 p-2 bg-blue-600 rounded-full flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                          <Play className="size-24" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex gap-3 px-1">
-                  <div>
-                    <AvatarPage
-                      name={video.owner.name}
-                      image={video.owner.avatarUrl}
-                      size="10"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <h3 className="text-[15px] font-semibold text-zinc-100 leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
-                      {video?.title}
-                    </h3>
-                    <div className="mt-1 flex flex-col text-[13px] text-zinc-400">
-                      <span className="hover:text-zinc-200 transition-colors">
-                        {video?.owner?.name}
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <span>
-                          {formatViewCount(video?.viewCount) || 0} views
-                        </span>
-                        <span className="w-0.5 h-0.5 rounded-full bg-zinc-600"></span>
-                        <span>{timeAgo(video?.createdAt)}</span>
+                    <div className="flex gap-3 px-1">
+                      <div>
+                        <AvatarPage
+                          name={video.owner.name}
+                          image={video.owner.avatarUrl}
+                          size="10"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <h3 className="text-[15px] font-semibold text-zinc-100 leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
+                          {video?.title}
+                        </h3>
+                        <div className="mt-1 flex flex-col text-[13px] text-zinc-400">
+                          <span className="hover:text-zinc-200 transition-colors">
+                            {video?.owner?.name}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span>
+                              {formatViewCount(video?.viewCount) || 0} views
+                            </span>
+                            <span className="w-0.5 h-0.5 rounded-full bg-zinc-600"></span>
+                            <span>{timeAgo(video?.createdAt)}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div ref={sentinelRef} className="py-8 flex justify-center">
-            {!hasMore && subscriptionVideos.length > 0 && (
-              <p className="text-zinc-500 text-sm">You've reached the end</p>
-            )}
+              <div ref={sentinelRef} className="py-8 flex justify-center">
+                {!hasMore && subscriptionVideos.length > 0 && (
+                  <p className="text-zinc-500 text-sm">
+                    You've reached the end
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col absolute-center items-center justify-center gap-2">
+          <div className="p-5 rounded-full bg-blue-950 mb-5 flex justify-center items-center">
+            <ClockFading className="size-20" />
+          </div>
+          <h1 className="text-xl font-bold">Lưu những kênh bạn yêu thích</h1>
+          <p className="font-semibold text-slate-400">
+            Hiện chưa có kênh nào khiến bạn thích thú. Xem thêm tại đây
+          </p>
+          <Link
+            to={`/`}
+            className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 mt-5"
+          >
+            Khám phá kênh mới
+          </Link>
+        </div>
+      )}
     </div>
   );
 };
