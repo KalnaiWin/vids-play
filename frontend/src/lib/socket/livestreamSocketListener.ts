@@ -53,13 +53,7 @@ export const startAsHost = async (
     audio: true,
   });
   screenTrack = screenPub?.videoTrack as LocalVideoTrack;
-
   screenAudioTrack = screenPub?.audioTrack as LocalAudioTrack;
-  if (screenAudioTrack) {
-    await room.localParticipant.publishTrack(screenAudioTrack, {
-      source: Track.Source.ScreenShareAudio,
-    });
-  }
 
   // Attach locally
   if (hostRef.current) cameraTrack.attach(hostRef.current);
@@ -110,18 +104,19 @@ export const joinAsViewer = async (
   // === RECOVER EXISTING AUDIO TRACKS ===
   room.remoteParticipants.forEach((participant) => {
     participant.trackPublications.forEach((pub) => {
-      if (!pub.track || !pub.isSubscribed) return;
-
-      // ← Correct property
-      if (pub.kind === Track.Kind.Audio && pub.track) {
-        const audioEl = pub.track.attach() as HTMLAudioElement;
-        audioEl.style.display = "none";
-        document.body.appendChild(audioEl);
-        audioElements.push(audioEl);
+      if (pub.track && pub.isSubscribed) {
+        if (pub.kind === Track.Kind.Audio) {
+          const audioEl = pub.track.attach() as HTMLAudioElement;
+          audioEl.style.display = "none";
+          document.body.appendChild(audioEl);
+          audioEl.play().catch(() => {});
+          audioElements.push(audioEl);
+        }
+      } else if (!pub.isSubscribed && pub.track) {
+        pub.setSubscribed(true);
       }
     });
   });
-
   // Cleanup when component unmounts (optional)
   return () => {
     audioElements.forEach((el) => {
