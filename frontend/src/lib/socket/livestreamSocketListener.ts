@@ -42,7 +42,11 @@ export const startAsHost = async (
   });
 
   // Audio from mic
-  micAudioTrack = await createLocalAudioTrack();
+  micAudioTrack = await createLocalAudioTrack({
+    echoCancellation: true, // ✅ cancels screen share audio feedback
+    noiseSuppression: true, // ✅ removes background noise
+    autoGainControl: true, // ✅ normalizes volume
+  });
   await room.localParticipant.publishTrack(micAudioTrack, {
     source: Track.Source.Microphone,
   });
