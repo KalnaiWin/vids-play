@@ -74,7 +74,7 @@ const VideoMainPage = () => {
     return <VideoMainPageSkeleton />;
 
   return (
-    <div className="text-white min-h-screen mx-10 text-sm">
+    <div className="text-white min-h-screen md:mx-10 mx-5 text-sm">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {videos.map((video) => (
           <div

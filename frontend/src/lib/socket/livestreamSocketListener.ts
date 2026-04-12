@@ -14,7 +14,8 @@ const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
 let room: Room;
 let cameraTrack: LocalVideoTrack;
 let screenTrack: LocalVideoTrack;
-let audioTrack: LocalAudioTrack;
+// let screenAudioTrack: LocalAudioTrack;
+let micAudioTrack: LocalAudioTrack;
 
 // ── HOST ─────────────────────────────────────────────────────────────────────
 
@@ -40,15 +41,16 @@ export const startAsHost = async (
     source: Track.Source.Camera,
   });
 
-  // Audio
-  audioTrack = await createLocalAudioTrack();
-  await room.localParticipant.publishTrack(audioTrack, {
+  // Audio from mic
+  micAudioTrack = await createLocalAudioTrack();
+  await room.localParticipant.publishTrack(micAudioTrack, {
     source: Track.Source.Microphone,
   });
 
   // Screen share
   const screenPub = await room.localParticipant.setScreenShareEnabled(true, {
     video: { displaySurface: "monitor" },
+    audio: true,
   });
   screenTrack = screenPub?.videoTrack as LocalVideoTrack;
 
@@ -145,10 +147,10 @@ export const toggleCamera = async (
 export const toggleMicro = (
   setToggleMicro: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
-  if (!audioTrack) return;
+  if (!micAudioTrack) return;
 
-  const willEnable = audioTrack.isMuted;
-  willEnable ? audioTrack.unmute() : audioTrack.mute();
+  const willEnable = micAudioTrack.isMuted;
+  willEnable ? micAudioTrack.unmute() : micAudioTrack.mute();
   setToggleMicro(willEnable);
 };
 
@@ -158,5 +160,5 @@ export const stopStream = async (roomId: string) => {
   room = undefined as any;
   cameraTrack = undefined as any;
   screenTrack = undefined as any;
-  audioTrack = undefined as any;
+  micAudioTrack = undefined as any;
 };

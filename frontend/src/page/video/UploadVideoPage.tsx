@@ -97,7 +97,7 @@ const UploadVideoPage = () => {
   };
 
   return (
-    <div className="text-slate-300 mx-5 flex flex-col gap-2 relative">
+    <div className="text-slate-300 md:mx-5 flex flex-col gap-2 relative">
       {statusCreating === "loading" && files.videoUrl && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="sm:w-[25%] w-[40%] bg-slate-200 rounded-2xl p-6 flex flex-col items-center gap-6 shadow-xl">
@@ -179,8 +179,8 @@ const UploadVideoPage = () => {
                   khi đăng lên
                 </div>
               </div>
-              <div className="flex md:flex-row flex-col gap-2 w-full md:h-40 h-10">
-                <div className="relative border border-dashed text-slate-500 bg-slate-950 border-slate-500 flex flex-col justify-center items-center md:w-1/3 h-1/6 md:h-full w-full rounded-xl">
+              <div className="flex md:flex-row flex-col gap-2 w-full md:h-40 h-200">
+                <div className="relative border border-dashed text-slate-500 bg-slate-950 border-slate-500 flex flex-col justify-center items-center md:w-1/3 h-1/3 md:h-full w-full rounded-xl">
                   <input
                     type="file"
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"

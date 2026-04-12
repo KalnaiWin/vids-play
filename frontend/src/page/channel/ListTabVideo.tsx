@@ -13,7 +13,7 @@ const ListTabVideo = () => {
 
   return (
     <div>
-      <div className="flex md:gap-5 md:text-lg text-sm md:justify-start justify-between">
+      <div className="flex md:gap-5 sm:text-sm xl:text-lg text-xs md:justify-start justify-between">
         {typeVideo.map((type) => (
           <div
             key={type.path}

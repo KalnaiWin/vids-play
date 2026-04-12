@@ -256,9 +256,9 @@ const RoomStreaming = () => {
                         hostRef,
                         screenRef,
                       );
-                      // await dispatch(
-                      //   changeStatusRoom({ id: String(id), status: "LIVE" }),
-                      // );
+                      await dispatch(
+                        changeStatusRoom({ id: String(id), status: "LIVE" }),
+                      );
                       setIsStreaming(true);
                       socket.emit("start-stream", {
                         roomId: streamingRoom._id,
