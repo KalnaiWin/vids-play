@@ -159,7 +159,7 @@ const RoomStreaming = () => {
                   className="aspect-video w-full"
                 />
                 <div
-                  className={`absolute rounded-xl bottom-2 right-2 md:w-[20%] w-[22%] bg-zinc-600 overflow-hidden transition-all duration-200 ${
+                  className={`absolute rounded-xl md:bottom-3 md:right-3 bottom-1 right-1 md:w-[20%] w-[22%] bg-zinc-600 overflow-hidden transition-all duration-200 ${
                     hostCameraOn ? "opacity-100 visible" : "opacity-0 invisible"
                   }`}
                   style={{ aspectRatio: "7/5" }}

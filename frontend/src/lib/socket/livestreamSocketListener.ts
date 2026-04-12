@@ -149,12 +149,14 @@ export const toggleMicro = (
   setToggleMicro: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   if (!micAudioTrack) return;
-
   const willEnable = micAudioTrack.isMuted;
-  willEnable ? micAudioTrack.unmute() : micAudioTrack.mute();
+  if (willEnable) {
+    micAudioTrack.unmute();
+  } else {
+    micAudioTrack.mute();
+  }
   setToggleMicro(willEnable);
 };
-
 export const stopStream = async (roomId: string) => {
   socket.emit("stream-ended", { roomId });
   await room?.disconnect();
