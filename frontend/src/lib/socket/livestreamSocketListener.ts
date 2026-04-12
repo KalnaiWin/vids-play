@@ -14,7 +14,7 @@ const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
 let room: Room;
 let cameraTrack: LocalVideoTrack;
 let screenTrack: LocalVideoTrack;
-// let screenAudioTrack: LocalAudioTrack;
+let screenAudioTrack: LocalAudioTrack;
 let micAudioTrack: LocalAudioTrack;
 
 // ── HOST ─────────────────────────────────────────────────────────────────────
@@ -57,7 +57,14 @@ export const startAsHost = async (
     audio: true,
   });
   screenTrack = screenPub?.videoTrack as LocalVideoTrack;
+  screenAudioTrack = screenPub?.audioTrack as LocalAudioTrack;
 
+  if (screenAudioTrack) {
+    await room.localParticipant.publishTrack(screenAudioTrack, {
+      source: Track.Source.ScreenShareAudio,
+    });
+    screenAudioTrack.mediaStreamTrack.enabled = false;
+  }
   // Attach locally
   if (hostRef.current) cameraTrack.attach(hostRef.current);
   if (screenRef.current && screenTrack) screenTrack.attach(screenRef.current);
@@ -167,6 +174,6 @@ export const stopStream = async (roomId: string) => {
   room = undefined as any;
   cameraTrack = undefined as any;
   screenTrack = undefined as any;
-  // screenAudioTrack = undefined as any;
+  screenAudioTrack = undefined as any;
   micAudioTrack = undefined as any;
 };
