@@ -167,7 +167,7 @@ const RoomStreaming = () => {
                     autoPlay
                     playsInline
                     ref={cameraRef}
-                    className="w-full h-full object-cover"
+                    className="xl:w-full w-[50%] h-full object-cover"
                   />
                 </div>
                 {streamEnded && (
@@ -185,18 +185,20 @@ const RoomStreaming = () => {
                   autoPlay
                   playsInline
                   ref={screenRef}
-                  className="aspect-video w-full"
+                  className="w-full h-full object-contain"
                 />
                 <div
-                  className={`absolute rounded-xl bottom-2 right-2 w-64 h-36 bg-zinc-600 overflow-hidden transition-all duration-200 ${
+                  className={`absolute rounded-xl md:bottom-3 md:right-3 bottom-1 right-1 bg-zinc-600 overflow-hidden transition-all duration-200 ${
                     isToggleCamera
                       ? "opacity-100 visible"
                       : "opacity-0 invisible"
-                  }`}
+                  } md:w-[20%] w-[22%] `}
+                  style={{ aspectRatio: "7/5" }}
                 >
                   <video
                     autoPlay
                     playsInline
+                    muted
                     ref={hostRef}
                     className="w-full h-full object-cover"
                   />
