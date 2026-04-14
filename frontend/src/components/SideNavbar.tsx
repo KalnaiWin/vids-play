@@ -9,8 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { fetchSubscriptions } from "../feature/userThunk";
 import { getColorFromFirstLetter } from "../types/helperFunction";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
 import { selectLogin } from "../store/globalSlice";
+import { clearAuthFlag } from "../types/utils/auth";
+import { logout } from "../feature/authThunk";
 
 const SideNavbar = () => {
   const { pathname } = useLocation();
@@ -117,7 +119,7 @@ export const ExpandSideNavBar = () => {
         </div>
       </div>
       {/* Profile */}
-      <div className="flex flex-col gap-2 items-start px-2 w-full mb-20">
+      <div className="flex flex-col gap-2 items-start px-2 w-full mb-10">
         <h1 className="font-black text-white text-xl pb-3">Hồ sơ</h1>
         {navBarItemsExpandProfile.map((item) => (
           <Link
@@ -129,6 +131,19 @@ export const ExpandSideNavBar = () => {
             <p>{item.name}</p>
           </Link>
         ))}
+        <button
+          title="Đăng xuất"
+          className="text-red-800 bg-red-100 rounded-md p-2 cursor-pointer flex items-center gap-2 w-full justify-center"
+          onClick={async () => {
+            const fcmToken = localStorage.getItem("current_fcm_token");
+            localStorage.removeItem("current_fcm_token");
+            clearAuthFlag();
+            dispatch(logout(String(fcmToken)));
+          }}
+        >
+          <LogOut />
+          <p className="font-bold">Đăng xuất</p>
+        </button>
       </div>
     </div>
   );

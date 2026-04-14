@@ -140,6 +140,15 @@ const RoomStreaming = () => {
     dispatch(recommendVideos({ id: String(id) }));
   }, [dispatch, id, statusSubscribe]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
   if (!streamingRoom) return <p>Loading...</p>;
 
   return (
@@ -188,7 +197,10 @@ const RoomStreaming = () => {
                 )}
               </div>
             ) : (
-              <div className="relative aspect-video w-full bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
+              <div
+                ref={containerRef}
+                className="group relative aspect-video w-full bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+              >
                 <video
                   autoPlay
                   playsInline
@@ -196,6 +208,12 @@ const RoomStreaming = () => {
                   ref={screenRef}
                   className="w-full h-full object-contain"
                 />
+                <button
+                  onClick={handleFullscreen}
+                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/60 hover:bg-black text-white p-2 rounded-lg"
+                >
+                  ⛶
+                </button>
                 <div
                   className={`absolute rounded-xl md:bottom-3 md:right-3 bottom-1 right-1 bg-zinc-600 overflow-hidden transition-all duration-200 ${
                     isToggleCamera
