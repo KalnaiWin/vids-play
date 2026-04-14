@@ -51,9 +51,9 @@ export const startAsHost = async (
 
   // Screen share
   const screenTracks = await room.localParticipant.createScreenTracks({
-    video: { displaySurface: "monitor" }, // or "window"
-    audio: true, // or { ... } if you want more control
-    suppressLocalAudioPlayback: true, // ← Correct place
+    video: { displaySurface: "monitor" }, 
+    audio: true, 
+    suppressLocalAudioPlayback: true, 
   });
 
   for (const track of screenTracks) {
@@ -65,6 +65,8 @@ export const startAsHost = async (
       screenAudioTrack = track as LocalAudioTrack;
     }
   }
+  await room.localParticipant.publishTrack(screenAudioTrack);
+
   // Attach locally
   if (screenRef.current && screenTrack) screenTrack.attach(screenRef.current);
   if (hostRef.current) cameraTrack.attach(hostRef.current);
@@ -78,7 +80,7 @@ export const joinAsViewer = async (
   roomId: string,
   cameraRef: React.RefObject<HTMLVideoElement | null>,
   sharedRef: React.RefObject<HTMLVideoElement | null>,
-  isHost: boolean = false, 
+  isHost: boolean = false,
 ) => {
   const { token } = await new Promise<{ token: string }>((resolve) => {
     socket.emit("get-viewer-token", { roomId }, resolve);
