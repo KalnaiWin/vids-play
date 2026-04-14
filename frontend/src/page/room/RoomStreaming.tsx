@@ -165,7 +165,10 @@ const RoomStreaming = () => {
         <div className="mx-auto flex flex-col gap-6">
           <div className="aspect-video w-full relative">
             {user?._id !== streamingRoom.host._id ? (
-              <div className="relative aspect-video w-full bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
+              <div
+                ref={containerRef}
+                className="group relative aspect-video w-full bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
+              >
                 <video
                   autoPlay
                   playsInline
@@ -173,6 +176,12 @@ const RoomStreaming = () => {
                   ref={sharedRef}
                   className="aspect-video w-full"
                 />
+                <button
+                  onClick={handleFullscreen}
+                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/60 hover:bg-black text-white p-2 rounded-lg"
+                >
+                  ⛶
+                </button>
                 <div
                   className={`absolute rounded-xl md:bottom-3 md:right-3 bottom-1 right-1 bg-zinc-600 overflow-hidden transition-all duration-200 ${
                     hostCameraOn ? "opacity-100 visible" : "opacity-0 invisible"
