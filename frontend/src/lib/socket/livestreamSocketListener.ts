@@ -47,27 +47,27 @@ export const startAsHost = async (
     noiseSuppression: true, // ✅ removes background noise
     autoGainControl: true, // ✅ normalizes volume
   });
-  await room.localParticipant.publishTrack(micAudioTrack, {
-    source: Track.Source.Microphone,
-  });
+  await room.localParticipant.publishTrack(micAudioTrack);
 
   // Screen share
-  const screenPub = await room.localParticipant.setScreenShareEnabled(true, {
-    video: { displaySurface: "monitor" },
-    audio: true,
+  const screenTracks = await room.localParticipant.createScreenTracks({
+    video: { displaySurface: "monitor" }, // or "window"
+    audio: true, // or { ... } if you want more control
+    suppressLocalAudioPlayback: true, // ← Correct place
   });
-  screenTrack = screenPub?.videoTrack as LocalVideoTrack;
-  screenAudioTrack = screenPub?.audioTrack as LocalAudioTrack;
 
-  if (screenAudioTrack) {
-    await room.localParticipant.publishTrack(screenAudioTrack, {
-      source: Track.Source.ScreenShareAudio,
-    });
-    screenAudioTrack.mediaStreamTrack.enabled = false;
+  for (const track of screenTracks) {
+    await room.localParticipant.publishTrack(track);
+
+    if (track.kind === Track.Kind.Video) {
+      screenTrack = track as LocalVideoTrack;
+    } else if (track.kind === Track.Kind.Audio) {
+      screenAudioTrack = track as LocalAudioTrack;
+    }
   }
   // Attach locally
-  if (hostRef.current) cameraTrack.attach(hostRef.current);
   if (screenRef.current && screenTrack) screenTrack.attach(screenRef.current);
+  if (hostRef.current) cameraTrack.attach(hostRef.current);
 
   // Emit AFTER everything is published
   socket.emit("start-stream", { roomId });
@@ -78,20 +78,18 @@ export const joinAsViewer = async (
   roomId: string,
   cameraRef: React.RefObject<HTMLVideoElement | null>,
   sharedRef: React.RefObject<HTMLVideoElement | null>,
+  isHost: boolean = false, 
 ) => {
   const { token } = await new Promise<{ token: string }>((resolve) => {
     socket.emit("get-viewer-token", { roomId }, resolve);
   });
 
-  if (room) {
-    await room.disconnect().catch(() => {});
-  }
-
+  if (room) await room.disconnect().catch(() => {});
   room = new Room();
 
   const audioElements: HTMLAudioElement[] = [];
 
-  room.on(RoomEvent.TrackSubscribed, (track, _publication) => {
+  room.on(RoomEvent.TrackSubscribed, (track) => {
     if (track.kind === Track.Kind.Video) {
       if (track.source === Track.Source.Camera && cameraRef.current) {
         track.attach(cameraRef.current);
@@ -102,20 +100,25 @@ export const joinAsViewer = async (
         track.attach(sharedRef.current);
       }
     } else if (track.kind === Track.Kind.Audio) {
+      if (isHost) return; // ✅ host never plays back their own audio
+
       const audioEl = track.attach() as HTMLAudioElement;
       audioEl.style.display = "none";
       document.body.appendChild(audioEl);
+      audioEl.play().catch(() => {});
       audioElements.push(audioEl);
     }
   });
 
   await room.connect(LIVEKIT_URL, token);
 
-  // === RECOVER EXISTING AUDIO TRACKS ===
+  // Recover existing tracks
   room.remoteParticipants.forEach((participant) => {
     participant.trackPublications.forEach((pub) => {
       if (pub.track && pub.isSubscribed) {
         if (pub.kind === Track.Kind.Audio) {
+          if (isHost) return; // ✅ skip audio for host
+
           const audioEl = pub.track.attach() as HTMLAudioElement;
           audioEl.style.display = "none";
           document.body.appendChild(audioEl);
@@ -127,7 +130,7 @@ export const joinAsViewer = async (
       }
     });
   });
-  // Cleanup when component unmounts (optional)
+
   return () => {
     audioElements.forEach((el) => {
       el.pause();

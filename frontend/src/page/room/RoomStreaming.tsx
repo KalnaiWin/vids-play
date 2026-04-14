@@ -100,7 +100,12 @@ const RoomStreaming = () => {
     const handleStartStream = async () => {
       if (hasJoinedRef.current) return;
       hasJoinedRef.current = true;
-      await joinAsViewer(String(streamingRoom._id), cameraRef, sharedRef);
+      await joinAsViewer(
+        String(streamingRoom._id),
+        cameraRef,
+        sharedRef,
+        isHost,
+      );
     };
 
     // Case 1: Viewer joins while stream is already live (late joiner)
@@ -160,9 +165,9 @@ const RoomStreaming = () => {
                   className="aspect-video w-full"
                 />
                 <div
-                  className={`absolute rounded-xl md:bottom-3 md:right-3 bottom-1 right-1 w-full bg-zinc-600 overflow-hidden transition-all duration-200 ${
+                  className={`absolute rounded-xl md:bottom-3 md:right-3 bottom-1 right-1 bg-zinc-600 overflow-hidden transition-all duration-200 ${
                     hostCameraOn ? "opacity-100 visible" : "opacity-0 invisible"
-                  }`}
+                  } md:w-[20%] w-[22%]`}
                   style={{ aspectRatio: "7/5" }}
                 >
                   <video
@@ -170,7 +175,7 @@ const RoomStreaming = () => {
                     playsInline
                     muted
                     ref={cameraRef}
-                    className="xl:w-full w-[50%] h-full object-cover"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 {streamEnded && (
