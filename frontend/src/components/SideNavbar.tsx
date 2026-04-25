@@ -131,19 +131,21 @@ export const ExpandSideNavBar = () => {
             <p>{item.name}</p>
           </Link>
         ))}
-        <button
-          title="Đăng xuất"
-          className="text-red-800 bg-red-100 rounded-md p-2 cursor-pointer flex items-center gap-2 w-full justify-center"
-          onClick={async () => {
-            const fcmToken = localStorage.getItem("current_fcm_token");
-            localStorage.removeItem("current_fcm_token");
-            clearAuthFlag();
-            dispatch(logout(String(fcmToken)));
-          }}
-        >
-          <LogOut />
-          <p className="font-bold">Đăng xuất</p>
-        </button>
+        {user && (
+          <button
+            title="Đăng xuất"
+            className="text-red-800 bg-red-100 rounded-md p-2 cursor-pointer flex items-center gap-2 w-full justify-center"
+            onClick={async () => {
+              const fcmToken = localStorage.getItem("current_fcm_token");
+              localStorage.removeItem("current_fcm_token");
+              clearAuthFlag();
+              dispatch(logout(String(fcmToken)));
+            }}
+          >
+            <LogOut />
+            <p className="font-bold">Đăng xuất</p>
+          </button>
+        )}
       </div>
     </div>
   );
