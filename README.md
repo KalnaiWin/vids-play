@@ -8,7 +8,7 @@ It is built with modern web technologies ( NestJs, React ) and focuses on scalab
 ## 🌍 Live Demo
 Deploy: https://vids-play.onrender.com
 
-Video Demo: 
+Video Demo: https://www.facebook.com/reel/1256487913346659
 
 ## 🧠 Challenges & What I Learned
 
